@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>مُوصل | MOWASIL DELIVERY</title>
-<meta name="description" content="مُوصل: منصة الشركات لتنظيم ومتابعة شحناتها وتحصيلها المالي وإدارة أسطولها — بوضعَي الشركات التجارية والجمعيات الخيرية، وواجهة عربية/إنجليزية." />
+<meta name="description" content="مُوصل: منصة الشركات لتنظيم ومتابعة شحناتها وإدارة أسطولها بأدوار (مدير/منسق/سائق) وواجهة عربية/إنجليزية." />
 
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -88,8 +88,8 @@
     dialog[open], dialog[open] *{ visibility:visible !important; }
     dialog[open]{ position:absolute !important; inset:0 !important; max-height:none !important; }
     dialog[open] .no-print{ display:none !important; }
-    #report-card, #invoice-doc-card{ box-shadow:none !important; border:none !important; background:#fff !important; color:#111 !important; max-height:none !important; overflow:visible !important; }
-    #report-card *, #invoice-doc-card *{ color:#111 !important; border-color:#ccc !important; }
+    #report-card{ box-shadow:none !important; border:none !important; background:#fff !important; color:#111 !important; max-height:none !important; overflow:visible !important; }
+    #report-card *{ color:#111 !important; border-color:#ccc !important; }
   }
 </style>
 </head>
@@ -191,10 +191,6 @@
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
         <span data-t="nav_delays">إدارة التأخير</span>
       </a>
-      <a class="nav-link" data-route="invoices">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6"/></svg>
-        <span data-mt="nav_invoices">الفواتير والتحصيل</span>
-      </a>
       <a class="nav-link" data-route="fleet">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 13l2-5a2 2 0 012-1h10a2 2 0 012 1l2 5v5h-3M6 18H3v-5M7 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM17 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM8 18h8"/></svg>
         <span data-t="nav_fleet">المركبات والصيانة</span>
@@ -289,11 +285,18 @@
       <h3 class="font-extrabold text-lg" data-t="delay_title">تسجيل / تعديل سبب التأخير</h3>
       <button value="cancel" class="btn btn-ghost !p-2" aria-label="Close">✕</button>
     </div>
-    <p class="text-sm text-slate-400 mb-4"><span data-mt="shipment_word"></span> <span id="dm-ship" class="font-bold text-slate-200"></span> — <span id="dm-client" class="text-slate-300"></span></p>
+    <p class="text-sm text-slate-400 mb-3"><span data-mt="shipment_word"></span> <span id="dm-ship" class="font-bold text-slate-200"></span> — <span id="dm-client" class="text-slate-300"></span></p>
+    <div id="dm-log" class="hidden mb-3 text-xs bg-ink-900 border border-ink-500 rounded-lg p-3 text-slate-300 space-y-1 max-h-32 overflow-y-auto"></div>
     <div class="space-y-4">
       <div><label data-t="delay_reason">سبب التأخير</label><select id="dm-reason"></select></div>
-      <div><label data-t="note_opt">ملاحظة (اختياري)</label><textarea id="dm-note" rows="3"></textarea></div>
+      <div><label data-t="note_opt">ملاحظة (اختياري)</label><textarea id="dm-note" rows="2"></textarea></div>
       <div><label data-t="update_status">تحديث الحالة</label><select id="dm-status"></select></div>
+      <div class="border-t border-ink-500 pt-3"><div class="text-xs font-bold text-slate-300 mb-2" data-t="new_eta">الموعد الجديد المتوقع (اختياري)</div>
+        <div class="grid grid-cols-2 gap-3">
+          <div><label data-t="eta_date">التاريخ</label><input id="dm-eta-date" type="date" /></div>
+          <div><label data-t="eta_time">الوقت</label><input id="dm-eta-time" type="time" /></div>
+        </div>
+      </div>
     </div>
     <div class="flex gap-2 mt-6 no-print">
       <button value="save" class="btn btn-brand flex-1 justify-center" data-t="save">حفظ</button>
@@ -311,39 +314,23 @@
     </div>
     <div class="grid grid-cols-2 gap-4">
       <div class="col-span-2 sm:col-span-1"><label data-mt="client_word"></label><input id="sm-client" required /></div>
+      <div class="col-span-2 sm:col-span-1"><label data-t="cust_phone">جوال العميل</label><input id="sm-phone" inputmode="tel" placeholder="05xxxxxxxx" /></div>
       <div class="col-span-2 sm:col-span-1"><label data-t="city">المدينة</label><select id="sm-city"></select></div>
       <div class="col-span-2 sm:col-span-1"><label data-mt="branch_word"></label><select id="sm-branch"></select></div>
+      <div class="col-span-2"><label data-t="cust_address">عنوان العميل</label><input id="sm-address" /></div>
       <div class="col-span-2 sm:col-span-1"><label data-t="status">الحالة</label><select id="sm-status"></select></div>
-      <div class="col-span-2 sm:col-span-1" id="sm-amount-wrap"><label data-t="amount">المبلغ</label><input id="sm-amount" type="number" min="0" value="300" /></div>
-      <div class="col-span-2 sm:col-span-1"><label data-t="eta">الوقت المتوقع</label><input id="sm-eta" placeholder="03:30 م" /></div>
-      <div class="col-span-2 hidden" id="sm-noamount-wrap">
-        <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="sm-noamount" class="!w-auto" /> <span data-t="no_amount">لا يوجد مبلغ</span></label>
+      <div class="col-span-2 sm:col-span-1"><label data-t="driver">السائق</label><input id="sm-driver" list="sm-drivers-dl" placeholder="—" /><datalist id="sm-drivers-dl"></datalist></div>
+      <div class="col-span-2 border-t border-ink-500 pt-3"><div class="text-xs font-bold text-slate-300 mb-2" data-t="eta_datetime">الموعد المتوقع</div>
+        <div class="grid grid-cols-2 gap-3">
+          <div><label data-t="eta_date">التاريخ</label><input id="sm-eta-date" type="date" /></div>
+          <div><label data-t="eta_time">الوقت</label><input id="sm-eta-time" type="time" /></div>
+        </div>
+        <div class="flex items-end gap-2 mt-2">
+          <div class="flex-1"><label data-t="eta_days">أيام من الآن</label><input id="sm-eta-days" type="number" min="0" placeholder="0" /></div>
+          <div class="flex-1"><label data-t="eta_hours">ساعات</label><input id="sm-eta-hours" type="number" min="0" placeholder="0" /></div>
+          <button type="button" id="sm-eta-calc" class="btn btn-ghost !py-2 text-xs" data-t="calc_btn">احسب</button>
+        </div>
       </div>
-      <div class="col-span-2 sm:col-span-1" id="sm-invno-wrap"><label data-t="invoice_no_field">رقم الفاتورة (إلزامي)</label><input id="sm-invno" placeholder="INV-2051" /></div>
-      <div class="col-span-2"><label data-t="driver">السائق</label><input id="sm-driver" list="sm-drivers-dl" placeholder="—" /><datalist id="sm-drivers-dl"></datalist></div>
-    </div>
-    <div class="flex gap-2 mt-6 no-print">
-      <button value="save" class="btn btn-brand flex-1 justify-center" data-t="save">حفظ</button>
-      <button value="cancel" class="btn btn-ghost" data-t="cancel">إلغاء</button>
-    </div>
-  </form>
-</dialog>
-
-<!-- إضافة فاتورة -->
-<dialog id="invoice-modal" class="w-[min(92vw,520px)]">
-  <form method="dialog" class="card p-6">
-    <div class="flex items-center justify-between mb-4">
-      <h3 class="font-extrabold text-lg" id="im-title"></h3>
-      <button value="cancel" class="btn btn-ghost !p-2" aria-label="Close">✕</button>
-    </div>
-    <div class="space-y-4">
-      <div><label data-t="invoice_no">رقم الفاتورة</label><input id="im-id" readonly class="opacity-70" /></div>
-      <div><label data-t="linked_shipment">الشحنة المرتبطة</label><select id="im-ship"></select></div>
-      <div class="grid grid-cols-2 gap-4">
-        <div><label data-t="amount">المبلغ</label><input id="im-amount" type="number" min="0" /></div>
-        <div><label data-t="due_date">تاريخ الاستحقاق</label><input id="im-due" type="date" /></div>
-      </div>
-      <div><label data-t="pay_status">حالة الدفع</label><select id="im-status"></select></div>
     </div>
     <div class="flex gap-2 mt-6 no-print">
       <button value="save" class="btn btn-brand flex-1 justify-center" data-t="save">حفظ</button>
@@ -367,7 +354,6 @@
       <div class="col-span-2 sm:col-span-1"><label data-t="odometer">قراءة العدّاد (كم)</label><input id="vm-odo" type="number" min="0" /></div>
       <div class="col-span-2 sm:col-span-1"><label data-t="next_service_date">تاريخ الصيانة القادمة</label><input id="vm-date" type="date" /></div>
       <div class="col-span-2 sm:col-span-1"><label data-t="service_type">نوع الصيانة</label><select id="vm-service"></select></div>
-      <div class="col-span-2 sm:col-span-1"><label data-t="service_cost">تكلفة الصيانة المتوقعة</label><input id="vm-cost" type="number" min="0" /></div>
       <div class="col-span-2">
         <label data-t="vehicle_photo">صورة المركبة (تُضغط تلقائياً)</label>
         <input id="vm-photo" type="file" accept="image/*" class="!p-2" />
@@ -438,7 +424,6 @@
           <label class="flex items-center gap-2"><input type="checkbox" id="um-perm-dashboard" class="!w-auto" /> <span data-t="nav_home">الرئيسية</span></label>
           <label class="flex items-center gap-2"><input type="checkbox" id="um-perm-shipments" class="!w-auto" /> <span data-mt="nav_shipments">الشحنات</span></label>
           <label class="flex items-center gap-2"><input type="checkbox" id="um-perm-delays" class="!w-auto" /> <span data-t="nav_delays">إدارة التأخير</span></label>
-          <label class="flex items-center gap-2"><input type="checkbox" id="um-perm-invoices" class="!w-auto" /> <span data-mt="nav_invoices">الفواتير</span></label>
           <label class="flex items-center gap-2"><input type="checkbox" id="um-perm-fleet" class="!w-auto" /> <span data-t="nav_fleet">المركبات</span></label>
           <label class="flex items-center gap-2"><input type="checkbox" id="um-perm-reports" class="!w-auto" /> <span data-t="nav_reports">التقارير</span></label>
         </div>
@@ -463,20 +448,6 @@
       </div>
     </div>
     <div id="report-body" class="p-6 overflow-y-auto" style="max-height:78vh"></div>
-  </div>
-</dialog>
-
-<!-- مستند الفاتورة (تصدير / طباعة / حفظ PDF) -->
-<dialog id="invoice-doc-modal" class="w-[min(96vw,800px)]">
-  <div id="invoice-doc-card" class="card p-0 overflow-hidden">
-    <div class="no-print flex items-center justify-between px-6 py-4 border-b border-ink-500 bg-ink-800">
-      <h3 class="font-extrabold text-lg" id="invoice-doc-heading"></h3>
-      <div class="flex gap-2">
-        <button id="invoice-doc-print" class="btn btn-brand" data-t="print_save_pdf">طباعة / حفظ PDF</button>
-        <button id="invoice-doc-close" class="btn btn-ghost" data-t="close">إغلاق</button>
-      </div>
-    </div>
-    <div id="invoice-doc-body" class="p-6 overflow-y-auto" style="max-height:80vh"></div>
   </div>
 </dialog>
 
@@ -799,6 +770,30 @@
     switch_account: { ar: 'تبديل الحساب', en: 'Switch account' },
     switched_user: { ar: 'تم التبديل إلى', en: 'Switched to' },
 
+    eta_datetime: { ar: 'الموعد المتوقع', en: 'Expected time' },
+    eta_date: { ar: 'التاريخ', en: 'Date' },
+    eta_time: { ar: 'الوقت', en: 'Time' },
+    eta_days: { ar: 'أيام من الآن', en: 'Days from now' },
+    eta_hours: { ar: 'ساعات', en: 'Hours' },
+    calc_btn: { ar: 'احسب', en: 'Set' },
+    eta_col: { ar: 'الموعد المتوقع', en: 'Expected' },
+    new_eta: { ar: 'الموعد الجديد المتوقع (اختياري)', en: 'New expected time (optional)' },
+    remaining_in: { ar: 'باقٍ', en: 'in' },
+    overdue_by: { ar: 'متأخرة', en: 'overdue by' },
+    d_day1: { ar: 'يوم', en: 'day' }, d_day2: { ar: 'يومان', en: '2 days' }, d_days: { ar: 'أيام', en: 'days' },
+    d_hr1: { ar: 'ساعة', en: 'hour' }, d_hr2: { ar: 'ساعتان', en: '2 hours' }, d_hrs: { ar: 'ساعات', en: 'hours' },
+    d_and: { ar: 'و', en: 'and' }, d_now: { ar: 'الآن', en: 'now' },
+    notify_customer: { ar: 'إشعار العميل', en: 'Notify customer' },
+    cust_notified: { ar: 'فُتحت رسالة واتساب للعميل', en: 'WhatsApp draft opened for the customer' },
+    no_phone: { ar: 'لا يوجد رقم للعميل', en: 'No customer phone on file' },
+    schedule_log: { ar: 'سجل المواعيد', en: 'Schedule log' },
+    rescheduled_n: { ar: 'أُعيدت جدولتها', en: 'Rescheduled' },
+    times_x: { ar: 'مرّات', en: '×' },
+    by_w: { ar: 'بواسطة', en: 'by' },
+    cust_wa_auto: { ar: 'إشعار واتساب للعميل تلقائياً', en: 'Auto WhatsApp to customer' },
+    cust_wa_auto_desc: { ar: 'عند تغيّر حالة الشحنة (بدء التوصيل / تم التسليم / تأخير أو إعادة جدولة) تُفتح رسالة واتساب جاهزة لجوال العميل. الإرسال التلقائي الكامل بلا تدخّل يتم عبر خادم مُوصل + WhatsApp Cloud API (مرحلة الخادم).', en: 'When a shipment status changes, a ready WhatsApp draft opens for the customer. Full hands-off auto-send runs via the Mowasil server + WhatsApp Cloud API (server phase).' },
+    reschedule_reason_default: { ar: 'إعادة جدولة الموعد', en: 'Schedule change' },
+
     add_shipment: { ar: 'شحنة جديدة', en: 'New shipment' },
     new_shipment: { ar: 'إضافة شحنة', en: 'Add shipment' },
     shipment_added: { ar: 'تمت إضافة الشحنة', en: 'Shipment added' },
@@ -817,7 +812,7 @@
     reports_title: { ar: 'التقارير', en: 'Reports' },
     reports_sub: { ar: 'تقارير تنفيذية جاهزة للطباعة أو الإرسال', en: 'Executive reports, ready to print or send' },
     weekly_card_title: { ar: 'التقرير الأسبوعي الشامل للمدير التنفيذي', en: 'Comprehensive executive weekly report' },
-    weekly_card_desc: { ar: 'ملخّص الشحنات، الفواتير والتحصيل، أكثر أسباب التأخير تكراراً، وتكاليف الصيانة — في شاشة واحدة جاهزة للطباعة.', en: 'Shipments summary, invoices & collections, top delay causes, and maintenance costs — one printable screen.' },
+    weekly_card_desc: { ar: 'ملخّص الشحنات، أكثر أسباب التأخير تكراراً، والمركبات التي تحتاج صيانة — في شاشة واحدة جاهزة للطباعة.', en: 'Shipments summary, top delay causes, and vehicles needing service — one printable screen.' },
     gen_now: { ar: 'توليد التقرير الآن', en: 'Generate report now' },
     quick_snapshot: { ar: 'لقطة سريعة', en: 'Quick snapshot' },
     weekly_report_title: { ar: 'التقرير الأسبوعي الشامل للمدير التنفيذي', en: 'Comprehensive executive weekly report' },
@@ -945,48 +940,37 @@
   const listName = (kind, id) => { const it = LIST(kind).find((x) => x.id === id); return it ? disp(it) : (id || '—'); };
 
   /* ===================== الحالة ===================== */
-  const ROOT_KEY = 'mowasil.root.v1';
+  const ROOT_KEY = 'mowasil.root.v2';
   const TODAY = '2025-05-08';
 
   function seedTenant() {
     const B = (ar, en) => ({ ar, en });
+    const H = (h) => new Date(Date.now() + h * 3600000).toISOString();
     return {
       targets: { onTime: 95, deliveryHours: 2 }, kmToday: 3680,
       shipments: [
-        { id: 'D-1024', client: B('أبو خالد','Abu Khalid'), city: 'riyadh', branch: 'malqa', status: 'late', eta: '10:00 ص', actual: '11:45 ص', reason: 'traffic', note: B('الطريق الدائري مزدحم','Ring road congested'), amount: 320, driver: B('سعد الأحمدي','Saad Al-Ahmadi'), phone: '0551234567', address: B('حي الملقا، شارع الأمير محمد بن سلمان، مبنى 12','Al-Malqa, Prince Mohammed bin Salman St, Bldg 12') },
-        { id: 'D-1025', client: B('شركة النخبة','Al-Nukhba Co.'), city: 'riyadh', branch: 'sahara', status: 'late', eta: '11:30 ص', actual: '12:10 م', reason: 'vehicle', note: B('بطارية ضعيفة','Weak battery'), amount: 540, driver: B('ماجد العتيبي','Majed Al-Otaibi') },
-        { id: 'D-1026', client: B('مطعم الورد','Al-Ward Restaurant'), city: 'jeddah', branch: 'malqa', status: 'late', eta: '01:00 م', actual: '01:20 م', reason: 'noreply', note: B('لا يرد على الجوال','Not answering phone'), amount: 210, driver: B('فهد الدوسري','Fahd Al-Dosari') },
-        { id: 'D-1027', client: B('العربية للتجارة','Arabian Trading'), city: 'dammam', branch: 'sahara', status: 'late', eta: '02:00 م', actual: '', reason: 'weather', note: B('أمطار غزيرة','Heavy rain'), amount: 730, driver: B('نايف القحطاني','Nayef Al-Qahtani') },
-        { id: 'D-1028', client: B('الدانة للمواد','Al-Danah Supplies'), city: 'riyadh', branch: 'malqa', status: 'delivered', eta: '03:30 م', actual: '03:15 م', reason: '', note: '', amount: 410, driver: B('سعد الأحمدي','Saad Al-Ahmadi'), onTime: true, phone: '0559876543', address: B('حي النرجس، طريق أنس بن مالك، فيلا 8','Al-Narjis, Anas bin Malik Rd, Villa 8') },
-        { id: 'D-1029', client: B('مؤسسة الريان','Al-Rayyan Est.'), city: 'riyadh', branch: 'sahara', status: 'delivered', eta: '04:00 م', actual: '04:05 م', reason: '', note: '', amount: 260, driver: B('ماجد العتيبي','Majed Al-Otaibi'), onTime: true },
-        { id: 'D-1030', client: B('شركة الأفق','Al-Ufuq Co.'), city: 'makkah', branch: 'malqa', status: 'delivered', eta: '05:00 م', actual: '05:10 م', reason: '', note: '', amount: 600, driver: B('فهد الدوسري','Fahd Al-Dosari'), onTime: true },
-        { id: 'D-1031', client: B('مطاعم السلطان','Al-Sultan Restaurants'), city: 'jeddah', branch: 'sahara', status: 'transit', eta: '06:30 م', actual: '', reason: '', note: '', amount: 355, driver: B('نايف القحطاني','Nayef Al-Qahtani') },
-        { id: 'D-1032', client: B('بقالة المنار','Al-Manar Grocery'), city: 'riyadh', branch: 'malqa', status: 'transit', eta: '07:00 م', actual: '', reason: '', note: '', amount: 180, driver: B('سعد الأحمدي','Saad Al-Ahmadi'), phone: '0554455667', address: B('حي الياسمين، شارع 30، محل رقم 4','Al-Yasmin, St 30, Shop 4') },
-        { id: 'D-1033', client: B('شركة البناء الحديث','Modern Construction Co.'), city: 'dammam', branch: 'sahara', status: 'transit', eta: '07:15 م', actual: '', reason: '', note: '', amount: 920, driver: B('خالد الشمري','Khalid Al-Shammari') },
-        { id: 'D-1034', client: B('صيدلية الشفاء','Al-Shifa Pharmacy'), city: 'riyadh', branch: 'malqa', status: 'canceled', eta: '—', actual: '', reason: 'address', note: B('العنوان غير صحيح','Address is incorrect'), amount: 0, driver: '—' },
-        { id: 'D-1035', client: B('متجر الإلكترونيات','Electronics Store'), city: 'jeddah', branch: 'sahara', status: 'preparing', eta: '08:00 م', actual: '', reason: '', note: '', amount: 1500, driver: '—' },
+        { id: 'D-1024', client: B('أبو خالد','Abu Khalid'), city: 'riyadh', branch: 'malqa', status: 'late', etaAt: H(-5), actualAt: '', reason: 'traffic', note: B('الطريق الدائري مزدحم','Ring road congested'), driver: B('سعد الأحمدي','Saad Al-Ahmadi'), phone: '0551234567', address: B('حي الملقا، شارع الأمير محمد بن سلمان، مبنى 12','Al-Malqa, Prince Mohammed bin Salman St, Bldg 12'), schedule: [] },
+        { id: 'D-1025', client: B('شركة النخبة','Al-Nukhba Co.'), city: 'riyadh', branch: 'sahara', status: 'late', etaAt: H(-3), actualAt: '', reason: 'vehicle', note: B('بطارية ضعيفة','Weak battery'), driver: B('ماجد العتيبي','Majed Al-Otaibi'), phone: '0553001122', address: B('حي المروج، طريق الملك عبدالعزيز','Al-Muruj, King Abdulaziz Rd'), schedule: [] },
+        { id: 'D-1026', client: B('مطعم الورد','Al-Ward Restaurant'), city: 'jeddah', branch: 'malqa', status: 'late', etaAt: H(-2), actualAt: '', reason: 'noreply', note: B('لا يرد على الجوال','Not answering phone'), driver: B('فهد الدوسري','Fahd Al-Dosari'), phone: '0567889900', address: B('حي الروضة، شارع الأمير سلطان','Al-Rawdah, Prince Sultan St'), schedule: [] },
+        { id: 'D-1027', client: B('العربية للتجارة','Arabian Trading'), city: 'dammam', branch: 'sahara', status: 'late', etaAt: H(-1), actualAt: '', reason: 'weather', note: B('أمطار غزيرة','Heavy rain'), driver: B('نايف القحطاني','Nayef Al-Qahtani'), phone: '0561234599', address: B('حي الشاطئ، طريق الخليج','Al-Shati, Gulf Rd'), schedule: [] },
+        { id: 'D-1028', client: B('الدانة للمواد','Al-Danah Supplies'), city: 'riyadh', branch: 'malqa', status: 'delivered', etaAt: H(-26), actualAt: H(-27), reason: '', note: '', driver: B('سعد الأحمدي','Saad Al-Ahmadi'), onTime: true, phone: '0559876543', address: B('حي النرجس، طريق أنس بن مالك، فيلا 8','Al-Narjis, Anas bin Malik Rd, Villa 8'), schedule: [] },
+        { id: 'D-1029', client: B('مؤسسة الريان','Al-Rayyan Est.'), city: 'riyadh', branch: 'sahara', status: 'delivered', etaAt: H(-24), actualAt: H(-23), reason: '', note: '', driver: B('ماجد العتيبي','Majed Al-Otaibi'), onTime: true, phone: '0552223344', address: B('حي الملز، شارع جرير','Al-Malaz, Jarir St'), schedule: [] },
+        { id: 'D-1030', client: B('شركة الأفق','Al-Ufuq Co.'), city: 'makkah', branch: 'malqa', status: 'delivered', etaAt: H(-20), actualAt: H(-19), reason: '', note: '', driver: B('فهد الدوسري','Fahd Al-Dosari'), onTime: true, phone: '0568001122', address: B('حي العزيزية، شارع إبراهيم الخليل','Al-Aziziyah, Ibrahim Al-Khalil St'), schedule: [] },
+        { id: 'D-1031', client: B('مطاعم السلطان','Al-Sultan Restaurants'), city: 'jeddah', branch: 'sahara', status: 'transit', etaAt: H(2), actualAt: '', reason: '', note: '', driver: B('نايف القحطاني','Nayef Al-Qahtani'), phone: '0533445566', address: B('حي السلامة، شارع الأربعين','Al-Salamah, Al-Arbaeen St'), schedule: [] },
+        { id: 'D-1032', client: B('بقالة المنار','Al-Manar Grocery'), city: 'riyadh', branch: 'malqa', status: 'transit', etaAt: H(3), actualAt: '', reason: '', note: '', driver: B('سعد الأحمدي','Saad Al-Ahmadi'), phone: '0554455667', address: B('حي الياسمين، شارع 30، محل رقم 4','Al-Yasmin, St 30, Shop 4'), schedule: [] },
+        { id: 'D-1033', client: B('شركة البناء الحديث','Modern Construction Co.'), city: 'dammam', branch: 'sahara', status: 'transit', etaAt: H(5), actualAt: '', reason: '', note: '', driver: B('خالد الشمري','Khalid Al-Shammari'), phone: '0569900112', address: B('المنطقة الصناعية الثانية','2nd Industrial Area'), schedule: [] },
+        { id: 'D-1034', client: B('صيدلية الشفاء','Al-Shifa Pharmacy'), city: 'riyadh', branch: 'malqa', status: 'canceled', etaAt: '', actualAt: '', reason: 'address', note: B('العنوان غير صحيح','Address is incorrect'), driver: '—', phone: '0550009988', address: B('—','—'), schedule: [] },
+        { id: 'D-1035', client: B('متجر الإلكترونيات','Electronics Store'), city: 'jeddah', branch: 'sahara', status: 'preparing', etaAt: H(22), actualAt: '', reason: '', note: '', driver: '—', phone: '0500112233', address: B('حي البوادي، شارع صاري','Al-Bawadi, Sari St'), schedule: [] },
       ],
       vehicles: [
-        { id: uid('V'), plate: 'أ ب ج 1234', model: 'Hyundai H1 2021', driver: B('سعد الأحمدي','Saad Al-Ahmadi'), status: 'moving', odo: 84200, service: 'oil', nextDate: '2025-05-20', cost: 450, photo: '' },
-        { id: uid('V'), plate: 'د هـ و 5678', model: 'Toyota HiAce 2020', driver: B('ماجد العتيبي','Majed Al-Otaibi'), status: 'moving', odo: 132500, service: 'brakes', nextDate: '2025-05-10', cost: 900, photo: '' },
-        { id: uid('V'), plate: 'ز ح ط 9012', model: 'Isuzu NPR 2019', driver: B('نايف القحطاني','Nayef Al-Qahtani'), status: 'service', odo: 210300, service: 'inspection', nextDate: '2025-05-06', cost: 1800, photo: '' },
-        { id: uid('V'), plate: 'ي ك ل 3456', model: 'Ford Transit 2022', driver: B('فهد الدوسري','Fahd Al-Dosari'), status: 'moving', odo: 45120, service: 'oil', nextDate: '2025-06-15', cost: 400, photo: '' },
-        { id: uid('V'), plate: 'م ن س 7890', model: 'Mercedes Sprinter 2021', driver: B('خالد الشمري','Khalid Al-Shammari'), status: 'idle', odo: 98750, service: 'tires', nextDate: '2025-05-25', cost: 1200, photo: '' },
-        { id: uid('V'), plate: 'ع ف ص 2345', model: 'Hyundai Porter 2018', driver: '—', status: 'idle', odo: 176400, service: 'transmission', nextDate: '2025-05-04', cost: 2600, photo: '' },
-        { id: uid('V'), plate: 'ق ر ش 6789', model: 'Toyota Dyna 2020', driver: B('عبدالله الغامدي','Abdullah Al-Ghamdi'), status: 'moving', odo: 120000, service: 'oil', nextDate: '2025-06-01', cost: 450, photo: '' },
-        { id: uid('V'), plate: 'ت ث خ 0123', model: 'Isuzu D-Max 2023', driver: B('سلطان المطيري','Sultan Al-Mutairi'), status: 'moving', odo: 22300, service: 'first', nextDate: '2025-07-10', cost: 300, photo: '' },
-      ],
-      invoices: [
-        { id: 'INV-2041', shipment: 'D-1024', amount: 320, status: 'unpaid', due: '2025-05-15' },
-        { id: 'INV-2042', shipment: 'D-1025', amount: 540, status: 'paid', due: '2025-05-05' },
-        { id: 'INV-2043', shipment: 'D-1026', amount: 210, status: 'unpaid', due: '2025-05-01' },
-        { id: 'INV-2044', shipment: 'D-1027', amount: 730, status: 'unpaid', due: '2025-05-20' },
-        { id: 'INV-2045', shipment: 'D-1028', amount: 410, status: 'paid', due: '2025-05-04' },
-        { id: 'INV-2046', shipment: 'D-1029', amount: 260, status: 'paid', due: '2025-05-06' },
-        { id: 'INV-2047', shipment: 'D-1030', amount: 600, status: 'paid', due: '2025-05-08' },
-        { id: 'INV-2048', shipment: 'D-1033', amount: 920, status: 'unpaid', due: '2025-05-25' },
-        { id: 'INV-2049', shipment: 'D-1034', amount: 0, status: 'canceled', due: '—' },
-        { id: 'INV-2050', shipment: 'D-1035', amount: 1500, status: 'unpaid', due: '2025-06-01' },
+        { id: uid('V'), plate: 'أ ب ج 1234', model: 'Hyundai H1 2021', driver: B('سعد الأحمدي','Saad Al-Ahmadi'), status: 'moving', odo: 84200, service: 'oil', nextDate: '2025-05-20', photo: '' },
+        { id: uid('V'), plate: 'د هـ و 5678', model: 'Toyota HiAce 2020', driver: B('ماجد العتيبي','Majed Al-Otaibi'), status: 'moving', odo: 132500, service: 'brakes', nextDate: '2025-05-10', photo: '' },
+        { id: uid('V'), plate: 'ز ح ط 9012', model: 'Isuzu NPR 2019', driver: B('نايف القحطاني','Nayef Al-Qahtani'), status: 'service', odo: 210300, service: 'inspection', nextDate: '2025-05-06', photo: '' },
+        { id: uid('V'), plate: 'ي ك ل 3456', model: 'Ford Transit 2022', driver: B('فهد الدوسري','Fahd Al-Dosari'), status: 'moving', odo: 45120, service: 'oil', nextDate: '2025-06-15', photo: '' },
+        { id: uid('V'), plate: 'م ن س 7890', model: 'Mercedes Sprinter 2021', driver: B('خالد الشمري','Khalid Al-Shammari'), status: 'idle', odo: 98750, service: 'tires', nextDate: '2025-05-25', photo: '' },
+        { id: uid('V'), plate: 'ع ف ص 2345', model: 'Hyundai Porter 2018', driver: '—', status: 'idle', odo: 176400, service: 'transmission', nextDate: '2025-05-04', photo: '' },
+        { id: uid('V'), plate: 'ق ر ش 6789', model: 'Toyota Dyna 2020', driver: B('عبدالله الغامدي','Abdullah Al-Ghamdi'), status: 'moving', odo: 120000, service: 'oil', nextDate: '2025-06-01', photo: '' },
+        { id: uid('V'), plate: 'ت ث خ 0123', model: 'Isuzu D-Max 2023', driver: B('سلطان المطيري','Sultan Al-Mutairi'), status: 'moving', odo: 22300, service: 'first', nextDate: '2025-07-10', photo: '' },
       ],
       delayHistoryWeek: { traffic: 5, vehicle: 3, noreply: 2, address: 1, weather: 1, other: 1 },
       lists: {
@@ -1015,16 +999,16 @@
       companies: [
         {
           id: 'c1', name: { ar: 'شركة الرياض السريعة', en: 'Riyadh Express Co.' }, mode: 'commercial',
-          wa: '', sched: { on: false, day: 4, time: '08:00' }, sub: { plan: 'الأساسية', amount: 499, renew: '2025-06-01', status: 'active' },
+          wa: '', sched: { on: false, day: 4, time: '08:00' }, custWa: true, sub: { plan: 'الأساسية', amount: 499, renew: '2025-06-01', status: 'active' },
           users: [
             { id: 'u1', user: 'riyadh', pass: 'Riyadh@1234', hash: null, role: 'manager', name: { ar: 'أحمد محمد', en: 'Ahmad Mohammed' } },
-            { id: 'u2', user: 'riyadh-c', pass: 'Coord@1234', hash: null, role: 'coordinator', name: { ar: 'منسق العمليات', en: 'Ops Coordinator' }, perms: { dashboard: true, shipments: true, delays: true, invoices: false, fleet: true, reports: false } },
+            { id: 'u2', user: 'riyadh-c', pass: 'Coord@1234', hash: null, role: 'coordinator', name: { ar: 'منسق العمليات', en: 'Ops Coordinator' }, perms: { dashboard: true, shipments: true, delays: true, fleet: true, reports: false } },
             { id: 'u3', user: 'riyadh-d', pass: 'Driver@1234', hash: null, role: 'driver', name: { ar: 'سعد الأحمدي', en: 'Saad Al-Ahmadi' }, driverId: 'd1' },
           ],
         },
         {
           id: 'c2', name: { ar: 'جمعية العطاء الخيرية', en: 'Al-Ataa Charity' }, mode: 'charity',
-          wa: '', sched: { on: false, day: 4, time: '08:00' }, sub: { plan: 'الجمعيات', amount: 0, renew: '2025-06-01', status: 'active' },
+          wa: '', sched: { on: false, day: 4, time: '08:00' }, custWa: true, sub: { plan: 'الجمعيات', amount: 0, renew: '2025-06-01', status: 'active' },
           users: [
             { id: 'u1', user: 'ataa', pass: 'Ataa@1234', hash: null, role: 'manager', name: { ar: 'مدير الجمعية', en: 'Charity Manager' } },
           ],
@@ -1044,11 +1028,11 @@
   const managerOf = (c) => (c && c.users || []).find((u) => u.role === 'manager') || (c && c.users || [])[0];
   const cu = () => { const c = company(); return (c && ctx && ctx.uid) ? c.users.find((u) => u.id === ctx.uid) : null; };
   const myRole = () => { if (ctx && ctx.role === 'admin') return 'admin'; const u = cu(); return u ? u.role : null; };
-  const ALL_ROUTES = ['dashboard', 'shipments', 'delays', 'invoices', 'fleet', 'reports', 'settings'];
+  const ALL_ROUTES = ['dashboard', 'shipments', 'delays', 'fleet', 'reports', 'settings'];
   function allowedRoutes() {
     const u = cu();
     if (!u || u.role === 'manager') return ALL_ROUTES.slice();
-    if (u.role === 'coordinator') { const p = u.perms || {}; return ['dashboard', 'shipments', 'delays', 'invoices', 'fleet', 'reports'].filter((r) => p[r]); }
+    if (u.role === 'coordinator') { const p = u.perms || {}; return ['dashboard', 'shipments', 'delays', 'fleet', 'reports'].filter((r) => p[r]); }
     if (u.role === 'driver') return ['mytrips'];
     return ['dashboard'];
   }
@@ -1062,7 +1046,7 @@
     state.lang = ROOT.lang;
   }
   // حالة مؤقتة قبل الدخول (لتفادي أخطاء الوصول المبكر)
-  state = { today: TODAY, mode: 'commercial', lang: ROOT.lang, shipments: [], vehicles: [], invoices: [], delayHistoryWeek: {}, targets: { onTime: 95, deliveryHours: 2 }, kmToday: 0 };
+  state = { today: TODAY, mode: 'commercial', lang: ROOT.lang, shipments: [], vehicles: [], delayHistoryWeek: {}, targets: { onTime: 95, deliveryHours: 2 }, kmToday: 0 };
 
   const Session = {
     _m: null,
@@ -1071,11 +1055,11 @@
     clear(k) { try { sessionStorage.removeItem(k); } catch (e) { this._m = null; } },
   };
 
-  /* أرقام / عملة / تواريخ حسب اللغة */
+  /* أرقام / تواريخ حسب اللغة */
   const locale = () => (state.lang === 'ar' ? 'ar-EG-u-nu-latn' : 'en-US');
   const nf = () => new Intl.NumberFormat(locale());
-  const money = (n) => {
-    if (n === null || n === undefined || n === '') return T('na');
+  const money = (n) => { // تُستخدم فقط في لوحة مدير المنصة (اشتراكات) — لا مبالغ داخل مساحة الشركة
+    if (n === null || n === undefined || n === '') return '—';
     const v = nf().format(Math.round(+n || 0));
     return state.lang === 'ar' ? v + ' ريال' : 'SAR ' + v;
   };
@@ -1084,6 +1068,76 @@
     return d.toLocaleDateString(locale(), { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
       + (state.lang === 'ar' ? ' — الساعة ' : ' — ') + d.toLocaleTimeString(locale(), { hour: '2-digit', minute: '2-digit' });
   }
+
+  /* ===================== الموعد المتوقع (تاريخ/وقت + عدّ تنازلي) ===================== */
+  const etaFmt = (iso) => {
+    if (!iso) return '—';
+    const d = new Date(iso); if (isNaN(d)) return esc(iso);
+    return d.toLocaleDateString(locale(), { year: 'numeric', month: 'short', day: 'numeric' })
+      + ' — ' + d.toLocaleTimeString(locale(), { hour: '2-digit', minute: '2-digit' });
+  };
+  function durText(ms) {
+    const totMin = Math.round(Math.abs(ms) / 60000);
+    const dd = Math.floor(totMin / 1440), hh = Math.floor((totMin % 1440) / 60);
+    if (dd === 0 && hh === 0) return T('d_now');
+    const parts = [];
+    if (dd === 1) parts.push(T('d_day1')); else if (dd === 2 && state.lang === 'ar') parts.push(T('d_day2')); else if (dd > 0) parts.push(nf().format(dd) + ' ' + T('d_days'));
+    if (hh === 1) parts.push(T('d_hr1')); else if (hh === 2 && state.lang === 'ar') parts.push(T('d_hr2')); else if (hh > 0) parts.push(nf().format(hh) + ' ' + T('d_hrs'));
+    return parts.join(' ' + T('d_and') + ' ');
+  }
+  const etaRel = (iso) => {
+    if (!iso) return { text: '', cls: '' };
+    const d = new Date(iso); if (isNaN(d)) return { text: '', cls: '' };
+    const diff = d - Date.now();
+    return diff >= 0
+      ? { text: T('remaining_in') + ' ' + durText(diff), cls: diff < 3600000 ? 'text-amber-400' : 'text-slate-400' }
+      : { text: T('overdue_by') + ' ' + durText(diff), cls: 'text-brand-bright font-bold' };
+  };
+  function etaCell(s) {
+    if (s.status === 'delivered') return `<span class="text-emerald-400">${esc(etaFmt(s.actualAt || s.etaAt))}</span>`;
+    if (s.status === 'canceled' || !s.etaAt) return '—';
+    const r = etaRel(s.etaAt);
+    return `${esc(etaFmt(s.etaAt))}<span class="block text-[11px] ${r.cls}">${esc(r.text)}</span>`;
+  }
+  // date+time inputs → ISO ; ISO → {date,time}
+  const dtToIso = (date, time) => (date ? new Date(date + 'T' + (time || '00:00')).toISOString() : '');
+  const isoToDate = (iso) => { if (!iso) return ''; const d = new Date(iso); return isNaN(d) ? '' : d.toISOString().slice(0, 10); };
+  const isoToTime = (iso) => { if (!iso) return ''; const d = new Date(iso); return isNaN(d) ? '' : d.toTimeString().slice(0, 5); };
+
+  /* ===================== واتساب العميل ===================== */
+  function waNum(phone) {
+    let p = String(phone || '').replace(/[^\d]/g, '');
+    if (!p) return '';
+    if (p.startsWith('00')) p = p.slice(2);
+    if (p.startsWith('966')) return p;
+    if (p.startsWith('0')) return '966' + p.slice(1);
+    if (p.length === 9) return '966' + p;
+    return p;
+  }
+  function custMsg(s) {
+    const ar = state.lang === 'ar';
+    const co = company() ? disp(company().name) : 'مُوصل';
+    const id = s.id, eta = etaFmt(s.etaAt);
+    if (s.status === 'delivered') return ar
+      ? `عميلنا العزيز، تم تسليم شحنتك رقم ${id} بنجاح. شكراً لثقتك بـ${co}.`
+      : `Dear customer, your shipment ${id} has been delivered. Thank you for choosing ${co}.`;
+    if (s.status === 'transit') return ar
+      ? `عميلنا العزيز، شحنتك رقم ${id} الآن قيد التوصيل. الموعد المتوقع للوصول: ${eta}.`
+      : `Dear customer, your shipment ${id} is out for delivery. Expected arrival: ${eta}.`;
+    if (s.status === 'late' || (s.schedule && s.schedule.length)) return ar
+      ? `عميلنا العزيز، نعتذر عن تأخر شحنتك رقم ${id}. الموعد الجديد المتوقع: ${eta}. نشكر تفهّمك.`
+      : `Dear customer, we apologize for the delay of shipment ${id}. New expected time: ${eta}. Thank you for your patience.`;
+    return ar
+      ? `عميلنا العزيز، شحنتك رقم ${id} قيد التحضير. الموعد المتوقع: ${eta}.`
+      : `Dear customer, your shipment ${id} is being prepared. Expected time: ${eta}.`;
+  }
+  const custWaLink = (s) => `https://wa.me/${waNum(s.phone)}?text=${encodeURIComponent(custMsg(s))}`;
+  function notifyCustomer(s, silent) {
+    if (!s || !s.phone) { if (!silent) toast(T('no_phone'), 'warn'); return; }
+    try { window.open(custWaLink(s), '_blank', 'noopener'); } catch (e) {}
+    if (!silent) toast(T('cust_notified'));
+  }
+  function autoNotify(s) { if (s && s.phone && company() && company().custWa !== false) notifyCustomer(s, true); }
 
   /* ===================== مشتقات ===================== */
   const REASONS = ['traffic', 'vehicle', 'noreply', 'address', 'weather', 'other'];
@@ -1097,11 +1151,6 @@
     get transit()   { return state.shipments.filter((s) => s.status === 'transit'); },
     get preparing() { return state.shipments.filter((s) => s.status === 'preparing'); },
     get canceled()  { return state.shipments.filter((s) => s.status === 'canceled'); },
-    get issued()    { return state.invoices.filter((i) => i.status !== 'canceled').reduce((a, i) => a + i.amount, 0); },
-    get collected() { return state.invoices.filter((i) => i.status === 'paid').reduce((a, i) => a + i.amount, 0); },
-    get pending()   { return state.invoices.filter((i) => i.status === 'unpaid').reduce((a, i) => a + i.amount, 0); },
-    get overdueInv(){ return state.invoices.filter((i) => i.status === 'unpaid' && i.due !== '—' && daysBetween(state.today, i.due) < 0); },
-    get maint()     { return state.vehicles.reduce((a, v) => a + (+v.cost || 0), 0); },
     get urgentVeh() { return state.vehicles.filter((v) => v.status === 'service' || (v.nextDate && daysBetween(state.today, v.nextDate) <= 3)); },
     get onTimeRate(){ const d = M.delivered; return d.length ? Math.round(d.filter((s) => s.onTime).length / d.length * 100) : 0; },
     delayCounts() {
@@ -1110,7 +1159,6 @@
       return REASONS.map((r) => ({ code: r, n: c[r] })).filter((x) => x.n > 0).sort((a, b) => b.n - a.n);
     },
   };
-  const hasInvoice = (shipId) => state.invoices.some((i) => i.shipment === shipId);
 
   /* ===================== الشعار + الشبكة ===================== */
   function logoSVG(size = 42) {
@@ -1204,13 +1252,6 @@
       kpiCard({ label: EN('status','delivered'), value: nf().format(M.delivered.length), sub: `${T('on_time_rate')} ${M.onTimeRate}%`, icon: IC.check, iconBg: 'rgba(16,185,129,.14)' }),
       kpiCard({ label: T('vehicles_on_road'), value: nf().format(state.vehicles.filter((v) => v.status === 'moving').length) + ' / ' + nf().format(state.vehicles.length), sub: `${nf().format(M.urgentVeh.length)} ${T('need_urgent_service')}`, icon: IC.wrench, iconBg: 'rgba(229,9,20,.14)' }),
     ].join('');
-    const kpisFin = [
-      kpiCard({ label: t('issued'), value: money(M.issued), icon: IC.box, iconBg: 'rgba(59,130,246,.14)' }),
-      kpiCard({ label: t('collected'), value: money(M.collected), sub: `${Math.round(M.collected / (M.issued || 1) * 100)}%`, icon: IC.cash, iconBg: 'rgba(16,185,129,.14)' }),
-      kpiCard({ label: t('pending'), value: money(M.pending), sub: `${nf().format(M.overdueInv.length)} ${t('invoice_word')} ${T('overdue_due')}`, icon: IC.clock, iconBg: 'rgba(245,158,11,.14)', danger: M.overdueInv.length > 0 }),
-      kpiCard({ label: T('maint_costs'), value: money(M.maint), sub: `${nf().format(state.vehicles.length)} ${T('vehicle_sing')}`, icon: IC.wrench, iconBg: 'rgba(229,9,20,.14)' }),
-    ].join('');
-
     const totalDelays = counts.reduce((a, c) => a + c.n, 0) || 1;
     const bars = counts.map((c) => ({ label: EN('reason', c.code), n: c.n, color: REASON_COLOR[c.code] }));
     const donut = counts.map((c) => ({ n: c.n, color: REASON_COLOR[c.code] }));
@@ -1234,7 +1275,6 @@
       </div>
 
       <div><h3 class="text-sm font-bold text-slate-400 mb-2">${esc(T('ops_kpis'))}</h3><div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">${kpisOps}</div></div>
-      <div><h3 class="text-sm font-bold text-slate-400 mb-2">${esc(T('fin_kpis'))}</h3><div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">${kpisFin}</div></div>
 
       <div class="grid gap-6 lg:grid-cols-3">
         <div class="card p-5 lg:col-span-2">
@@ -1271,27 +1311,25 @@
   function shipmentsTable(list, { showAction = true } = {}) {
     const rows = list.map((s) => {
       const late = s.status === 'late';
-      const mkInv = !hasInvoice(s.id) && s.status !== 'canceled';
+      const nRes = (s.schedule || []).length;
       return `<tr class="border-b border-ink-600/60 ${late ? 'row-late' : ''}">
         <td class="py-2.5 px-3 font-bold">#${esc(s.id)}</td>
-        <td class="py-2.5 px-3">${esc(disp(s.client))}</td>
-        <td class="py-2.5 px-3 text-slate-400">${esc(listName('cities', s.city))}</td>
-        <td class="py-2.5 px-3 text-slate-400">${esc(listName('branches', s.branch))}</td>
+        <td class="py-2.5 px-3">${esc(disp(s.client))}${s.phone ? `<span class="block text-[11px] text-slate-500 tabular-nums">${esc(s.phone)}</span>` : ''}</td>
+        <td class="py-2.5 px-3 text-slate-400">${esc(listName('cities', s.city))} — ${esc(listName('branches', s.branch))}</td>
         <td class="py-2.5 px-3"><span class="badge ${STATUS_BADGE[s.status] || 'badge-gray'}">${esc(EN('status', s.status))}</span></td>
         <td class="py-2.5 px-3">${s.reason ? `<span class="badge badge-red">${esc(EN('reason', s.reason))}</span>` : (late ? `<span class="text-xs text-slate-500">${esc(T('not_logged'))}</span>` : '—')}</td>
-        <td class="py-2.5 px-3 text-slate-400 tabular-nums">${esc(s.eta || '—')}${s.actual ? ` <span class="text-brand-bright">/ ${esc(s.actual)}</span>` : ''}</td>
-        <td class="py-2.5 px-3 tabular-nums">${s.amount == null ? esc(T('na')) : (s.amount ? money(s.amount) : '—')}</td>
-        ${showAction ? `<td class="py-2.5 px-3 no-print"><div class="flex gap-1.5">
+        <td class="py-2.5 px-3 text-slate-400">${etaCell(s)}${nRes ? `<span class="block text-[11px] text-amber-400">${esc(T('rescheduled_n'))}${nRes > 1 ? ' ×' + nf().format(nRes) : ''}</span>` : ''}</td>
+        ${showAction ? `<td class="py-2.5 px-3 no-print"><div class="flex gap-1.5 flex-wrap">
           <button class="btn ${late ? 'btn-brand' : 'btn-ghost'} !py-1 !px-2 text-xs" data-delay="${esc(s.id)}">${esc(late ? T('update_reason') : T('edit'))}</button>
-          ${mkInv ? `<button class="btn btn-ghost !py-1 !px-2 text-xs" data-mkinv="${esc(s.id)}">${esc(T('add_inv_short'))}</button>` : ''}
+          ${s.phone ? `<button class="btn btn-ghost !py-1 !px-2 text-xs" data-notify="${esc(s.id)}">📲 ${esc(T('notify_customer'))}</button>` : ''}
         </div></td>` : ''}
       </tr>`;
     }).join('');
     const th = (x) => `<th class="py-2 px-3 font-semibold" style="text-align:start">${esc(x)}</th>`;
     return `<div class="overflow-x-auto"><table class="w-full text-sm">
       <thead class="text-slate-400 border-b border-ink-500">
-        <tr>${th(t('shipment_word'))}${th(t('client_word'))}${th(T('city'))}${th(t('branch_word'))}${th(T('status'))}${th(T('delay_reason'))}${th(T('expected_actual'))}${th(T('amount'))}${showAction ? `<th class="py-2 px-3 font-semibold no-print" style="text-align:start">${esc(T('action'))}</th>` : ''}</tr>
-      </thead><tbody>${rows || `<tr><td colspan="9" class="py-6 text-center text-slate-500">${esc(T('no_results'))}</td></tr>`}</tbody>
+        <tr>${th(t('shipment_word'))}${th(t('client_word'))}${th(T('destination'))}${th(T('status'))}${th(T('delay_reason'))}${th(T('eta_col'))}${showAction ? `<th class="py-2 px-3 font-semibold no-print" style="text-align:start">${esc(T('action'))}</th>` : ''}</tr>
+      </thead><tbody>${rows || `<tr><td colspan="7" class="py-6 text-center text-slate-500">${esc(T('no_results'))}</td></tr>`}</tbody>
     </table></div>`;
   }
 
@@ -1363,7 +1401,6 @@
           <div class="text-slate-400">${esc(T('next_service'))}</div><div>${esc(EN('servicetype', v.service))}</div>
           <div class="text-slate-400">${esc(T('due'))}</div>
           <div class="${overdue ? 'text-brand-bright font-bold' : urgent ? 'text-amber-400' : ''}">${esc(v.nextDate || '—')}${overdue ? ' (' + esc(T('overdue')) + ')' : urgent ? ' (' + esc(T('soon')) + ')' : ''}</div>
-          <div class="text-slate-400">${esc(T('expected_cost'))}</div><div class="tabular-nums">${money(v.cost)}</div>
         </div>
         ${urgent ? `<div class="mt-3 text-xs badge badge-red w-full justify-center py-1.5">${esc(T('requires_urgent'))}</div>` : ''}
         <div class="flex gap-2 mt-3 no-print">
@@ -1375,7 +1412,7 @@
     return `<section class="view-enter space-y-5">
       <div class="flex flex-wrap items-end justify-between gap-3">
         <div><h2 class="text-xl font-extrabold">${esc(T('fleet_title'))}</h2>
-          <p class="text-sm text-slate-400">${nf().format(state.vehicles.length)} ${esc(T('vehicle_sing'))} • <span class="text-brand-bright">${nf().format(M.urgentVeh.length)} ${esc(T('need_urgent_service'))}</span> • ${esc(T('maint_costs'))} ${money(M.maint)}</p></div>
+          <p class="text-sm text-slate-400">${nf().format(state.vehicles.length)} ${esc(T('vehicle_sing'))} • <span class="text-brand-bright">${nf().format(M.urgentVeh.length)} ${esc(T('need_urgent_service'))}</span></p></div>
         <button class="btn btn-brand no-print" id="btn-add-veh">+ ${esc(T('add_vehicle'))}</button>
       </div>
       ${M.urgentVeh.length ? `<div class="card p-4 border-brand/40">
@@ -1385,56 +1422,12 @@
     </section>`;
   }
 
-  let invFilter = 'all';
-  function view_invoices() {
-    let list = state.invoices.slice();
-    if (invFilter !== 'all') list = list.filter((i) => i.status === invFilter);
-    const rows = list.map((i) => {
-      const overdue = i.status === 'unpaid' && i.due !== '—' && daysBetween(state.today, i.due) < 0;
-      const b = i.status === 'paid' ? 'badge-green' : i.status === 'unpaid' ? 'badge-amber' : 'badge-gray';
-      return `<tr class="border-b border-ink-600/60 ${overdue ? 'row-late' : ''}">
-        <td class="py-2.5 px-3 font-bold">${esc(i.id)}</td>
-        <td class="py-2.5 px-3"><button class="text-brand-bright hover:underline" data-goship="${esc(i.shipment)}">#${esc(i.shipment)}</button></td>
-        <td class="py-2.5 px-3 tabular-nums">${money(i.amount)}</td>
-        <td class="py-2.5 px-3"><span class="badge ${b}">${esc(EN('invstatus', i.status))}</span></td>
-        <td class="py-2.5 px-3 tabular-nums ${overdue ? 'text-brand-bright font-bold' : 'text-slate-400'}">${esc(i.due)}${overdue ? ' (' + esc(T('overdue_due')) + ')' : ''}</td>
-        <td class="py-2.5 px-3 no-print"><div class="flex gap-1.5">
-          <button class="btn btn-brand !py-1 !px-2 text-xs" data-inv-export="${esc(i.id)}">${esc(T('export_invoice'))}</button>
-          ${i.status === 'unpaid' ? `<button class="btn btn-ghost !py-1 !px-2 text-xs" data-inv-pay="${esc(i.id)}">${esc(T('mark_collected'))}</button>` : ''}
-        </div></td>
-      </tr>`;
-    }).join('');
-    const th = (x) => `<th class="py-2 px-3 font-semibold" style="text-align:start">${esc(x)}</th>`;
-    const filters = [['all', T('all')], ['paid', EN('invstatus', 'paid')], ['unpaid', EN('invstatus', 'unpaid')], ['canceled', EN('invstatus', 'canceled')]];
-    return `<section class="view-enter space-y-5">
-      <div class="flex flex-wrap items-end justify-between gap-3">
-        <div><h2 class="text-xl font-extrabold">${esc(t('nav_invoices'))}</h2>
-          <p class="text-sm text-slate-400">${esc(t('collected'))}: ${money(M.collected)} • ${esc(t('pending'))}: ${money(M.pending)} • ${nf().format(M.overdueInv.length)} ${esc(T('overdue_due'))}</p></div>
-        <button class="btn btn-brand no-print" id="btn-add-invoice">+ ${esc(t('invmod_title'))}</button>
-      </div>
-      <div class="grid gap-4 sm:grid-cols-3">
-        ${kpiCard({ label: t('issued'), value: money(M.issued), icon: IC.box, iconBg: 'rgba(59,130,246,.14)' })}
-        ${kpiCard({ label: t('collected'), value: money(M.collected), icon: IC.cash, iconBg: 'rgba(16,185,129,.14)' })}
-        ${kpiCard({ label: t('pending'), value: money(M.pending), icon: IC.clock, iconBg: 'rgba(245,158,11,.14)', danger: M.overdueInv.length > 0 })}
-      </div>
-      <div class="card p-4">
-        <div class="flex flex-wrap items-center gap-2 mb-3 no-print">
-          ${filters.map(([v, l]) => `<button class="btn ${invFilter === v ? 'btn-brand' : 'btn-ghost'} !py-1.5 text-xs" data-invf="${v}">${esc(l)}</button>`).join('')}
-        </div>
-        <div class="overflow-x-auto"><table class="w-full text-sm">
-          <thead class="text-slate-400 border-b border-ink-500"><tr>${th(t('invoice_word'))}${th(t('shipment_word') + ' ' + T('linked_to'))}${th(T('amount'))}${th(T('pay_status'))}${th(T('due_date'))}<th class="py-2 px-3 font-semibold no-print" style="text-align:start">${esc(T('action'))}</th></tr></thead>
-          <tbody>${rows}</tbody>
-        </table></div>
-      </div>
-    </section>`;
-  }
-
   function view_reports() {
     return `<section class="view-enter space-y-5">
       <div><h2 class="text-xl font-extrabold">${esc(T('reports_title'))}</h2><p class="text-sm text-slate-400">${esc(T('reports_sub'))}</p></div>
       <div class="grid gap-4 md:grid-cols-2">
         <div class="card card-hover p-6">
-          <div class="w-12 h-12 rounded-xl bg-brand/15 flex items-center justify-center mb-4">${IC.box}</div>
+          <div class="w-12 h-12 rounded-xl bg-brand/15 flex items-center justify-center mb-4">${IC.truck}</div>
           <h3 class="font-extrabold text-lg">${esc(T('weekly_card_title'))}</h3>
           <p class="text-sm text-slate-400 mt-2 leading-relaxed">${esc(T('weekly_card_desc'))}</p>
           <button class="btn btn-brand mt-4" id="btn-weekly2">${esc(T('gen_now'))}</button>
@@ -1443,10 +1436,10 @@
           <h3 class="font-extrabold text-lg mb-3">${esc(T('quick_snapshot'))}</h3>
           <ul class="text-sm space-y-2 text-slate-300">
             <li class="flex justify-between"><span>${esc(t('shipments_word'))}</span><b>${nf().format(state.shipments.length)}</b></li>
+            <li class="flex justify-between"><span>${esc(EN('status','transit'))}</span><b>${nf().format(M.transit.length)}</b></li>
             <li class="flex justify-between"><span>${esc(T('late_lower'))}</span><b class="text-brand-bright">${nf().format(M.late.length)}</b></li>
-            <li class="flex justify-between"><span>${esc(t('collected'))}</span><b>${money(M.collected)}</b></li>
-            <li class="flex justify-between"><span>${esc(t('pending'))}</span><b>${money(M.pending)}</b></li>
-            <li class="flex justify-between"><span>${esc(T('maint_costs'))}</span><b>${money(M.maint)}</b></li>
+            <li class="flex justify-between"><span>${esc(EN('status','delivered'))}</span><b>${nf().format(M.delivered.length)}</b></li>
+            <li class="flex justify-between"><span>${esc(T('vehicles_need_service'))}</span><b>${nf().format(M.urgentVeh.length)}</b></li>
             <li class="flex justify-between"><span>${esc(T('on_time_rate'))}</span><b>${M.onTimeRate}%</b></li>
           </ul>
         </div>
@@ -1475,12 +1468,15 @@
           <span class="badge ${b}">${esc(EN('status', s.status))}</span>
         </div>
         <div class="text-sm text-slate-400 mt-2 space-y-1">
-          <div>${esc(listName('cities', s.city))} — ${esc(listName('branches', s.branch))} · ${esc(T('eta'))}: ${esc(s.eta || '—')}</div>
+          <div>${esc(listName('cities', s.city))} — ${esc(listName('branches', s.branch))}</div>
+          <div>${esc(T('eta_col'))}: <span class="text-slate-300">${esc(etaFmt(s.etaAt))}</span> <span class="${etaRel(s.etaAt).cls}">${esc(etaRel(s.etaAt).text)}</span></div>
           ${s.address ? `<div><span class="text-slate-500">${esc(T('cust_address'))}:</span> ${esc(disp(s.address))}</div>` : ''}
+          ${(s.schedule || []).length ? `<div class="text-amber-400 text-[11px]">${esc(T('rescheduled_n'))}${s.schedule.length > 1 ? ' ×' + nf().format(s.schedule.length) : ''}</div>` : ''}
           ${s.reason ? `<div><span class="badge badge-red">${esc(EN('reason', s.reason))}</span></div>` : ''}
         </div>
         <div class="flex flex-wrap gap-2 mt-3">
-          ${tel ? `<a href="tel:${esc(tel)}" class="btn btn-ghost !py-1.5 text-xs">📞 ${esc(T('call_customer'))} (${esc(s.phone)})</a>` : ''}
+          ${tel ? `<a href="tel:${esc(tel)}" class="btn btn-ghost !py-1.5 text-xs">📞 ${esc(s.phone)}</a>` : ''}
+          ${s.phone ? `<button class="btn btn-ghost !py-1.5 text-xs" data-notify="${esc(s.id)}">📲 ${esc(T('notify_customer'))}</button>` : ''}
           ${s.status !== 'delivered' && s.status !== 'canceled' ? `<button class="btn btn-brand !py-1.5 text-xs" data-mydone="${esc(s.id)}">${esc(T('mark_delivered'))}</button>` : ''}
           ${s.status === 'preparing' ? `<button class="btn btn-ghost !py-1.5 text-xs" data-mytransit="${esc(s.id)}">${esc(T('mark_transit'))}</button>` : ''}
           <button class="btn btn-ghost !py-1.5 text-xs" data-delay="${esc(s.id)}">${esc(T('report_delay'))}</button>
@@ -1571,6 +1567,11 @@
       ${listCard('cities', T('list_cities'))}
       ${listCard('branches', T('list_branches'))}
       ${listCard('drivers', T('list_drivers'))}
+      <div class="card p-5"><h3 class="font-extrabold mb-3">${esc(T('cust_wa_auto'))}</h3>
+        <p class="text-sm text-slate-400 mb-3">${esc(T('cust_wa_auto_desc'))}</p>
+        <label class="flex items-center gap-2 cursor-pointer text-sm"><input type="checkbox" id="custwa-on" class="!w-auto" ${company()?.custWa !== false ? 'checked' : ''} /> <span>${esc(T('cust_wa_auto'))}</span></label>
+        <button class="btn btn-brand mt-3" id="custwa-save">${esc(T('save_settings'))}</button>
+      </div>
       <div class="card p-5"><h3 class="font-extrabold mb-3">${esc(T('wa_report_title'))}</h3>
         <p class="text-sm text-slate-400 mb-3">${esc(T('wa_report_desc'))}</p>
         <form id="wa-form" class="space-y-3">
@@ -1611,8 +1612,7 @@
     const counts = M.delayCounts();
     const totalDelays = counts.reduce((a, c) => a + c.n, 0) || 1;
     const rReasons = counts.map((c) => `<tr><td>${esc(EN('reason', c.code))}</td><td class="tabular-nums">${nf().format(c.n)}</td><td class="tabular-nums">${Math.round(c.n / totalDelays * 100)}%</td></tr>`).join('');
-    const rInv = state.invoices.map((i) => `<tr><td>${esc(i.id)}</td><td>#${esc(i.shipment)}</td><td class="tabular-nums">${money(i.amount)}</td><td>${esc(EN('invstatus', i.status))}</td><td>${esc(i.due)}</td></tr>`).join('');
-    const rVeh = state.vehicles.filter((v) => M.urgentVeh.includes(v)).map((v) => `<tr><td>${esc(v.plate)}</td><td>${esc(v.model)}</td><td>${esc(EN('servicetype', v.service))}</td><td>${esc(v.nextDate)}</td><td class="tabular-nums">${money(v.cost)}</td></tr>`).join('') || `<tr><td colspan="5">${esc(T('rep_no_urgent'))}</td></tr>`;
+    const rVeh = state.vehicles.filter((v) => M.urgentVeh.includes(v)).map((v) => `<tr><td>${esc(v.plate)}</td><td>${esc(v.model)}</td><td>${esc(EN('servicetype', v.service))}</td><td>${esc(v.nextDate)}</td></tr>`).join('') || `<tr><td colspan="4">${esc(T('rep_no_urgent'))}</td></tr>`;
     const cell = (k, v, red) => `<div class="card p-3 text-center"><div class="text-xs text-slate-400">${esc(k)}</div><div class="text-xl font-extrabold ${red ? 'text-brand-bright' : ''}">${v}</div></div>`;
     return `<div class="space-y-6 text-sm leading-relaxed">
       <div class="flex items-center justify-between border-b border-ink-500 pb-4 flex-wrap gap-3">
@@ -1626,18 +1626,12 @@
         </div>
         <p class="mt-2 text-slate-400 text-xs">${esc(T('rep_ontime'))} <b class="text-slate-200">${M.onTimeRate}%</b> (${esc(T('target'))} ${state.targets.onTime}%).</p>
       </div>
-      <div><h4 class="font-extrabold mb-2">${esc(T('rep_s2'))}</h4>
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-3">
-          ${cell(t('issued'), money(M.issued))}${cell(t('collected'), money(M.collected))}${cell(t('pending'), money(M.pending))}${cell(T('overdue_due'), money(M.overdueInv.reduce((a, i) => a + i.amount, 0)))}
-        </div>
-        <table class="w-full text-xs report-table"><thead><tr><th>${esc(t('invoice_word'))}</th><th>${esc(t('shipment_word'))}</th><th>${esc(T('amount'))}</th><th>${esc(T('status'))}</th><th>${esc(T('due_date'))}</th></tr></thead><tbody>${rInv}</tbody></table>
-      </div>
       <div><h4 class="font-extrabold mb-2">${esc(T('rep_s3'))}</h4>
         <table class="w-full text-xs report-table"><thead><tr><th>${esc(T('reason_col'))}</th><th>${esc(T('cases_count'))}</th><th>${esc(T('share'))}</th></tr></thead><tbody>${rReasons}</tbody></table>
       </div>
       <div><h4 class="font-extrabold mb-2">${esc(T('rep_s4'))}</h4>
-        <p class="text-slate-400 text-xs mb-2">${esc(T('rep_total_maint'))} <b class="text-slate-200">${money(M.maint)}</b> — ${esc(T('rep_veh_count'))} ${nf().format(state.vehicles.length)}.</p>
-        <table class="w-full text-xs report-table"><thead><tr><th>${esc(T('plate'))}</th><th>${esc(T('model'))}</th><th>${esc(T('service_type'))}</th><th>${esc(T('due'))}</th><th>${esc(T('expected_cost'))}</th></tr></thead><tbody>${rVeh}</tbody></table>
+        <p class="text-slate-400 text-xs mb-2">${esc(T('rep_veh_count'))} ${nf().format(state.vehicles.length)} — ${nf().format(M.urgentVeh.length)} ${esc(T('need_urgent_service'))}.</p>
+        <table class="w-full text-xs report-table"><thead><tr><th>${esc(T('plate'))}</th><th>${esc(T('model'))}</th><th>${esc(T('service_type'))}</th><th>${esc(T('due'))}</th></tr></thead><tbody>${rVeh}</tbody></table>
       </div>
       <div class="border-t border-ink-500 pt-3 text-[11px] text-slate-500">${esc(T('rep_generated'))}</div>
     </div>
@@ -1649,30 +1643,18 @@
     const c = M.delayCounts()[0];
     const name = company() ? disp(company().name) : 'مُوصل';
     const L = state.lang === 'ar';
-    const lines = L ? [
-      `📦 تقرير مُوصل الأسبوعي — ${name}`,
-      `التاريخ: ${new Date().toLocaleDateString('ar-EG-u-nu-latn', { year: 'numeric', month: 'long', day: 'numeric' })}`,
+    const lines = [
+      L ? `📦 تقرير مُوصل الأسبوعي — ${name}` : `📦 Mowasil weekly report — ${name}`,
+      (L ? 'التاريخ: ' : 'Date: ') + new Date().toLocaleDateString(L ? 'ar-EG-u-nu-latn' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
       ``,
       `• ${t('shipments_word')}: ${nf().format(state.shipments.length)}`,
+      `• ${EN('status', 'transit')}: ${nf().format(M.transit.length)}`,
       `• ${T('late_lower')}: ${nf().format(M.late.length)}`,
-      `• ${EN('status', 'delivered')}: ${nf().format(M.delivered.length)} (${M.onTimeRate}% ${T('on_time_rate')})`,
-      `• ${t('collected')}: ${money(M.collected)}`,
-      `• ${t('pending')}: ${money(M.pending)} (${nf().format(M.overdueInv.length)} ${T('overdue_due')})`,
-      `• ${T('maint_costs')}: ${money(M.maint)}`,
-      c ? `• ${T('most_common')} ${T('delay_reason')}: ${EN('reason', c.code)}` : '',
-    ] : [
-      `📦 Mowasil weekly report — ${name}`,
-      `Date: ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`,
-      ``,
-      `• ${t('shipments_word')}: ${nf().format(state.shipments.length)}`,
-      `• ${T('late_lower')}: ${nf().format(M.late.length)}`,
-      `• ${EN('status', 'delivered')}: ${nf().format(M.delivered.length)} (${M.onTimeRate}% on-time)`,
-      `• ${t('collected')}: ${money(M.collected)}`,
-      `• ${t('pending')}: ${money(M.pending)} (${nf().format(M.overdueInv.length)} past due)`,
-      `• ${T('maint_costs')}: ${money(M.maint)}`,
-      c ? `• Top delay cause: ${EN('reason', c.code)}` : '',
+      `• ${EN('status', 'delivered')}: ${nf().format(M.delivered.length)} (${M.onTimeRate}% ${L ? T('on_time_rate') : 'on-time'})`,
+      `• ${T('vehicles_need_service')}: ${nf().format(M.urgentVeh.length)}`,
+      c ? `• ${L ? T('most_common') + ' ' + T('delay_reason') : 'Top delay cause'}: ${EN('reason', c.code)}` : '',
     ];
-    return lines.filter(Boolean).join('\n');
+    return lines.filter((x) => x !== '').join('\n');
   }
   function saveWhatsApp(e) {
     e.preventDefault();
@@ -1685,7 +1667,7 @@
   }
 
   /* ===================== التوجيه ===================== */
-  const VIEWS = { dashboard: view_dashboard, shipments: view_shipments, delays: view_delays, fleet: view_fleet, invoices: view_invoices, reports: view_reports, settings: view_settings, mytrips: view_mytrips };
+  const VIEWS = { dashboard: view_dashboard, shipments: view_shipments, delays: view_delays, fleet: view_fleet, reports: view_reports, settings: view_settings, mytrips: view_mytrips };
   let activeRoute = 'dashboard';
   function currentRoute() { const h = (location.hash || '').replace(/^#\/?/, ''); return (h && VIEWS[h]) ? h : activeRoute; }
   function go(route) { activeRoute = VIEWS[route] ? route : 'dashboard'; try { if (location.hash !== '#/' + activeRoute) location.hash = '#/' + activeRoute; } catch (e) {} render(); }
@@ -1710,9 +1692,9 @@
 
   function wireView() {
     $$('[data-delay]').forEach((b) => b.addEventListener('click', () => openDelayModal(b.dataset.delay)));
-    $$('[data-mydone]').forEach((b) => b.addEventListener('click', () => { const s = state.shipments.find((x) => x.id === b.dataset.mydone); if (s) { s.status = 'delivered'; s.actual = s.actual || '—'; s.onTime = true; save(); render(); toast(T('marked_delivered') + ' ' + s.id); } }));
-    $$('[data-mytransit]').forEach((b) => b.addEventListener('click', () => { const s = state.shipments.find((x) => x.id === b.dataset.mytransit); if (s) { s.status = 'transit'; save(); render(); toast(T('shipment_updated') + ' ' + s.id); } }));
-    $$('[data-mkinv]').forEach((b) => b.addEventListener('click', () => openInvoiceModal(b.dataset.mkinv)));
+    $$('[data-notify]').forEach((b) => b.addEventListener('click', () => notifyCustomer(state.shipments.find((x) => x.id === b.dataset.notify))));
+    $$('[data-mydone]').forEach((b) => b.addEventListener('click', () => { const s = state.shipments.find((x) => x.id === b.dataset.mydone); if (s) { s.status = 'delivered'; s.actualAt = new Date().toISOString(); s.onTime = true; save(); autoNotify(s); render(); toast(T('marked_delivered') + ' ' + s.id); } }));
+    $$('[data-mytransit]').forEach((b) => b.addEventListener('click', () => { const s = state.shipments.find((x) => x.id === b.dataset.mytransit); if (s) { s.status = 'transit'; save(); autoNotify(s); render(); toast(T('shipment_updated') + ' ' + s.id); } }));
     $('#btn-weekly')?.addEventListener('click', openWeekly);
     $('#btn-weekly2')?.addEventListener('click', openWeekly);
 
@@ -1723,16 +1705,10 @@
       $('#f-branch').addEventListener('change', (e) => { shipFilter.branch = e.target.value; render(); });
     }
     $('#btn-add-ship')?.addEventListener('click', () => openShipmentModal());
-    $('#btn-add-invoice')?.addEventListener('click', () => openInvoiceModal());
 
     $('#btn-add-veh')?.addEventListener('click', () => openVehicleModal(null));
     $$('[data-veh-edit]').forEach((b) => b.addEventListener('click', () => openVehicleModal(b.dataset.vehEdit)));
     $$('[data-veh-del]').forEach((b) => b.addEventListener('click', () => { if (confirm(T('del_vehicle_q'))) { state.vehicles = state.vehicles.filter((v) => v.id !== b.dataset.vehDel); save(); render(); toast(T('vehicle_deleted')); } }));
-
-    $$('[data-invf]').forEach((b) => b.addEventListener('click', () => { invFilter = b.dataset.invf; render(); }));
-    $$('[data-inv-pay]').forEach((b) => b.addEventListener('click', () => { const inv = state.invoices.find((i) => i.id === b.dataset.invPay); if (inv) { inv.status = 'paid'; save(); render(); toast(T('collection_logged') + ': ' + inv.id); } }));
-    $$('[data-inv-export]').forEach((b) => b.addEventListener('click', () => openInvoiceDoc(b.dataset.invExport)));
-    $$('[data-goship]').forEach((b) => b.addEventListener('click', () => { shipFilter = { q: b.dataset.goship, status: 'all', branch: 'all' }; go('shipments'); }));
 
     $$('[data-setmode]', $('#view')).forEach((b) => b.addEventListener('click', () => setMode(b.dataset.setmode)));
     $$('[data-setlang]').forEach((b) => b.addEventListener('click', () => setLang(b.dataset.setlang)));
@@ -1742,6 +1718,7 @@
     $$('[data-user-edit]').forEach((b) => b.addEventListener('click', () => openUserModal(b.dataset.userEdit)));
     $$('[data-user-del]').forEach((b) => b.addEventListener('click', () => delUser(b.dataset.userDel)));
     $('#pw-form')?.addEventListener('submit', changePassword);
+    $('#custwa-save')?.addEventListener('click', () => { const c = company(); if (c) { c.custWa = $('#custwa-on').checked; save(); toast(T('wa_saved')); } });
     $('#wa-form')?.addEventListener('submit', saveWhatsApp);
     $('#wa-preview')?.addEventListener('click', () => { const el = $('#wa-text'); el.textContent = weeklyReportText(); el.classList.remove('hidden'); });
     $('#wa-copy')?.addEventListener('click', async () => { try { await navigator.clipboard.writeText(weeklyReportText()); toast(T('wa_copied')); } catch (e) { const el = $('#wa-text'); el.textContent = weeklyReportText(); el.classList.remove('hidden'); } });
@@ -1784,6 +1761,14 @@
     fillSelect($('#dm-reason'), [{ v: '', l: T('none') }].concat(REASONS.map((r) => ({ v: r, l: EN('reason', r) }))), s.reason || '');
     fillSelect($('#dm-status'), STATUSES.map((st) => ({ v: st, l: EN('status', st) })), s.status);
     $('#dm-note').value = disp(s.note) || '';
+    $('#dm-eta-date').value = isoToDate(s.etaAt);
+    $('#dm-eta-time').value = isoToTime(s.etaAt);
+    const log = $('#dm-log');
+    if ((s.schedule || []).length) {
+      log.classList.remove('hidden');
+      log.innerHTML = `<div class="font-bold text-slate-200 mb-1">${esc(T('schedule_log'))}</div>` + s.schedule.map((h) =>
+        `<div>• ${esc(etaFmt(h.from))} ← ${esc(etaFmt(h.to))} <span class="text-slate-500">(${esc(T('by_w'))} ${esc(h.by || '—')}${h.reason ? ' — ' + esc(EN('reason', h.reason)) : ''})</span></div>`).join('');
+    } else { log.classList.add('hidden'); log.innerHTML = ''; }
     $('#delay-modal').showModal();
   }
   onModalSave('#delay-modal', () => {
@@ -1792,7 +1777,12 @@
     s.reason = $('#dm-reason').value;
     s.note = $('#dm-note').value.trim();
     s.status = $('#dm-status').value;
-    save(); render(); toast(T('shipment_updated') + ' ' + s.id);
+    const newEta = dtToIso($('#dm-eta-date').value, $('#dm-eta-time').value);
+    if (newEta && newEta !== s.etaAt) {
+      (s.schedule = s.schedule || []).push({ at: new Date().toISOString(), by: disp((cu() && cu().name)) || T('role_manager'), from: s.etaAt, to: newEta, reason: s.reason || '' });
+      s.etaAt = newEta;
+    }
+    save(); autoNotify(s); render(); toast(T('shipment_updated') + ' ' + s.id);
     delayTarget = null;
   });
 
@@ -1801,75 +1791,39 @@
     return 'D-' + (Math.max(1023, ...n) + 1);
   }
   function openShipmentModal() {
-    const charity = state.mode === 'charity';
     $('#sm-title').textContent = T('new_shipment');
-    $('#sm-client').value = '';
+    $('#sm-client').value = ''; $('#sm-phone').value = ''; $('#sm-address').value = '';
     fillSelect($('#sm-city'), LIST('cities').map((c) => ({ v: c.id, l: disp(c) })), LIST('cities')[0]?.id);
     fillSelect($('#sm-branch'), LIST('branches').map((b) => ({ v: b.id, l: disp(b) })), LIST('branches')[0]?.id);
     fillSelect($('#sm-status'), STATUSES.map((st) => ({ v: st, l: EN('status', st) })), 'preparing');
     $('#sm-drivers-dl').innerHTML = LIST('drivers').map((d) => `<option value="${esc(disp(d))}"></option>`).join('');
-    $('#sm-amount').value = 300; $('#sm-amount').disabled = false;
-    $('#sm-eta').value = ''; $('#sm-driver').value = '';
-    $('#sm-noamount').checked = false;
-    $('#sm-noamount-wrap').classList.toggle('hidden', !charity);
-    $('#sm-invno-wrap').classList.toggle('hidden', charity);
-    $('#sm-invno').value = charity ? '' : nextInvId();
+    $('#sm-driver').value = '';
+    $('#sm-eta-date').value = ''; $('#sm-eta-time').value = ''; $('#sm-eta-days').value = ''; $('#sm-eta-hours').value = '';
     $('#shipment-modal').showModal();
   }
-  $('#sm-noamount').addEventListener('change', (e) => { $('#sm-amount').disabled = e.target.checked; if (e.target.checked) $('#sm-amount').value = ''; });
+  $('#sm-eta-calc').addEventListener('click', () => {
+    const d = +$('#sm-eta-days').value || 0, h = +$('#sm-eta-hours').value || 0;
+    if (!d && !h) return;
+    const at = new Date(Date.now() + (d * 24 + h) * 3600000);
+    $('#sm-eta-date').value = at.toISOString().slice(0, 10);
+    $('#sm-eta-time').value = at.toTimeString().slice(0, 5);
+  });
   onModalSave('#shipment-modal', () => {
-    const charity = state.mode === 'charity';
     const client = $('#sm-client').value.trim();
     if (!client) { toast(T('client_required'), 'err'); return false; }
-    const noAmount = charity && $('#sm-noamount').checked;
-    const amount = noAmount ? null : (+$('#sm-amount').value || 0);
-    let invno = '';
-    if (!charity) {
-      invno = $('#sm-invno').value.trim();
-      if (!invno) { toast(T('invoice_no_required'), 'err'); return false; }
-      if (state.invoices.some((i) => i.id === invno)) { toast(T('invoice_no_dup'), 'err'); return false; }
+    let etaAt = dtToIso($('#sm-eta-date').value, $('#sm-eta-time').value);
+    if (!etaAt) {
+      const d = +$('#sm-eta-days').value || 0, h = +$('#sm-eta-hours').value || 0;
+      if (d || h) etaAt = new Date(Date.now() + (d * 24 + h) * 3600000).toISOString();
     }
     const id = nextShipId();
     state.shipments.unshift({
-      id, client, city: $('#sm-city').value, branch: $('#sm-branch').value,
-      status: $('#sm-status').value, eta: $('#sm-eta').value.trim() || '—', actual: '',
-      reason: '', note: '', amount, driver: $('#sm-driver').value.trim() || '—',
+      id, client, phone: $('#sm-phone').value.trim(), address: $('#sm-address').value.trim(),
+      city: $('#sm-city').value, branch: $('#sm-branch').value,
+      status: $('#sm-status').value, etaAt, actualAt: '',
+      reason: '', note: '', driver: $('#sm-driver').value.trim() || '—', schedule: [],
     });
-    if (invno) {
-      const due = new Date(state.today); due.setDate(due.getDate() + 14);
-      state.invoices.unshift({ id: invno, shipment: id, amount: amount || 0, status: 'unpaid', due: due.toISOString().slice(0, 10) });
-    }
-    save(); render();
-    toast(T('shipment_added') + (invno ? ' — ' + T('invoice_auto_created') : ''));
-  });
-
-  function nextInvId() {
-    const n = state.invoices.map((i) => +(String(i.id).match(/(\d+)$/) || [])[1] || 0);
-    return 'INV-' + (Math.max(2040, ...n) + 1);
-  }
-  function openInvoiceModal(shipId) {
-    if (shipId && hasInvoice(shipId)) { toast(T('invoice_exists'), 'warn'); return; }
-    $('#im-title').textContent = t('invmod_title');
-    $('#im-id').value = nextInvId();
-    const opts = state.shipments.filter((s) => shipId ? s.id === shipId : !hasInvoice(s.id));
-    const pool = opts.length ? opts : state.shipments;
-    fillSelect($('#im-ship'), pool.map((s) => ({ v: s.id, l: `#${s.id} — ${disp(s.client)}` })), shipId || pool[0]?.id);
-    const s = state.shipments.find((x) => x.id === (shipId || pool[0]?.id));
-    $('#im-amount').value = s ? s.amount : 0;
-    const due = new Date(state.today); due.setDate(due.getDate() + 14);
-    $('#im-due').value = due.toISOString().slice(0, 10);
-    fillSelect($('#im-status'), ['unpaid', 'paid', 'canceled'].map((v) => ({ v, l: EN('invstatus', v) })), 'unpaid');
-    $('#invoice-modal').showModal();
-    $('#im-ship').onchange = () => { const sh = state.shipments.find((x) => x.id === $('#im-ship').value); if (sh) $('#im-amount').value = sh.amount; };
-  }
-  onModalSave('#invoice-modal', () => {
-    if (!$('#im-ship').value) return false;
-    state.invoices.unshift({
-      id: $('#im-id').value, shipment: $('#im-ship').value,
-      amount: +$('#im-amount').value || 0, status: $('#im-status').value,
-      due: $('#im-due').value || '—',
-    });
-    save(); render(); toast(T('invoice_added'));
+    save(); render(); toast(T('shipment_added'));
   });
 
   let vehTarget = null, vehPhoto = '';
@@ -1885,7 +1839,6 @@
     fillSelect($('#vm-service'), Object.keys(ENUM.servicetype).map((s) => ({ v: s, l: EN('servicetype', s) })), v?.service || 'oil');
     $('#vm-odo').value = v?.odo || '';
     $('#vm-date').value = v?.nextDate || '';
-    $('#vm-cost').value = v?.cost || '';
     $('#vm-photo-info').textContent = '';
     const pv = $('#vm-photo-preview');
     if (v?.photo) { pv.src = v.photo; pv.classList.remove('hidden'); } else { pv.classList.add('hidden'); }
@@ -1906,7 +1859,7 @@
     const data = {
       plate: $('#vm-plate').value.trim(), model: $('#vm-model').value.trim(), driver: $('#vm-driver').value.trim() || '—',
       status: $('#vm-status').value, odo: +$('#vm-odo').value || 0, nextDate: $('#vm-date').value,
-      service: $('#vm-service').value, cost: +$('#vm-cost').value || 0,
+      service: $('#vm-service').value,
     };
     if (!data.plate || !data.model) { toast(T('plate_model_required'), 'err'); return false; }
     if (vehTarget) { const v = state.vehicles.find((x) => x.id === vehTarget); Object.assign(v, data); if (vehPhoto) v.photo = vehPhoto; toast(T('vehicle_updated')); }
@@ -1917,79 +1870,6 @@
   function openWeekly() { $('#report-body').innerHTML = buildWeeklyReport(); $('#report-modal').showModal(); }
   $('#report-close').addEventListener('click', () => $('#report-modal').close());
   $('#report-print').addEventListener('click', () => window.print());
-
-  /* مستند الفاتورة القابل للتصدير (طباعة المتصفح → حفظ PDF) */
-  function buildInvoiceDoc(invId) {
-    const i = state.invoices.find((x) => x.id === invId);
-    if (!i) return '';
-    const sh = state.shipments.find((s) => s.id === i.shipment);
-    const customer = sh ? disp(sh.client) : '—';
-    const city = sh ? listName('cities', sh.city) : '';
-    const isCharity = state.mode === 'charity';
-    const docTitle = isCharity ? T('disbursement_doc_title') : T('invoice_doc_title');
-    const vat = i.status === 'canceled' ? 0 : Math.round(i.amount * 0.15);
-    const total = i.amount + vat;
-    const stBadge = i.status === 'paid' ? 'badge-green' : i.status === 'unpaid' ? 'badge-amber' : 'badge-gray';
-    return `<div class="text-sm leading-relaxed">
-      <div class="flex items-start justify-between gap-4 border-b border-ink-500 pb-4 flex-wrap">
-        <div class="flex items-center gap-3">${logoSVG(48)}
-          <div><div class="font-extrabold text-lg">مُوصل | MOWASIL DELIVERY</div>
-          <div class="text-slate-400 text-xs">${esc(T('issued_by'))}: مُوصل</div></div>
-        </div>
-        <div class="text-end">
-          <div class="text-2xl font-extrabold tracking-wide">${esc(docTitle)}</div>
-          <div class="text-slate-400 text-xs mt-1">${esc(i.id)}</div>
-          <span class="badge ${stBadge} mt-2">${esc(EN('invstatus', i.status))}</span>
-        </div>
-      </div>
-
-      <div class="grid grid-cols-2 gap-4 py-4">
-        <div>
-          <div class="text-slate-400 text-xs mb-1">${esc(T('bill_to'))}</div>
-          <div class="font-bold">${esc(customer)}</div>
-          <div class="text-slate-400">${esc(city)}</div>
-        </div>
-        <div class="text-end">
-          <div class="text-xs text-slate-400">${esc(T('issue_date'))}: <span class="text-slate-200">${esc(state.today)}</span></div>
-          <div class="text-xs text-slate-400 mt-1">${esc(T('due_date'))}: <span class="text-slate-200">${esc(i.due)}</span></div>
-          <div class="text-xs text-slate-400 mt-1">${esc(t('shipment_word'))}: <span class="text-slate-200">#${esc(i.shipment)}</span></div>
-        </div>
-      </div>
-
-      <table class="w-full doc-table">
-        <thead><tr><th style="text-align:start">${esc(T('description'))}</th><th style="text-align:end">${esc(T('amount'))}</th></tr></thead>
-        <tbody>
-          <tr><td>${esc(T('delivery_service_for'))} #${esc(i.shipment)} — ${esc(customer)}</td><td style="text-align:end" class="tabular-nums">${money(i.amount)}</td></tr>
-        </tbody>
-      </table>
-
-      <div class="flex justify-end mt-4">
-        <table class="doc-totals">
-          <tr><td>${esc(T('subtotal'))}</td><td class="tabular-nums">${money(i.amount)}</td></tr>
-          <tr><td>${esc(T('vat15'))}</td><td class="tabular-nums">${money(vat)}</td></tr>
-          <tr class="grand"><td>${esc(T('grand_total'))}</td><td class="tabular-nums">${money(total)}</td></tr>
-        </table>
-      </div>
-
-      <p class="text-[11px] text-slate-500 border-t border-ink-500 mt-5 pt-3">${esc(T('invoice_doc_note'))}</p>
-    </div>
-    <style>
-      .doc-table{border-collapse:collapse}.doc-table th,.doc-table td{border:1px solid #2A313F;padding:8px 10px}
-      .doc-table th{background:#12151B}
-      .doc-totals{border-collapse:collapse;min-width:260px}
-      .doc-totals td{border:1px solid #2A313F;padding:7px 10px}
-      .doc-totals td:last-child{text-align:end;font-weight:700}
-      .doc-totals .grand td{background:#1E2430;font-size:1rem}
-    </style>`;
-  }
-  function openInvoiceDoc(invId) {
-    const i = state.invoices.find((x) => x.id === invId); if (!i) return;
-    $('#invoice-doc-heading').textContent = (state.mode === 'charity' ? T('disbursement_doc_title') : T('invoice_doc_title')) + ' · ' + i.id;
-    $('#invoice-doc-body').innerHTML = buildInvoiceDoc(invId);
-    $('#invoice-doc-modal').showModal();
-  }
-  $('#invoice-doc-close').addEventListener('click', () => $('#invoice-doc-modal').close());
-  $('#invoice-doc-print').addEventListener('click', () => window.print());
 
   /* ===================== اللغة + الوضع ===================== */
   function applyStatic() {
@@ -2019,7 +1899,7 @@
   function setMode(m) { state.mode = m; if (company()) company().mode = m; save(); applyStatic(); render(); toast(T('switched_mode') + ' ' + t('mode_name')); }
 
   function buildMobileNav() {
-    const labels = { dashboard: T('nav_home'), shipments: t('nav_shipments'), delays: T('nav_delays'), invoices: t('nav_invoices'), fleet: T('nav_fleet'), reports: T('nav_reports'), settings: T('nav_settings'), mytrips: T('nav_mytrips') };
+    const labels = { dashboard: T('nav_home'), shipments: t('nav_shipments'), delays: T('nav_delays'), fleet: T('nav_fleet'), reports: T('nav_reports'), settings: T('nav_settings'), mytrips: T('nav_mytrips') };
     const items = allowedRoutes();
     $('#mobile-nav').innerHTML = items.map((r) => `<button class="btn btn-ghost !py-1.5 shrink-0 text-xs" data-route="${r}">${esc(labels[r] || r)}</button>`).join('');
   }
@@ -2027,7 +1907,6 @@
     const items = [];
     if (M.late.length) items.push({ c: 'badge-red', t: `${nf().format(M.late.length)} ${T('n_late_ship')}` });
     if (M.urgentVeh.length) items.push({ c: 'badge-amber', t: `${nf().format(M.urgentVeh.length)} ${T('n_veh_urgent')}` });
-    if (M.overdueInv.length) items.push({ c: 'badge-red', t: `${nf().format(M.overdueInv.length)} ${T('n_inv_overdue')}` });
     if (!items.length) items.push({ c: 'badge-green', t: T('no_alerts') });
     $('#bell-count').textContent = items.filter((i) => i.c !== 'badge-green').length;
     $('#bell-menu').innerHTML = items.map((i) => `<div class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-ink-700"><span class="badge ${i.c}">●</span><span>${esc(i.t)}</span></div>`).join('');
@@ -2091,7 +1970,7 @@
 
   /* ===================== المصادقة متعددة الشركات ===================== */
   function transientState() {
-    return { today: TODAY, mode: 'commercial', lang: ROOT.lang, shipments: [], vehicles: [], invoices: [], delayHistoryWeek: {}, targets: { onTime: 95, deliveryHours: 2 }, kmToday: 0 };
+    return { today: TODAY, mode: 'commercial', lang: ROOT.lang, shipments: [], vehicles: [], delayHistoryWeek: {}, targets: { onTime: 95, deliveryHours: 2 }, kmToday: 0 };
   }
   async function ensureHashes() {
     if (!ROOT.admin.hash) ROOT.admin.hash = await sha256('Owner@1234');
@@ -2264,7 +2143,7 @@
 
   /* ===================== مستخدمو الشركة (المدير) ===================== */
   let userTarget = null;
-  const PERM_KEYS = ['dashboard', 'shipments', 'delays', 'invoices', 'fleet', 'reports'];
+  const PERM_KEYS = ['dashboard', 'shipments', 'delays', 'fleet', 'reports'];
   function umToggleRole() {
     const r = $('#um-role').value;
     $('#um-perms-wrap').classList.toggle('hidden', r !== 'coordinator');
@@ -2284,7 +2163,7 @@
     const isMgr = !!(u && u.role === 'manager');
     fillSelect($('#um-role'), isMgr ? [{ v: 'manager', l: T('role_manager') }] : [{ v: 'coordinator', l: T('role_coordinator') }, { v: 'driver', l: T('role_driver') }], u ? u.role : 'coordinator');
     $('#um-role').disabled = isMgr;
-    const p = (u && u.perms) || { dashboard: true, shipments: true, delays: true, invoices: false, fleet: true, reports: false };
+    const p = (u && u.perms) || { dashboard: true, shipments: true, delays: true, fleet: true, reports: false };
     PERM_KEYS.forEach((k) => { $('#um-perm-' + k).checked = !!p[k]; });
     fillSelect($('#um-driver'), LIST('drivers').map((d) => ({ v: d.id, l: disp(d) })), (u && u.driverId) || LIST('drivers')[0]?.id);
     umToggleRole();
