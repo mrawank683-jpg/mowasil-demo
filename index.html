@@ -1,0 +1,2382 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>مُوصل | MOWASIL DELIVERY</title>
+<meta name="description" content="مُوصل: منصة الشركات لتنظيم ومتابعة شحناتها وتحصيلها المالي وإدارة أسطولها — بوضعَي الشركات التجارية والجمعيات الخيرية، وواجهة عربية/إنجليزية." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet" />
+
+<!-- TailwindCSS (نموذج أولي عبر CDN؛ للإنتاج ثبّته عبر PostCSS/CLI) -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          brand: { DEFAULT: '#E50914', bright: '#FF2A2A', dark: '#B00610', deep: '#5C020A' },
+          ink:   { 900: '#0D0F12', 800: '#12151B', 700: '#161A22', 600: '#1E2430', 500: '#2A313F' },
+        },
+        fontFamily: { sans: ['Cairo', 'Inter', 'Tajawal', 'system-ui', 'sans-serif'] },
+      },
+    },
+  };
+</script>
+
+<style>
+  :root{
+    --brand:#E50914; --brand-bright:#FF2A2A; --brand-dark:#B00610;
+    --ink-900:#0D0F12; --ink-800:#12151B; --ink-700:#161A22; --ink-600:#1E2430; --line:#2A313F;
+  }
+  html,body{ background:var(--ink-900); color:#E7EAF0; font-family:'Cairo','Inter','Tajawal',system-ui,sans-serif; }
+  html[lang="en"] body{ font-family:'Inter','Cairo',system-ui,sans-serif; }
+  ::-webkit-scrollbar{ width:10px; height:10px; }
+  ::-webkit-scrollbar-track{ background:transparent; }
+  ::-webkit-scrollbar-thumb{ background:#2A313F; border-radius:99px; }
+  ::-webkit-scrollbar-thumb:hover{ background:#3a4356; }
+
+  .card{ background:linear-gradient(180deg,#161A22,#12151B); border:1px solid var(--line); border-radius:1rem; }
+  .card-hover{ transition:transform .15s ease, border-color .15s ease, box-shadow .15s ease; }
+  .card-hover:hover{ transform:translateY(-2px); border-color:#3a4356; box-shadow:0 10px 30px -12px rgba(0,0,0,.6); }
+
+  .btn{ display:inline-flex; align-items:center; gap:.5rem; font-weight:600; border-radius:.75rem; padding:.55rem .95rem; font-size:.875rem; transition:filter .15s ease, background .15s ease, opacity .15s ease; cursor:pointer; white-space:nowrap; border:0; }
+  .btn:disabled{ opacity:.5; cursor:not-allowed; }
+  .btn-brand{ background:linear-gradient(180deg,var(--brand-bright),var(--brand)); color:#fff; box-shadow:0 8px 20px -10px rgba(229,9,20,.8); }
+  .btn-brand:hover{ filter:brightness(1.08); }
+  .btn-ghost{ background:#1E2430; color:#D7DCE5; border:1px solid var(--line); }
+  .btn-ghost:hover{ background:#252c3a; }
+
+  .badge{ display:inline-flex; align-items:center; gap:.35rem; font-size:.75rem; font-weight:700; padding:.2rem .6rem; border-radius:99px; border:1px solid transparent; }
+  .badge-red{   background:rgba(229,9,20,.14);  color:#FF6B72; border-color:rgba(229,9,20,.35); }
+  .badge-green{ background:rgba(16,185,129,.14); color:#34D399; border-color:rgba(16,185,129,.30); }
+  .badge-amber{ background:rgba(245,158,11,.14); color:#FBBF24; border-color:rgba(245,158,11,.30); }
+  .badge-blue{  background:rgba(59,130,246,.14); color:#60A5FA; border-color:rgba(59,130,246,.30); }
+  .badge-gray{  background:rgba(148,163,184,.12);color:#CBD5E1; border-color:rgba(148,163,184,.25); }
+
+  .nav-link{ display:flex; align-items:center; gap:.75rem; padding:.7rem .9rem; border-radius:.75rem; color:#9AA4B2; font-weight:600; font-size:.925rem; transition:background .15s ease, color .15s ease; cursor:pointer; border-inline-start:3px solid transparent; }
+  .nav-link:hover{ background:#1a1f29; color:#E7EAF0; }
+  .nav-link.active{ background:linear-gradient(90deg,rgba(229,9,20,.20),rgba(229,9,20,0)); color:#fff; border-inline-start-color:var(--brand-bright); }
+
+  .row-late{ background:linear-gradient(90deg, rgba(229,9,20,.10), rgba(229,9,20,.02)); }
+  .row-late td:first-child{ border-inline-start:3px solid var(--brand-bright); }
+
+  .view-enter{ animation:fadeUp .25s ease both; }
+  @keyframes fadeUp{ from{ opacity:0; transform:translateY(8px); } to{ opacity:1; transform:none; } }
+
+  .pulse-dot{ position:relative; }
+  .pulse-dot::after{ content:""; position:absolute; inset:-4px; border-radius:99px; border:2px solid var(--brand-bright); animation:ring 1.8s ease-out infinite; }
+  @keyframes ring{ 0%{ transform:scale(.6); opacity:.9; } 100%{ transform:scale(1.9); opacity:0; } }
+
+  dialog{ color:#E7EAF0; border:none; padding:0; background:transparent; max-height:92vh; }
+  dialog::backdrop{ background:rgba(3,5,8,.72); backdrop-filter:blur(3px); }
+  dialog[open]{ animation:fadeUp .2s ease both; }
+
+  input,select,textarea{ background:#0F1319; border:1px solid var(--line); border-radius:.7rem; padding:.55rem .75rem; color:#E7EAF0; width:100%; font-family:inherit; font-size:.9rem; }
+  input:focus,select:focus,textarea:focus{ outline:none; border-color:var(--brand-bright); box-shadow:0 0 0 3px rgba(229,9,20,.18); }
+  label{ font-size:.8rem; color:#9AA4B2; font-weight:600; display:block; margin-bottom:.35rem; }
+
+  .kpi-line{ height:3px; border-radius:99px; background:linear-gradient(90deg,var(--brand-bright),transparent); }
+  .seg{ display:flex; gap:.25rem; background:var(--ink-700); border:1px solid var(--line); border-radius:.75rem; padding:.25rem; }
+  .seg button{ font-size:.75rem; font-weight:700; padding:.35rem .7rem; border-radius:.5rem; color:#9AA4B2; }
+  .seg button.on{ background:linear-gradient(180deg,var(--brand-bright),var(--brand)); color:#fff; }
+
+  @media print{
+    body > *{ visibility:hidden !important; }
+    dialog[open], dialog[open] *{ visibility:visible !important; }
+    dialog[open]{ position:absolute !important; inset:0 !important; max-height:none !important; }
+    dialog[open] .no-print{ display:none !important; }
+    #report-card, #invoice-doc-card{ box-shadow:none !important; border:none !important; background:#fff !important; color:#111 !important; max-height:none !important; overflow:visible !important; }
+    #report-card *, #invoice-doc-card *{ color:#111 !important; border-color:#ccc !important; }
+  }
+</style>
+</head>
+<body class="min-h-screen">
+
+<!-- ============ تسجيل الدخول ============ -->
+<div id="login" class="fixed inset-0 z-50 flex items-center justify-center px-4">
+  <canvas id="net-login" class="absolute inset-0 w-full h-full opacity-40"></canvas>
+  <div class="card card-hover relative w-full max-w-md p-8">
+    <div class="flex items-center justify-between mb-6">
+      <div class="flex items-center gap-3">
+        <div id="logo-login" class="shrink-0"></div>
+        <div>
+          <div class="text-xl font-extrabold leading-tight">مُوصل <span class="text-slate-400 font-semibold text-sm">| MOWASIL</span></div>
+          <div class="text-xs text-slate-400" data-t="login_sub">منصة الشركات لتنظيم شحناتها ومتابعتها وتحصيلها</div>
+        </div>
+      </div>
+      <div class="seg" id="lang-seg-login">
+        <button type="button" data-lang="ar">ع</button>
+        <button type="button" data-lang="en">EN</button>
+      </div>
+    </div>
+    <form id="login-form" class="space-y-4">
+      <div>
+        <label for="lg-user" data-t="username">اسم المستخدم</label>
+        <input id="lg-user" name="user" autocomplete="username" value="owner" required />
+      </div>
+      <div>
+        <label for="lg-pass" data-t="password">كلمة المرور</label>
+        <input id="lg-pass" name="pass" type="password" autocomplete="current-password" placeholder="••••••••" required />
+      </div>
+      <p id="lg-error" class="text-sm text-brand-bright hidden" data-t="login_err">بيانات الدخول غير صحيحة.</p>
+      <button type="submit" class="btn btn-brand w-full justify-center" data-t="login_btn">دخول لوحة التحكم</button>
+    </form>
+
+    <div class="mt-5 pt-4 border-t border-ink-500">
+      <div class="text-xs font-bold text-slate-300 mb-2" data-t="quick_access">دخول سريع (تجريبي)</div>
+      <div class="grid grid-cols-3 gap-2">
+        <button class="btn btn-ghost !py-2 justify-center text-xs" data-quick="owner" data-t="qa_admin">مدير المنصة</button>
+        <button class="btn btn-ghost !py-2 justify-center text-xs" data-quick="riyadh" data-t="qa_company">شركة تجارية</button>
+        <button class="btn btn-ghost !py-2 justify-center text-xs" data-quick="ataa" data-t="qa_charity">جمعية خيرية</button>
+      </div>
+      <div class="flex items-center justify-between mt-3 gap-2">
+        <span class="text-[11px] text-slate-500" data-t="login_hash_note">كلمات المرور بصمة SHA‑256 محلياً؛ الإنتاج bcrypt/argon2 على الخادم.</span>
+        <button id="lg-reset" class="text-[11px] text-brand-bright hover:underline shrink-0" data-t="reset_all">إعادة تعيين</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ لوحة مدير المنصة ============ -->
+<div id="admin-shell" class="hidden min-h-screen">
+  <header class="relative border-b border-ink-500 bg-ink-800/60 backdrop-blur">
+    <canvas id="net-admin" class="absolute inset-0 w-full h-full opacity-30 pointer-events-none"></canvas>
+    <div class="relative flex flex-wrap items-center gap-3 px-4 md:px-6 py-3">
+      <div id="logo-admin" class="shrink-0"></div>
+      <div class="min-w-0">
+        <h1 class="font-extrabold text-lg leading-tight" data-t="admin_title">لوحة مدير المنصة</h1>
+        <p class="text-xs text-slate-400" data-t="admin_sub">إدارة الشركات المشتركة في مُوصل وإصدار حسابات الدخول</p>
+      </div>
+      <div class="ms-auto flex items-center gap-2">
+        <div class="seg" id="lang-seg-admin"><button type="button" data-lang="ar">ع</button><button type="button" data-lang="en">EN</button></div>
+        <button id="admin-logout" class="btn btn-ghost !p-2" data-t-title="logout" aria-label="Logout">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 12H4M11 8l-4 4 4 4M14 4h5v16h-5"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+  <main id="admin-view" class="p-4 md:p-6 max-w-[1200px] w-full mx-auto"></main>
+</div>
+
+<!-- ============ الهيكل ============ -->
+<div id="shell" class="hidden min-h-screen flex flex-col">
+  <div id="impersonate-bar" class="hidden bg-brand/15 border-b border-brand/40 text-sm px-4 py-2 flex items-center justify-between gap-3">
+    <span><span data-t="signed_in_as_company">أنت داخل بصفة</span>: <b id="imp-name"></b></span>
+    <button id="imp-back" class="btn btn-ghost !py-1 !px-3 text-xs" data-t="back_to_platform">رجوع للوحة المنصة</button>
+  </div>
+  <div class="flex-1 min-h-0 flex">
+
+  <aside class="w-64 shrink-0 border-e border-ink-500 bg-ink-800/70 backdrop-blur px-3 py-5 hidden lg:flex flex-col gap-2">
+    <div class="flex items-center gap-3 px-2 mb-4">
+      <div id="logo-side" class="shrink-0"></div>
+      <div>
+        <div class="font-extrabold leading-tight">مُوصل</div>
+        <div class="text-[11px] text-slate-500">MOWASIL DELIVERY</div>
+      </div>
+    </div>
+
+    <nav class="flex flex-col gap-1">
+      <a class="nav-link" data-route="dashboard">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></svg>
+        <span data-t="nav_home">الرئيسية</span>
+      </a>
+      <a class="nav-link" data-route="shipments">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7h11v10H3zM14 10h4l3 3v4h-7M6.5 20a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM17.5 20a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/></svg>
+        <span data-mt="nav_shipments">الشحنات</span>
+      </a>
+      <a class="nav-link" data-route="delays">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        <span data-t="nav_delays">إدارة التأخير</span>
+      </a>
+      <a class="nav-link" data-route="invoices">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6"/></svg>
+        <span data-mt="nav_invoices">الفواتير والتحصيل</span>
+      </a>
+      <a class="nav-link" data-route="fleet">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 13l2-5a2 2 0 012-1h10a2 2 0 012 1l2 5v5h-3M6 18H3v-5M7 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM17 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM8 18h8"/></svg>
+        <span data-t="nav_fleet">المركبات والصيانة</span>
+      </a>
+      <a class="nav-link" data-route="reports">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
+        <span data-t="nav_reports">التقارير</span>
+      </a>
+      <a class="nav-link" data-route="settings">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 00-.1-1l2-1.5-2-3.5-2.4 1a7 7 0 00-1.7-1L14.5 2h-4l-.3 2.5a7 7 0 00-1.7 1l-2.4-1-2 3.5 2 1.5a7 7 0 000 2l-2 1.5 2 3.5 2.4-1a7 7 0 001.7 1l.3 2.5h4l.3-2.5a7 7 0 001.7-1l2.4 1 2-3.5-2-1.5c.06-.33.1-.66.1-1z"/></svg>
+        <span data-t="nav_settings">الإعدادات</span>
+      </a>
+    </nav>
+
+    <div class="mt-auto card p-3 text-[11px] text-slate-400 leading-relaxed">
+      <div class="flex items-center gap-2 mb-1 text-slate-300 font-bold">
+        <span class="w-2 h-2 rounded-full bg-emerald-400"></span> <span data-t="current_mode">الوضع الحالي</span>
+      </div>
+      <span id="mode-label-side"></span>
+    </div>
+  </aside>
+
+  <div class="flex-1 min-w-0 flex flex-col">
+
+    <header class="relative border-b border-ink-500 bg-ink-800/60 backdrop-blur">
+      <canvas id="net-header" class="absolute inset-0 w-full h-full opacity-30 pointer-events-none"></canvas>
+      <div class="relative flex flex-wrap items-center gap-3 px-4 md:px-6 py-3">
+        <div id="logo-header" class="shrink-0 lg:hidden"></div>
+        <div class="min-w-0">
+          <h1 class="font-extrabold text-lg leading-tight truncate">مُوصل <span class="text-slate-500 font-semibold text-sm">| MOWASIL DELIVERY</span></h1>
+          <p id="header-sub" class="text-xs text-slate-400 truncate"></p>
+        </div>
+
+        <div class="ms-auto flex items-center gap-2">
+          <!-- مبدّل اللغة -->
+          <div class="seg" id="lang-seg">
+            <button type="button" data-lang="ar">ع</button>
+            <button type="button" data-lang="en">EN</button>
+          </div>
+          <!-- مبدّل الوضع -->
+          <div class="seg" id="mode-seg">
+            <button type="button" data-setmode="commercial" data-mt="mode_btn_commercial"></button>
+            <button type="button" data-setmode="charity" data-mt="mode_btn_charity"></button>
+          </div>
+        </div>
+
+        <div class="relative">
+          <button id="bell-btn" class="btn btn-ghost !p-2 relative" aria-label="Notifications">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9a6 6 0 1112 0c0 5 2 6 2 6H4s2-1 2-6M10 20a2 2 0 004 0"/></svg>
+            <span id="bell-count" class="absolute -top-1.5 -inset-inline-start-1.5 bg-brand-bright text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center" style="inset-inline-start:-6px">0</span>
+          </button>
+          <div id="bell-menu" class="hidden absolute mt-2 w-72 card p-2 z-30 text-sm" style="inset-inline-end:0"></div>
+        </div>
+
+        <div class="relative flex items-center gap-2 ps-2 border-s border-ink-500">
+          <button id="user-btn" class="flex items-center gap-2" aria-haspopup="true">
+            <span class="w-9 h-9 rounded-full bg-gradient-to-b from-ink-600 to-ink-700 border border-ink-500 flex items-center justify-center">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0116 0"/></svg>
+            </span>
+            <span class="hidden md:block leading-tight text-start">
+              <span class="block text-sm font-bold" id="hdr-name">أحمد محمد</span>
+              <span class="block text-[11px] text-slate-500" id="hdr-role">مدير النظام</span>
+            </span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-slate-500"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <button id="logout-btn" class="btn btn-ghost !p-2" data-t-title="logout" title="تسجيل الخروج" aria-label="Logout">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 12H4M11 8l-4 4 4 4M14 4h5v16h-5"/></svg>
+          </button>
+          <div id="user-menu" class="hidden absolute w-64 card p-2 z-30 text-sm" style="inset-inline-end:0; top:calc(100% + 6px)"></div>
+        </div>
+      </div>
+
+      <nav id="mobile-nav" class="lg:hidden relative flex gap-1 px-3 pb-3 overflow-x-auto text-sm"></nav>
+    </header>
+
+    <main id="view" class="flex-1 p-4 md:p-6 max-w-[1500px] w-full mx-auto"></main>
+
+    <footer class="border-t border-ink-500 px-6 py-4 flex items-center justify-between text-xs text-slate-500 gap-3 flex-wrap">
+      <div class="flex items-center gap-2"><span id="logo-footer"></span><span>مُوصل — MOWASIL DELIVERY</span></div>
+      <div data-t="footer_note">نموذج أولي تفاعلي — البيانات تجريبية ومخزَّنة محلياً في المتصفح</div>
+    </footer>
+  </div>
+  </div>
+</div>
+
+<!-- ============ نوافذ ============ -->
+
+<!-- تعديل سبب التأخير -->
+<dialog id="delay-modal" class="w-[min(92vw,520px)]">
+  <form method="dialog" class="card p-6">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="font-extrabold text-lg" data-t="delay_title">تسجيل / تعديل سبب التأخير</h3>
+      <button value="cancel" class="btn btn-ghost !p-2" aria-label="Close">✕</button>
+    </div>
+    <p class="text-sm text-slate-400 mb-4"><span data-mt="shipment_word"></span> <span id="dm-ship" class="font-bold text-slate-200"></span> — <span id="dm-client" class="text-slate-300"></span></p>
+    <div class="space-y-4">
+      <div><label data-t="delay_reason">سبب التأخير</label><select id="dm-reason"></select></div>
+      <div><label data-t="note_opt">ملاحظة (اختياري)</label><textarea id="dm-note" rows="3"></textarea></div>
+      <div><label data-t="update_status">تحديث الحالة</label><select id="dm-status"></select></div>
+    </div>
+    <div class="flex gap-2 mt-6 no-print">
+      <button value="save" class="btn btn-brand flex-1 justify-center" data-t="save">حفظ</button>
+      <button value="cancel" class="btn btn-ghost" data-t="cancel">إلغاء</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- إضافة شحنة -->
+<dialog id="shipment-modal" class="w-[min(92vw,560px)]">
+  <form method="dialog" class="card p-6">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="font-extrabold text-lg" id="sm-title"></h3>
+      <button value="cancel" class="btn btn-ghost !p-2" aria-label="Close">✕</button>
+    </div>
+    <div class="grid grid-cols-2 gap-4">
+      <div class="col-span-2 sm:col-span-1"><label data-mt="client_word"></label><input id="sm-client" required /></div>
+      <div class="col-span-2 sm:col-span-1"><label data-t="city">المدينة</label><select id="sm-city"></select></div>
+      <div class="col-span-2 sm:col-span-1"><label data-mt="branch_word"></label><select id="sm-branch"></select></div>
+      <div class="col-span-2 sm:col-span-1"><label data-t="status">الحالة</label><select id="sm-status"></select></div>
+      <div class="col-span-2 sm:col-span-1" id="sm-amount-wrap"><label data-t="amount">المبلغ</label><input id="sm-amount" type="number" min="0" value="300" /></div>
+      <div class="col-span-2 sm:col-span-1"><label data-t="eta">الوقت المتوقع</label><input id="sm-eta" placeholder="03:30 م" /></div>
+      <div class="col-span-2 hidden" id="sm-noamount-wrap">
+        <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="sm-noamount" class="!w-auto" /> <span data-t="no_amount">لا يوجد مبلغ</span></label>
+      </div>
+      <div class="col-span-2 sm:col-span-1" id="sm-invno-wrap"><label data-t="invoice_no_field">رقم الفاتورة (إلزامي)</label><input id="sm-invno" placeholder="INV-2051" /></div>
+      <div class="col-span-2"><label data-t="driver">السائق</label><input id="sm-driver" list="sm-drivers-dl" placeholder="—" /><datalist id="sm-drivers-dl"></datalist></div>
+    </div>
+    <div class="flex gap-2 mt-6 no-print">
+      <button value="save" class="btn btn-brand flex-1 justify-center" data-t="save">حفظ</button>
+      <button value="cancel" class="btn btn-ghost" data-t="cancel">إلغاء</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- إضافة فاتورة -->
+<dialog id="invoice-modal" class="w-[min(92vw,520px)]">
+  <form method="dialog" class="card p-6">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="font-extrabold text-lg" id="im-title"></h3>
+      <button value="cancel" class="btn btn-ghost !p-2" aria-label="Close">✕</button>
+    </div>
+    <div class="space-y-4">
+      <div><label data-t="invoice_no">رقم الفاتورة</label><input id="im-id" readonly class="opacity-70" /></div>
+      <div><label data-t="linked_shipment">الشحنة المرتبطة</label><select id="im-ship"></select></div>
+      <div class="grid grid-cols-2 gap-4">
+        <div><label data-t="amount">المبلغ</label><input id="im-amount" type="number" min="0" /></div>
+        <div><label data-t="due_date">تاريخ الاستحقاق</label><input id="im-due" type="date" /></div>
+      </div>
+      <div><label data-t="pay_status">حالة الدفع</label><select id="im-status"></select></div>
+    </div>
+    <div class="flex gap-2 mt-6 no-print">
+      <button value="save" class="btn btn-brand flex-1 justify-center" data-t="save">حفظ</button>
+      <button value="cancel" class="btn btn-ghost" data-t="cancel">إلغاء</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- إضافة/تعديل مركبة -->
+<dialog id="vehicle-modal" class="w-[min(92vw,560px)]">
+  <form method="dialog" class="card p-6">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="font-extrabold text-lg" id="vm-title"></h3>
+      <button value="cancel" class="btn btn-ghost !p-2" aria-label="Close">✕</button>
+    </div>
+    <div class="grid grid-cols-2 gap-4">
+      <div class="col-span-2 sm:col-span-1"><label data-t="plate">رقم اللوحة</label><input id="vm-plate" required /></div>
+      <div class="col-span-2 sm:col-span-1"><label data-t="model">الموديل</label><input id="vm-model" required /></div>
+      <div class="col-span-2 sm:col-span-1"><label data-t="driver">السائق</label><input id="vm-driver" list="vm-drivers-dl" /><datalist id="vm-drivers-dl"></datalist></div>
+      <div class="col-span-2 sm:col-span-1"><label data-t="drive_status">حالة السير</label><select id="vm-status"></select></div>
+      <div class="col-span-2 sm:col-span-1"><label data-t="odometer">قراءة العدّاد (كم)</label><input id="vm-odo" type="number" min="0" /></div>
+      <div class="col-span-2 sm:col-span-1"><label data-t="next_service_date">تاريخ الصيانة القادمة</label><input id="vm-date" type="date" /></div>
+      <div class="col-span-2 sm:col-span-1"><label data-t="service_type">نوع الصيانة</label><select id="vm-service"></select></div>
+      <div class="col-span-2 sm:col-span-1"><label data-t="service_cost">تكلفة الصيانة المتوقعة</label><input id="vm-cost" type="number" min="0" /></div>
+      <div class="col-span-2">
+        <label data-t="vehicle_photo">صورة المركبة (تُضغط تلقائياً)</label>
+        <input id="vm-photo" type="file" accept="image/*" class="!p-2" />
+        <p id="vm-photo-info" class="text-[11px] text-slate-500 mt-1"></p>
+        <img id="vm-photo-preview" alt="" class="mt-2 rounded-lg border border-ink-500 hidden max-h-40" />
+      </div>
+    </div>
+    <div class="flex gap-2 mt-6 no-print">
+      <button value="save" class="btn btn-brand flex-1 justify-center" data-t="save">حفظ</button>
+      <button value="cancel" class="btn btn-ghost" data-t="cancel">إلغاء</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- إضافة/تعديل شركة (مدير المنصة) -->
+<dialog id="company-modal" class="w-[min(92vw,520px)]">
+  <form method="dialog" class="card p-6">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="font-extrabold text-lg" id="cm-title"></h3>
+      <button value="cancel" class="btn btn-ghost !p-2" aria-label="Close">✕</button>
+    </div>
+    <div class="space-y-4">
+      <div class="grid grid-cols-2 gap-4">
+        <div><label data-t="company_name_ar">الاسم بالعربية</label><input id="cm-name-ar" required /></div>
+        <div><label data-t="company_name_en">الاسم بالإنجليزية</label><input id="cm-name-en" /></div>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div><label data-t="login_user">اسم المستخدم</label><input id="cm-user" autocomplete="off" required /></div>
+        <div><label data-t="login_pass">كلمة المرور</label><input id="cm-pass" required /></div>
+      </div>
+      <div><label data-t="default_mode">الوضع</label><select id="cm-mode"><option value="commercial"></option><option value="charity"></option></select></div>
+      <div class="border-t border-ink-500 pt-3 mt-1"><div class="text-xs font-bold text-slate-300 mb-2" data-t="subscription">الاشتراك</div>
+        <div class="grid grid-cols-2 gap-4">
+          <div><label data-t="sub_plan">الخطة</label><input id="cm-plan" /></div>
+          <div><label data-t="sub_amount">المبلغ الشهري</label><input id="cm-amount" type="number" min="0" /></div>
+          <div><label data-t="sub_renew">تاريخ التجديد</label><input id="cm-renew" type="date" /></div>
+          <div><label data-t="sub_status">حالة الاشتراك</label><select id="cm-substatus"></select></div>
+        </div>
+      </div>
+    </div>
+    <div class="flex gap-2 mt-6">
+      <button value="save" class="btn btn-brand flex-1 justify-center" data-t="save">حفظ</button>
+      <button value="cancel" class="btn btn-ghost" data-t="cancel">إلغاء</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- إضافة/تعديل مستخدم شركة (المدير) -->
+<dialog id="user-modal" class="w-[min(92vw,520px)]">
+  <form method="dialog" class="card p-6">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="font-extrabold text-lg" id="um-title"></h3>
+      <button value="cancel" class="btn btn-ghost !p-2" aria-label="Close">✕</button>
+    </div>
+    <div class="space-y-4">
+      <div class="grid grid-cols-2 gap-4">
+        <div><label data-t="company_name_ar">الاسم بالعربية</label><input id="um-name-ar" required /></div>
+        <div><label data-t="company_name_en">الاسم بالإنجليزية</label><input id="um-name-en" /></div>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div><label data-t="login_user">اسم المستخدم</label><input id="um-user" autocomplete="off" required /></div>
+        <div><label data-t="login_pass">كلمة المرور</label><input id="um-pass" /></div>
+      </div>
+      <div><label data-t="user_role">الدور</label><select id="um-role"></select></div>
+      <div id="um-perms-wrap" class="hidden">
+        <label data-t="user_perms">الأقسام المسموحة للمنسق</label>
+        <div class="grid grid-cols-2 gap-2 mt-1 text-sm">
+          <label class="flex items-center gap-2"><input type="checkbox" id="um-perm-dashboard" class="!w-auto" /> <span data-t="nav_home">الرئيسية</span></label>
+          <label class="flex items-center gap-2"><input type="checkbox" id="um-perm-shipments" class="!w-auto" /> <span data-mt="nav_shipments">الشحنات</span></label>
+          <label class="flex items-center gap-2"><input type="checkbox" id="um-perm-delays" class="!w-auto" /> <span data-t="nav_delays">إدارة التأخير</span></label>
+          <label class="flex items-center gap-2"><input type="checkbox" id="um-perm-invoices" class="!w-auto" /> <span data-mt="nav_invoices">الفواتير</span></label>
+          <label class="flex items-center gap-2"><input type="checkbox" id="um-perm-fleet" class="!w-auto" /> <span data-t="nav_fleet">المركبات</span></label>
+          <label class="flex items-center gap-2"><input type="checkbox" id="um-perm-reports" class="!w-auto" /> <span data-t="nav_reports">التقارير</span></label>
+        </div>
+      </div>
+      <div id="um-driver-wrap" class="hidden"><label data-t="linked_driver">السائق المرتبط</label><select id="um-driver"></select></div>
+    </div>
+    <div class="flex gap-2 mt-6">
+      <button value="save" class="btn btn-brand flex-1 justify-center" data-t="save">حفظ</button>
+      <button value="cancel" class="btn btn-ghost" data-t="cancel">إلغاء</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- التقرير الأسبوعي -->
+<dialog id="report-modal" class="w-[min(96vw,900px)]">
+  <div id="report-card" class="card p-0 overflow-hidden">
+    <div class="no-print flex items-center justify-between px-6 py-4 border-b border-ink-500 bg-ink-800">
+      <h3 class="font-extrabold text-lg" data-t="weekly_report_title">التقرير الأسبوعي الشامل للمدير التنفيذي</h3>
+      <div class="flex gap-2">
+        <button id="report-print" class="btn btn-brand" data-t="print">طباعة</button>
+        <button id="report-close" class="btn btn-ghost" data-t="close">إغلاق</button>
+      </div>
+    </div>
+    <div id="report-body" class="p-6 overflow-y-auto" style="max-height:78vh"></div>
+  </div>
+</dialog>
+
+<!-- مستند الفاتورة (تصدير / طباعة / حفظ PDF) -->
+<dialog id="invoice-doc-modal" class="w-[min(96vw,800px)]">
+  <div id="invoice-doc-card" class="card p-0 overflow-hidden">
+    <div class="no-print flex items-center justify-between px-6 py-4 border-b border-ink-500 bg-ink-800">
+      <h3 class="font-extrabold text-lg" id="invoice-doc-heading"></h3>
+      <div class="flex gap-2">
+        <button id="invoice-doc-print" class="btn btn-brand" data-t="print_save_pdf">طباعة / حفظ PDF</button>
+        <button id="invoice-doc-close" class="btn btn-ghost" data-t="close">إغلاق</button>
+      </div>
+    </div>
+    <div id="invoice-doc-body" class="p-6 overflow-y-auto" style="max-height:80vh"></div>
+  </div>
+</dialog>
+
+<div id="toast" class="fixed bottom-5 left-1/2 -translate-x-1/2 z-[60] flex flex-col gap-2 items-center"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ===================== أدوات ===================== */
+  const $  = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const uid = (p) => p + '-' + Math.random().toString(36).slice(2, 7).toUpperCase();
+  const daysBetween = (a, b) => Math.round((new Date(b) - new Date(a)) / 86400000);
+
+  function toast(msg, kind = 'ok') {
+    const el = document.createElement('div');
+    const c = kind === 'ok' ? 'badge-green' : kind === 'warn' ? 'badge-amber' : 'badge-red';
+    el.className = 'card px-4 py-2 text-sm font-semibold shadow-xl flex items-center gap-2';
+    el.innerHTML = `<span class="badge ${c}">●</span>${esc(msg)}`;
+    $('#toast').appendChild(el);
+    setTimeout(() => { el.style.transition = 'opacity .3s'; el.style.opacity = '0'; setTimeout(() => el.remove(), 300); }, 2600);
+  }
+
+  async function sha256(str) {
+    try {
+      if (self.crypto && self.crypto.subtle) {
+        const buf = await self.crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+        return [...new Uint8Array(buf)].map((x) => x.toString(16).padStart(2, '0')).join('');
+      }
+    } catch (e) {}
+    return sha256js(str);
+  }
+  function sha256js(ascii) {
+    function rr(n, x) { return (x >>> n) | (x << (32 - n)); }
+    const K = [0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
+    let h0=0x6a09e667,h1=0xbb67ae85,h2=0x3c6ef372,h3=0xa54ff53a,h4=0x510e527f,h5=0x9b05688c,h6=0x1f83d9ab,h7=0x5be0cd19;
+    const bytes = unescape(encodeURIComponent(ascii)); const words = [];
+    for (let i = 0; i < bytes.length; i++) words[i >> 2] |= bytes.charCodeAt(i) << ((3 - (i % 4)) * 8);
+    words[bytes.length >> 2] |= 0x80 << ((3 - (bytes.length % 4)) * 8);
+    words[((bytes.length + 8 >> 6) + 1) * 16 - 1] = bytes.length * 8;
+    const w = new Array(64);
+    for (let j = 0; j < words.length; j += 16) {
+      for (let i = 0; i < 16; i++) w[i] = words[j + i] | 0;
+      for (let i = 16; i < 64; i++) {
+        const s0 = rr(7, w[i-15]) ^ rr(18, w[i-15]) ^ (w[i-15] >>> 3);
+        const s1 = rr(17, w[i-2]) ^ rr(19, w[i-2]) ^ (w[i-2] >>> 10);
+        w[i] = (w[i-16] + s0 + w[i-7] + s1) | 0;
+      }
+      let a=h0,b=h1,c=h2,d=h3,e=h4,f=h5,g=h6,hh=h7;
+      for (let i = 0; i < 64; i++) {
+        const S1 = rr(6,e) ^ rr(11,e) ^ rr(25,e); const ch = (e & f) ^ (~e & g);
+        const t1 = (hh + S1 + ch + K[i] + w[i]) | 0;
+        const S0 = rr(2,a) ^ rr(13,a) ^ rr(22,a); const maj = (a & b) ^ (a & c) ^ (b & c);
+        const t2 = (S0 + maj) | 0;
+        hh=g; g=f; f=e; e=(d+t1)|0; d=c; c=b; b=a; a=(t1+t2)|0;
+      }
+      h0=(h0+a)|0;h1=(h1+b)|0;h2=(h2+c)|0;h3=(h3+d)|0;h4=(h4+e)|0;h5=(h5+f)|0;h6=(h6+g)|0;h7=(h7+hh)|0;
+    }
+    return [h0,h1,h2,h3,h4,h5,h6,h7].map((x) => (x >>> 0).toString(16).padStart(8, '0')).join('');
+  }
+
+  async function compressImage(file, maxDim = 1280, quality = 0.82) {
+    const bmp = await createImageBitmap(file);
+    const scale = Math.min(1, maxDim / Math.max(bmp.width, bmp.height));
+    const w = Math.round(bmp.width * scale), h = Math.round(bmp.height * scale);
+    const canvas = Object.assign(document.createElement('canvas'), { width: w, height: h });
+    canvas.getContext('2d').drawImage(bmp, 0, 0, w, h);
+    const blob = await new Promise((r) => canvas.toBlob(r, 'image/jpeg', quality));
+    const dataUrl = await new Promise((r) => { const fr = new FileReader(); fr.onload = () => r(fr.result); fr.readAsDataURL(blob); });
+    return { dataUrl, w, h, size: blob.size, before: file.size };
+  }
+  const kb = (b) => (b / 1024).toFixed(0) + ' KB';
+
+  /* ===================== الترجمة ===================== */
+  const I18N = {
+    login_sub:   { ar: 'منصة الشركات لتنظيم شحناتها ومتابعتها وتحصيلها', en: 'The platform for businesses to organize, track & collect on shipments' },
+    username:    { ar: 'اسم المستخدم', en: 'Username' },
+    password:    { ar: 'كلمة المرور', en: 'Password' },
+    login_btn:   { ar: 'دخول لوحة التحكم', en: 'Sign in to dashboard' },
+    login_err:   { ar: 'بيانات الدخول غير صحيحة.', en: 'Invalid credentials.' },
+    login_note:  { ar: 'بيانات تجريبية: admin / Admin@1234 — تُخزَّن كلمة المرور كبصمة SHA‑256 محلياً في هذا النموذج، وفي الإنتاج تُستخدم bcrypt/argon2 على الخادم.', en: 'Demo: admin / Admin@1234 — password stored as a local SHA‑256 hash in this prototype; production uses bcrypt/argon2 on the server.' },
+    quick_access: { ar: 'دخول سريع (تجريبي)', en: 'Quick access (demo)' },
+    qa_admin:    { ar: 'مدير المنصة', en: 'Platform admin' },
+    qa_company:  { ar: 'شركة تجارية', en: 'Business' },
+    qa_charity:  { ar: 'جمعية خيرية', en: 'Charity' },
+    login_hash_note: { ar: 'كلمات المرور بصمة SHA‑256 محلياً؛ الإنتاج bcrypt/argon2 على الخادم.', en: 'Passwords are local SHA‑256 hashes; production uses bcrypt/argon2 on the server.' },
+    reset_all:   { ar: 'إعادة تعيين', en: 'Reset' },
+    reset_all_confirm: { ar: 'مسح كل البيانات المحلية والعودة للحسابات التجريبية؟', en: 'Clear all local data and restore the demo accounts?' },
+    nav_home:    { ar: 'الرئيسية', en: 'Home' },
+    nav_delays:  { ar: 'إدارة التأخير', en: 'Delay management' },
+    nav_fleet:   { ar: 'المركبات والصيانة', en: 'Fleet & maintenance' },
+    nav_reports: { ar: 'التقارير', en: 'Reports' },
+    nav_settings:{ ar: 'الإعدادات', en: 'Settings' },
+    current_mode:{ ar: 'الوضع الحالي', en: 'Current mode' },
+    role_admin:  { ar: 'مدير النظام', en: 'System admin' },
+    logout:      { ar: 'تسجيل الخروج', en: 'Log out' },
+    footer_note: { ar: 'نموذج أولي تفاعلي — البيانات تجريبية ومخزَّنة محلياً في المتصفح', en: 'Interactive prototype — demo data stored locally in the browser' },
+
+    welcome:     { ar: 'مرحباً بك في لوحة تحكم مُوصل', en: 'Welcome to the Mowasil dashboard' },
+    ops_kpis:    { ar: 'مؤشرات الأداء التشغيلي', en: 'Operational KPIs' },
+    fin_kpis:    { ar: 'مؤشرات الأداء المالي', en: 'Financial KPIs' },
+    gen_weekly:  { ar: 'توليد التقرير الأسبوعي للمدير', en: 'Generate manager weekly report' },
+    delay_analysis_week: { ar: 'تحليل أسباب تأخير الشحنات — الأسبوع الحالي', en: 'Delay-cause analysis — current week' },
+    delay_cases: { ar: 'حالة تأخير', en: 'delay cases' },
+    delay_dist:  { ar: 'توزيع أسباب التأخير', en: 'Delay-cause distribution' },
+    delay_note:  { ar: 'النِّسب محسوبة من إجمالي حالات التأخير خلال الأسبوع، وتشمل الشحنات المتأخرة الحالية.', en: 'Shares are computed from total weekly delay cases, including current late shipments.' },
+    urgent_action: { ar: 'تحتاج إجراءً فورياً', en: 'need immediate action' },
+    manage_delays_arrow: { ar: 'إدارة التأخير ←', en: 'Delay management →' },
+    top_delay_reasons: { ar: 'أكثر أسباب التأخير تكراراً', en: 'Most frequent delay causes' },
+    distribution: { ar: 'التوزيع', en: 'Distribution' },
+    on_time_rate: { ar: 'معدل الالتزام بالمواعيد', en: 'On-time rate' },
+    avg_delivery: { ar: 'متوسط وقت التوصيل', en: 'Avg. delivery time' },
+    total_distance: { ar: 'إجمالي المسافة المقطوعة', en: 'Total distance' },
+    vehicles_need_service: { ar: 'مركبات تحتاج صيانة', en: 'Vehicles needing service' },
+    target: { ar: 'الهدف', en: 'Target' },
+    hours: { ar: 'ساعة', en: 'h' },
+    hour_18: { ar: '1.8 ساعة', en: '1.8 h' },
+    today: { ar: 'اليوم', en: 'Today' },
+    urgent_near: { ar: 'عاجلة / قريبة', en: 'urgent / due soon' },
+    vehicles_on_road: { ar: 'المركبات على الطريق', en: 'Vehicles on the road' },
+    need_urgent_service: { ar: 'تحتاج صيانة عاجلة', en: 'need urgent service' },
+    most_common: { ar: 'الأكثر', en: 'Top' },
+    not_logged: { ar: 'غير مسجّل', en: 'Not recorded' },
+    destination: { ar: 'الوجهة', en: 'Destination' },
+    action: { ar: 'الإجراء', en: 'Action' },
+    update_reason: { ar: 'تحديث السبب', en: 'Update reason' },
+    edit: { ar: 'تعديل', en: 'Edit' },
+    delete: { ar: 'حذف', en: 'Delete' },
+    no_late_shipments: { ar: 'لا توجد شحنات متأخرة 🎉', en: 'No late shipments 🎉' },
+    no_results: { ar: 'لا توجد نتائج', en: 'No results' },
+
+    track_manage: { ar: 'إدارة وتتبّع', en: 'Track & manage' },
+    total_word: { ar: 'إجمالاً', en: 'total' },
+    late_lower: { ar: 'متأخرة', en: 'late' },
+    search_ship: { ar: 'بحث برقم الشحنة أو اسم العميل', en: 'Search by shipment no. or customer' },
+    status: { ar: 'الحالة', en: 'Status' },
+    all_statuses: { ar: 'جميع الحالات', en: 'All statuses' },
+    all: { ar: 'الكل', en: 'All' },
+    city: { ar: 'المدينة', en: 'City' },
+    red_rows_hint: { ar: 'الصفوف الحمراء = شحنات متأخرة', en: 'Red rows = late shipments' },
+    showing: { ar: 'عرض', en: 'Showing' },
+    of: { ar: 'من', en: 'of' },
+    expected_actual: { ar: 'المتوقع / الفعلي', en: 'ETA / Actual' },
+    amount: { ar: 'المبلغ', en: 'Amount' },
+    eta: { ar: 'الوقت المتوقع', en: 'ETA' },
+    driver: { ar: 'السائق', en: 'Driver' },
+    delay_reason: { ar: 'سبب التأخير', en: 'Delay reason' },
+
+    delays_title: { ar: 'إدارة التأخير وأسبابه', en: 'Delay & cause management' },
+    without_reason: { ar: 'بدون سبب مُسجّل', en: 'without a recorded cause' },
+
+    fleet_title: { ar: 'إدارة المركبات وصيانة الأسطول', en: 'Fleet & maintenance management' },
+    vehicle_sing: { ar: 'مركبة', en: 'vehicle' },
+    maint_costs: { ar: 'تكاليف الصيانة', en: 'Maintenance costs' },
+    add_vehicle: { ar: 'إضافة مركبة', en: 'Add vehicle' },
+    edit_vehicle: { ar: 'تعديل مركبة', en: 'Edit vehicle' },
+    preventive_alert: { ar: 'تنبيه الصيانة الوقائية', en: 'Preventive-maintenance alert' },
+    plate: { ar: 'رقم اللوحة', en: 'Plate no.' },
+    model: { ar: 'الموديل', en: 'Model' },
+    drive_status: { ar: 'حالة السير', en: 'Drive status' },
+    odometer: { ar: 'العدّاد', en: 'Odometer' },
+    next_service: { ar: 'الصيانة القادمة', en: 'Next service' },
+    next_service_date: { ar: 'تاريخ الصيانة القادمة', en: 'Next service date' },
+    due: { ar: 'الموعد', en: 'Due' },
+    expected_cost: { ar: 'التكلفة المتوقعة', en: 'Expected cost' },
+    service_type: { ar: 'نوع الصيانة', en: 'Service type' },
+    service_cost: { ar: 'تكلفة الصيانة المتوقعة', en: 'Expected service cost' },
+    requires_urgent: { ar: 'تتطلب صيانة عاجلة', en: 'Requires urgent service' },
+    overdue: { ar: 'متأخرة', en: 'overdue' },
+    soon: { ar: 'قريبة', en: 'soon' },
+    vehicle_photo: { ar: 'صورة المركبة (تُضغط تلقائياً)', en: 'Vehicle photo (auto-compressed)' },
+    compressing: { ar: 'جارٍ الضغط...', en: 'Compressing…' },
+    photo_read_err: { ar: 'تعذّر قراءة الصورة', en: 'Could not read image' },
+    orig: { ar: 'الأصل', en: 'Original' },
+    after_compress: { ar: 'بعد الضغط', en: 'compressed' },
+    less: { ar: 'أقل', en: 'smaller' },
+    del_vehicle_q: { ar: 'حذف هذه المركبة؟', en: 'Delete this vehicle?' },
+    vehicle_deleted: { ar: 'تم حذف المركبة', en: 'Vehicle deleted' },
+    vehicle_updated: { ar: 'تم تحديث المركبة', en: 'Vehicle updated' },
+    vehicle_added: { ar: 'تمت إضافة المركبة', en: 'Vehicle added' },
+    plate_model_required: { ar: 'اللوحة والموديل مطلوبان', en: 'Plate and model are required' },
+
+    invoice_no: { ar: 'رقم الفاتورة', en: 'Invoice no.' },
+    linked_shipment: { ar: 'الشحنة المرتبطة', en: 'Linked shipment' },
+    due_date: { ar: 'تاريخ الاستحقاق', en: 'Due date' },
+    pay_status: { ar: 'حالة الدفع', en: 'Payment status' },
+    add_invoice: { ar: 'إضافة فاتورة', en: 'Add invoice' },
+    new_invoice: { ar: 'فاتورة جديدة', en: 'New invoice' },
+    linked_to: { ar: 'المرتبطة', en: 'linked' },
+    overdue_due: { ar: 'متجاوزة الاستحقاق', en: 'past due' },
+    mark_collected: { ar: 'تسجيل التحصيل', en: 'Mark collected' },
+    collection_logged: { ar: 'تم تسجيل التحصيل', en: 'Collection recorded' },
+    invoice_added: { ar: 'تمت إضافة الفاتورة', en: 'Invoice added' },
+    invoice_exists: { ar: 'لهذه الشحنة فاتورة بالفعل', en: 'This shipment already has an invoice' },
+    add_inv_short: { ar: '＋ فاتورة', en: '＋ Invoice' },
+    export_invoice: { ar: 'تصدير الفاتورة', en: 'Export invoice' },
+    export_short: { ar: 'تصدير', en: 'Export' },
+    print_save_pdf: { ar: 'طباعة / حفظ PDF', en: 'Print / Save as PDF' },
+    invoice_doc_title: { ar: 'فاتورة', en: 'INVOICE' },
+    disbursement_doc_title: { ar: 'سند صرف', en: 'DISBURSEMENT' },
+    issued_by: { ar: 'صادرة عن', en: 'Issued by' },
+    bill_to: { ar: 'إلى', en: 'Bill to' },
+    issue_date: { ar: 'تاريخ الإصدار', en: 'Issue date' },
+    description: { ar: 'الوصف', en: 'Description' },
+    delivery_service_for: { ar: 'خدمة توصيل الشحنة', en: 'Delivery service — shipment' },
+    subtotal: { ar: 'المبلغ قبل الضريبة', en: 'Subtotal' },
+    vat15: { ar: 'ضريبة القيمة المضافة (15%)', en: 'VAT (15%)' },
+    grand_total: { ar: 'الإجمالي المستحق', en: 'Total due' },
+    invoice_doc_note: { ar: 'فاتورة صادرة آلياً من منصة مُوصل — يُرجى السداد قبل تاريخ الاستحقاق.', en: 'Auto-generated by Mowasil — please settle before the due date.' },
+
+    invoice_no_field: { ar: 'رقم الفاتورة (إلزامي)', en: 'Invoice number (required)' },
+    invoice_no_required: { ar: 'رقم الفاتورة إلزامي', en: 'Invoice number is required' },
+    invoice_no_dup: { ar: 'رقم الفاتورة مستخدم مسبقاً', en: 'Invoice number already used' },
+    no_amount: { ar: 'لا يوجد مبلغ', en: 'No amount' },
+    na: { ar: 'لا يوجد', en: 'N/A' },
+    invoice_auto_created: { ar: 'أُنشئت فاتورة مرتبطة تلقائياً', en: 'Linked invoice auto-created' },
+
+    wa_report_title: { ar: 'التقرير الأسبوعي عبر واتساب', en: 'Weekly report via WhatsApp' },
+    wa_report_desc: { ar: 'يُرسَل ملخص الأداء الأسبوعي تلقائياً لجوال المدير في الموعد المحدد.', en: 'The weekly performance summary is sent automatically to the manager on schedule.' },
+    wa_number: { ar: 'رقم واتساب المدير (بصيغة دولية، مثل 9665xxxxxxxx)', en: 'Manager WhatsApp (international, e.g. 9665xxxxxxxx)' },
+    wa_enable: { ar: 'تفعيل الإرسال الأسبوعي التلقائي', en: 'Enable automatic weekly send' },
+    wa_day: { ar: 'يوم الإرسال', en: 'Send day' },
+    wa_time: { ar: 'وقت الإرسال', en: 'Send time' },
+    wa_preview: { ar: 'معاينة نص الرسالة', en: 'Preview message text' },
+    wa_copy: { ar: 'نسخ النص', en: 'Copy text' },
+    wa_copied: { ar: 'تم نسخ نص التقرير', en: 'Report text copied' },
+    wa_saved: { ar: 'تم حفظ إعدادات واتساب', en: 'WhatsApp settings saved' },
+    wa_need_number: { ar: 'أدخل رقم واتساب صحيحاً أولاً', en: 'Enter a valid WhatsApp number first' },
+    wa_backend_note: { ar: 'الإرسال الفعلي يتم عبر خادم مُوصل (مهمة مجدولة أسبوعية) + واجهة WhatsApp Business Cloud API. هذه الشاشة تحفظ الجدولة ونص الرسالة؛ التفعيل الفعلي يتم في مرحلة الخادم.', en: 'Actual delivery runs on the Mowasil server (weekly cron) via WhatsApp Business Cloud API. This screen stores the schedule and message; live delivery is enabled in the server phase.' },
+    save_settings: { ar: 'حفظ الإعدادات', en: 'Save settings' },
+    day_0: { ar: 'الأحد', en: 'Sunday' }, day_1: { ar: 'الاثنين', en: 'Monday' }, day_2: { ar: 'الثلاثاء', en: 'Tuesday' },
+    day_3: { ar: 'الأربعاء', en: 'Wednesday' }, day_4: { ar: 'الخميس', en: 'Thursday' }, day_5: { ar: 'الجمعة', en: 'Friday' }, day_6: { ar: 'السبت', en: 'Saturday' },
+
+    admin_title: { ar: 'لوحة مدير المنصة', en: 'Platform admin' },
+    admin_sub: { ar: 'إدارة الشركات المشتركة في مُوصل وإصدار حسابات الدخول', en: 'Manage subscribed companies and issue login accounts' },
+    companies: { ar: 'الشركات', en: 'Companies' },
+    add_company: { ar: 'إضافة شركة', en: 'Add company' },
+    edit_company: { ar: 'تعديل شركة', en: 'Edit company' },
+    company_name: { ar: 'اسم الشركة', en: 'Company name' },
+    company_name_ar: { ar: 'الاسم بالعربية', en: 'Name (Arabic)' },
+    company_name_en: { ar: 'الاسم بالإنجليزية', en: 'Name (English)' },
+    login_user: { ar: 'اسم المستخدم', en: 'Username' },
+    login_pass: { ar: 'كلمة المرور', en: 'Password' },
+    default_mode: { ar: 'الوضع', en: 'Mode' },
+    enter_workspace: { ar: 'دخول', en: 'Open' },
+    reset_pass: { ar: 'إعادة تعيين كلمة المرور', en: 'Reset password' },
+    del_company_q: { ar: 'حذف هذه الشركة وكل بياناتها؟', en: 'Delete this company and all its data?' },
+    company_added: { ar: 'تمت إضافة الشركة', en: 'Company added' },
+    company_updated: { ar: 'تم تحديث الشركة', en: 'Company updated' },
+    company_deleted: { ar: 'تم حذف الشركة', en: 'Company deleted' },
+    pass_reset_to: { ar: 'أُعيدت كلمة المرور إلى', en: 'Password reset to' },
+    user_dup: { ar: 'اسم المستخدم مستخدم مسبقاً', en: 'Username already in use' },
+    fields_required: { ar: 'الاسم واسم المستخدم وكلمة المرور مطلوبة', en: 'Name, username and password are required' },
+    back_to_platform: { ar: 'رجوع للوحة المنصة', en: 'Back to platform' },
+    signed_in_as_company: { ar: 'أنت داخل بصفة', en: 'Working inside' },
+    shipments_count: { ar: 'شحنات', en: 'shipments' },
+    created: { ar: 'أُنشئت', en: 'Created' },
+    change_pw_ctx: { ar: 'تغيير كلمة المرور', en: 'Change password' },
+
+    lists_title: { ar: 'قوائم الشركة', en: 'Company lists' },
+    lists_desc: { ar: 'تُستخدم في نوافذ إضافة الشحنات والمركبات وفلاتر البحث.', en: 'Used in the add-shipment / add-vehicle modals and search filters.' },
+    list_cities: { ar: 'المدن', en: 'Cities' },
+    list_branches: { ar: 'الفروع', en: 'Branches' },
+    list_drivers: { ar: 'السائقون', en: 'Drivers' },
+    li_ar: { ar: 'بالعربية', en: 'Arabic' },
+    li_en: { ar: 'بالإنجليزية', en: 'English' },
+    li_add: { ar: 'إضافة', en: 'Add' },
+    li_added: { ar: 'أُضيف للقائمة', en: 'Added to list' },
+    li_removed: { ar: 'حُذف من القائمة', en: 'Removed from list' },
+    li_inuse: { ar: 'العنصر مستخدم في سجلات ولا يمكن حذفه', en: 'Item is used in records and cannot be deleted' },
+    li_need_ar: { ar: 'الاسم بالعربية مطلوب', en: 'Arabic name is required' },
+
+    subscription: { ar: 'الاشتراك', en: 'Subscription' },
+    sub_plan: { ar: 'الخطة', en: 'Plan' },
+    sub_amount: { ar: 'المبلغ الشهري', en: 'Monthly amount' },
+    sub_renew: { ar: 'تاريخ التجديد', en: 'Renewal date' },
+    sub_status: { ar: 'حالة الاشتراك', en: 'Subscription status' },
+    sub_active: { ar: 'نشط', en: 'Active' },
+    sub_due: { ar: 'مستحق', en: 'Due' },
+    sub_canceled: { ar: 'ملغى', en: 'Canceled' },
+    revenue_title: { ar: 'إيرادات الاشتراكات', en: 'Subscription revenue' },
+    mrr: { ar: 'الإيراد الشهري المتكرر', en: 'Monthly recurring revenue' },
+    active_subs: { ar: 'اشتراكات نشطة', en: 'Active subscriptions' },
+    due_subs: { ar: 'مستحقة', en: 'Due' },
+    next_renewal: { ar: 'أقرب تجديد', en: 'Next renewal' },
+
+    role_manager: { ar: 'مدير الشركة', en: 'Manager' },
+    role_coordinator: { ar: 'منسق', en: 'Coordinator' },
+    role_driver: { ar: 'سائق', en: 'Driver' },
+    nav_mytrips: { ar: 'شحناتي', en: 'My deliveries' },
+    mytrips_title: { ar: 'شحناتي اليوم', en: 'My deliveries today' },
+    mytrips_none: { ar: 'لا توجد شحنات مُسنَدة إليك حالياً', en: 'No deliveries assigned to you right now' },
+    assigned: { ar: 'مُسنَدة', en: 'Assigned' },
+    call_customer: { ar: 'اتصال بالعميل', en: 'Call customer' },
+    cust_address: { ar: 'عنوان العميل', en: 'Customer address' },
+    cust_phone: { ar: 'جوال العميل', en: 'Customer phone' },
+    mark_delivered: { ar: 'تم التسليم', en: 'Mark delivered' },
+    mark_transit: { ar: 'بدء التوصيل', en: 'Start delivery' },
+    report_delay: { ar: 'تسجيل تأخير', en: 'Report delay' },
+    marked_delivered: { ar: 'تم تعليم الشحنة كمُسلّمة', en: 'Marked as delivered' },
+
+    users_title: { ar: 'مستخدمو الشركة', en: 'Company users' },
+    users_desc: { ar: 'المدير ينشئ حسابات المنسقين والسائقين ويحدّد صلاحياتهم.', en: 'The manager creates coordinator/driver accounts and sets their access.' },
+    add_user: { ar: 'إضافة مستخدم', en: 'Add user' },
+    edit_user: { ar: 'تعديل مستخدم', en: 'Edit user' },
+    user_role: { ar: 'الدور', en: 'Role' },
+    user_name: { ar: 'الاسم', en: 'Name' },
+    user_perms: { ar: 'الأقسام المسموحة للمنسق', en: 'Sections allowed for coordinator' },
+    linked_driver: { ar: 'السائق المرتبط', en: 'Linked driver' },
+    user_added: { ar: 'تمت إضافة المستخدم', en: 'User added' },
+    user_updated: { ar: 'تم تحديث المستخدم', en: 'User updated' },
+    user_deleted: { ar: 'تم حذف المستخدم', en: 'User deleted' },
+    del_user_q: { ar: 'حذف هذا المستخدم؟', en: 'Delete this user?' },
+    cant_del_manager: { ar: 'لا يمكن حذف حساب المدير', en: 'Cannot delete the manager account' },
+    cant_del_self: { ar: 'لا يمكنك حذف حسابك', en: 'You cannot delete your own account' },
+    user_fields_req: { ar: 'الاسم واسم المستخدم وكلمة المرور مطلوبة', en: 'Name, username and password are required' },
+    pick_driver_req: { ar: 'اختر السائق المرتبط', en: 'Select the linked driver' },
+    switch_account: { ar: 'تبديل الحساب', en: 'Switch account' },
+    switched_user: { ar: 'تم التبديل إلى', en: 'Switched to' },
+
+    add_shipment: { ar: 'شحنة جديدة', en: 'New shipment' },
+    new_shipment: { ar: 'إضافة شحنة', en: 'Add shipment' },
+    shipment_added: { ar: 'تمت إضافة الشحنة', en: 'Shipment added' },
+    shipment_updated: { ar: 'تم تحديث الشحنة', en: 'Shipment updated' },
+    client_required: { ar: 'اسم العميل مطلوب', en: 'Customer name is required' },
+
+    delay_title: { ar: 'تسجيل / تعديل سبب التأخير', en: 'Record / edit delay reason' },
+    note_opt: { ar: 'ملاحظة (اختياري)', en: 'Note (optional)' },
+    update_status: { ar: 'تحديث الحالة', en: 'Update status' },
+    save: { ar: 'حفظ', en: 'Save' },
+    cancel: { ar: 'إلغاء', en: 'Cancel' },
+    close: { ar: 'إغلاق', en: 'Close' },
+    print: { ar: 'طباعة', en: 'Print' },
+    none: { ar: '— بدون —', en: '— None —' },
+
+    reports_title: { ar: 'التقارير', en: 'Reports' },
+    reports_sub: { ar: 'تقارير تنفيذية جاهزة للطباعة أو الإرسال', en: 'Executive reports, ready to print or send' },
+    weekly_card_title: { ar: 'التقرير الأسبوعي الشامل للمدير التنفيذي', en: 'Comprehensive executive weekly report' },
+    weekly_card_desc: { ar: 'ملخّص الشحنات، الفواتير والتحصيل، أكثر أسباب التأخير تكراراً، وتكاليف الصيانة — في شاشة واحدة جاهزة للطباعة.', en: 'Shipments summary, invoices & collections, top delay causes, and maintenance costs — one printable screen.' },
+    gen_now: { ar: 'توليد التقرير الآن', en: 'Generate report now' },
+    quick_snapshot: { ar: 'لقطة سريعة', en: 'Quick snapshot' },
+    weekly_report_title: { ar: 'التقرير الأسبوعي الشامل للمدير التنفيذي', en: 'Comprehensive executive weekly report' },
+    rep_generated: { ar: 'أُنشئ آلياً من منصة مُوصل — البيانات وقت الإنشاء. للطباعة اضغط «طباعة».', en: 'Auto-generated by Mowasil — data as of generation time. Click "Print" to print.' },
+    rep_weekly_on: { ar: 'التقرير الأسبوعي الشامل —', en: 'Comprehensive weekly report —' },
+    rep_mode: { ar: 'الوضع:', en: 'Mode:' },
+    rep_s1: { ar: '1) ملخص الشحنات', en: '1) Shipments summary' },
+    rep_s2: { ar: '2) الفواتير والتحصيل', en: '2) Invoices & collections' },
+    rep_s3: { ar: '3) تحليل أسباب التأخير', en: '3) Delay-cause analysis' },
+    rep_s4: { ar: '4) تكاليف الصيانة والمركبات العاجلة', en: '4) Maintenance costs & urgent vehicles' },
+    rep_ontime: { ar: 'نسبة الالتزام بالمواعيد:', en: 'On-time rate:' },
+    rep_total_maint: { ar: 'إجمالي تكاليف صيانة الأسطول:', en: 'Total fleet maintenance cost:' },
+    rep_veh_count: { ar: 'عدد المركبات:', en: 'vehicles:' },
+    rep_no_urgent: { ar: 'لا توجد صيانة عاجلة', en: 'No urgent maintenance' },
+    total: { ar: 'الإجمالي', en: 'Total' },
+    reason_col: { ar: 'السبب', en: 'Cause' },
+    cases_count: { ar: 'عدد الحالات', en: 'Cases' },
+    share: { ar: 'النسبة', en: 'Share' },
+
+    settings_title: { ar: 'الإعدادات', en: 'Settings' },
+    platform_mode: { ar: 'وضع المنصة', en: 'Platform mode' },
+    platform_mode_desc: { ar: 'يبدّل المسميات تلقائياً عبر الواجهة (عميل/مستفيد، شحنة/سلة غذائية، فاتورة/سند صرف...).', en: 'Automatically switches terminology across the UI (customer/beneficiary, shipment/food basket, invoice/disbursement…).' },
+    language: { ar: 'اللغة', en: 'Language' },
+    language_desc: { ar: 'العربية (RTL) أو الإنجليزية (LTR) — يُحفظ اختيارك.', en: 'Arabic (RTL) or English (LTR) — your choice is saved.' },
+    change_admin_pw: { ar: 'تغيير كلمة مرور المسؤول', en: 'Change admin password' },
+    current_pw: { ar: 'كلمة المرور الحالية', en: 'Current password' },
+    new_pw: { ar: 'كلمة المرور الجديدة', en: 'New password' },
+    pw_note: { ar: 'تُخزَّن كبصمة SHA‑256 في هذا النموذج. للإنتاج: تجزئة bcrypt/argon2 على الخادم مع Salt، ونقل عبر HTTPS فقط.', en: 'Stored as a SHA‑256 hash in this prototype. Production: bcrypt/argon2 on the server with salt, over HTTPS only.' },
+    update_pw: { ar: 'تحديث كلمة المرور', en: 'Update password' },
+    pw_wrong: { ar: 'كلمة المرور الحالية غير صحيحة', en: 'Current password is incorrect' },
+    pw_updated: { ar: 'تم تحديث كلمة المرور', en: 'Password updated' },
+    data: { ar: 'البيانات', en: 'Data' },
+    export_json: { ar: 'تصدير JSON', en: 'Export JSON' },
+    import_json: { ar: 'استيراد JSON', en: 'Import JSON' },
+    reset_demo: { ar: 'إعادة تعيين البيانات التجريبية', en: 'Reset demo data' },
+    reset_confirm: { ar: 'استعادة البيانات التجريبية؟ سيُمسح ما أدخلته.', en: 'Restore demo data? Your entries will be cleared.' },
+    reset_done: { ar: 'تمت إعادة التعيين', en: 'Reset complete' },
+    imported: { ar: 'تم استيراد البيانات', en: 'Data imported' },
+    bad_file: { ar: 'ملف غير صالح', en: 'Invalid file' },
+    switched_lang: { ar: 'تم تغيير اللغة', en: 'Language changed' },
+    switched_mode: { ar: 'تم التبديل إلى وضع:', en: 'Switched to mode:' },
+    n_late_ship: { ar: 'شحنة متأخرة تحتاج متابعة', en: 'late shipment(s) need follow-up' },
+    n_veh_urgent: { ar: 'مركبة تحتاج صيانة عاجلة', en: 'vehicle(s) need urgent service' },
+    n_inv_overdue: { ar: 'فاتورة تجاوزت تاريخ الاستحقاق', en: 'invoice(s) past due' },
+    no_alerts: { ar: 'لا توجد تنبيهات', en: 'No alerts' },
+  };
+  function T(k) { const e = I18N[k]; return e ? (e[state.lang] || e.ar) : k; }
+
+  /* مسميات حسب الوضع + اللغة */
+  const LABELS = {
+    tagline: {
+      commercial: { ar: 'منصة الشركات لتنظيم شحناتها ومتابعتها وتحصيلها', en: 'The platform for businesses to organize, track and collect on their shipments' },
+      charity:    { ar: 'منصة الجمعيات لتنظيم توزيع السلال والمساعدات ومتابعتها', en: 'The platform for charities to organize and track basket & aid distribution' },
+    },
+    mode_name: {
+      commercial: { ar: 'الشركات التجارية', en: 'Commercial' },
+      charity:    { ar: 'الجمعيات الخيرية', en: 'Charities' },
+    },
+    mode_btn_commercial: { commercial: { ar: 'شركات', en: 'Business' }, charity: { ar: 'شركات', en: 'Business' } },
+    mode_btn_charity:    { commercial: { ar: 'جمعيات', en: 'Charity' }, charity: { ar: 'جمعيات', en: 'Charity' } },
+    nav_shipments: { commercial: { ar: 'الشحنات', en: 'Shipments' }, charity: { ar: 'السلال الغذائية', en: 'Food baskets' } },
+    nav_invoices:  { commercial: { ar: 'الفواتير والتحصيل', en: 'Invoices & collections' }, charity: { ar: 'التكاليف والصرف', en: 'Costs & disbursement' } },
+    client_word:   { commercial: { ar: 'العميل', en: 'Customer' }, charity: { ar: 'المستفيد', en: 'Beneficiary' } },
+    clients_word:  { commercial: { ar: 'العملاء', en: 'Customers' }, charity: { ar: 'المستفيدون', en: 'Beneficiaries' } },
+    shipment_word: { commercial: { ar: 'شحنة', en: 'shipment' }, charity: { ar: 'سلة', en: 'basket' } },
+    shipments_word:{ commercial: { ar: 'الشحنات', en: 'shipments' }, charity: { ar: 'السلال', en: 'baskets' } },
+    shipments_total:{ commercial: { ar: 'إجمالي الشحنات اليوم', en: 'Total shipments today' }, charity: { ar: 'إجمالي السلال اليوم', en: 'Total baskets today' } },
+    branch_word:   { commercial: { ar: 'الفرع', en: 'Branch' }, charity: { ar: 'منطقة التوزيع', en: 'Distribution area' } },
+    invoice_word:  { commercial: { ar: 'فاتورة', en: 'invoice' }, charity: { ar: 'سند صرف', en: 'disbursement' } },
+    invoices_word: { commercial: { ar: 'الفواتير', en: 'invoices' }, charity: { ar: 'سندات الصرف', en: 'disbursements' } },
+    issued:    { commercial: { ar: 'إجمالي المبالغ الصادرة', en: 'Total issued' }, charity: { ar: 'الميزانية المخصّصة', en: 'Allocated budget' } },
+    collected: { commercial: { ar: 'المبالغ المحصّلة', en: 'Amount collected' }, charity: { ar: 'المبالغ المصروفة', en: 'Amount disbursed' } },
+    pending:   { commercial: { ar: 'الفواتير المعلقة (قيد التحصيل)', en: 'Outstanding (to collect)' }, charity: { ar: 'مبالغ قيد الصرف', en: 'Pending disbursement' } },
+    invmod_title: { commercial: { ar: 'إضافة فاتورة', en: 'Add invoice' }, charity: { ar: 'إضافة سند صرف', en: 'Add disbursement' } },
+  };
+  function t(k) { const e = LABELS[k]; if (!e) return k; const m = e[state.mode] || e.commercial; return m[state.lang] || m.ar; }
+
+  /* قيم القوائم الثابتة */
+  const ENUM = {
+    status: {
+      preparing: { ar: 'قيد التحضير', en: 'Preparing' },
+      transit:   { ar: 'جاري التوصيل', en: 'In transit' },
+      delivered: { ar: 'تم التوصيل', en: 'Delivered' },
+      late:      { ar: 'متأخرة', en: 'Late' },
+      canceled:  { ar: 'ملغاة', en: 'Canceled' },
+    },
+    reason: {
+      '':        { ar: '', en: '' },
+      traffic:   { ar: 'ازدحام مروري', en: 'Traffic congestion' },
+      vehicle:   { ar: 'عطل في المركبة', en: 'Vehicle breakdown' },
+      noreply:   { ar: 'عدم استجابة العميل', en: 'Customer unreachable' },
+      address:   { ar: 'خطأ في العنوان', en: 'Wrong address' },
+      weather:   { ar: 'ظروف جوية', en: 'Weather conditions' },
+      other:     { ar: 'أخرى', en: 'Other' },
+    },
+    city: {
+      riyadh: { ar: 'الرياض', en: 'Riyadh' }, jeddah: { ar: 'جدة', en: 'Jeddah' },
+      dammam: { ar: 'الدمام', en: 'Dammam' }, makkah: { ar: 'مكة', en: 'Makkah' },
+    },
+    branch: { malqa: { ar: 'الملقا', en: 'Al-Malqa' }, sahara: { ar: 'صحارى', en: 'Sahara' } },
+    invstatus: {
+      paid:     { commercial: { ar: 'تم التحصيل', en: 'Collected' }, charity: { ar: 'تم الصرف', en: 'Disbursed' } },
+      unpaid:   { commercial: { ar: 'بانتظار الدفع', en: 'Awaiting payment' }, charity: { ar: 'قيد الصرف', en: 'Pending disbursement' } },
+      canceled: { commercial: { ar: 'ملغاة', en: 'Canceled' }, charity: { ar: 'ملغاة', en: 'Canceled' } },
+    },
+    drive: { moving: { ar: 'سائر', en: 'Moving' }, idle: { ar: 'متوقف', en: 'Idle' }, service: { ar: 'صيانة', en: 'In service' } },
+    servicetype: {
+      oil:          { ar: 'تغيير زيت', en: 'Oil change' },
+      brakes:       { ar: 'الفرامل', en: 'Brakes' },
+      inspection:   { ar: 'فحص شامل', en: 'Full inspection' },
+      tires:        { ar: 'الإطارات', en: 'Tires' },
+      transmission: { ar: 'ناقل الحركة', en: 'Transmission' },
+      first:        { ar: 'الدورية الأولى', en: 'First service' },
+    },
+  };
+  const EN = (group, code) => {
+    const e = ENUM[group] && ENUM[group][code];
+    if (!e) return code;
+    if (e.commercial) { const m = e[state.mode] || e.commercial; return m[state.lang] || m.ar; }
+    return e[state.lang] || e.ar;
+  };
+  const disp = (v) => (v && typeof v === 'object') ? (v[state.lang] || v.ar || '') : v;
+  /* قوائم كل شركة (المدن/الفروع/السائقون) — تُدار من الإعدادات */
+  const LIST = (kind) => (state.lists && state.lists[kind]) || [];
+  const listName = (kind, id) => { const it = LIST(kind).find((x) => x.id === id); return it ? disp(it) : (id || '—'); };
+
+  /* ===================== الحالة ===================== */
+  const ROOT_KEY = 'mowasil.root.v1';
+  const TODAY = '2025-05-08';
+
+  function seedTenant() {
+    const B = (ar, en) => ({ ar, en });
+    return {
+      targets: { onTime: 95, deliveryHours: 2 }, kmToday: 3680,
+      shipments: [
+        { id: 'D-1024', client: B('أبو خالد','Abu Khalid'), city: 'riyadh', branch: 'malqa', status: 'late', eta: '10:00 ص', actual: '11:45 ص', reason: 'traffic', note: B('الطريق الدائري مزدحم','Ring road congested'), amount: 320, driver: B('سعد الأحمدي','Saad Al-Ahmadi'), phone: '0551234567', address: B('حي الملقا، شارع الأمير محمد بن سلمان، مبنى 12','Al-Malqa, Prince Mohammed bin Salman St, Bldg 12') },
+        { id: 'D-1025', client: B('شركة النخبة','Al-Nukhba Co.'), city: 'riyadh', branch: 'sahara', status: 'late', eta: '11:30 ص', actual: '12:10 م', reason: 'vehicle', note: B('بطارية ضعيفة','Weak battery'), amount: 540, driver: B('ماجد العتيبي','Majed Al-Otaibi') },
+        { id: 'D-1026', client: B('مطعم الورد','Al-Ward Restaurant'), city: 'jeddah', branch: 'malqa', status: 'late', eta: '01:00 م', actual: '01:20 م', reason: 'noreply', note: B('لا يرد على الجوال','Not answering phone'), amount: 210, driver: B('فهد الدوسري','Fahd Al-Dosari') },
+        { id: 'D-1027', client: B('العربية للتجارة','Arabian Trading'), city: 'dammam', branch: 'sahara', status: 'late', eta: '02:00 م', actual: '', reason: 'weather', note: B('أمطار غزيرة','Heavy rain'), amount: 730, driver: B('نايف القحطاني','Nayef Al-Qahtani') },
+        { id: 'D-1028', client: B('الدانة للمواد','Al-Danah Supplies'), city: 'riyadh', branch: 'malqa', status: 'delivered', eta: '03:30 م', actual: '03:15 م', reason: '', note: '', amount: 410, driver: B('سعد الأحمدي','Saad Al-Ahmadi'), onTime: true, phone: '0559876543', address: B('حي النرجس، طريق أنس بن مالك، فيلا 8','Al-Narjis, Anas bin Malik Rd, Villa 8') },
+        { id: 'D-1029', client: B('مؤسسة الريان','Al-Rayyan Est.'), city: 'riyadh', branch: 'sahara', status: 'delivered', eta: '04:00 م', actual: '04:05 م', reason: '', note: '', amount: 260, driver: B('ماجد العتيبي','Majed Al-Otaibi'), onTime: true },
+        { id: 'D-1030', client: B('شركة الأفق','Al-Ufuq Co.'), city: 'makkah', branch: 'malqa', status: 'delivered', eta: '05:00 م', actual: '05:10 م', reason: '', note: '', amount: 600, driver: B('فهد الدوسري','Fahd Al-Dosari'), onTime: true },
+        { id: 'D-1031', client: B('مطاعم السلطان','Al-Sultan Restaurants'), city: 'jeddah', branch: 'sahara', status: 'transit', eta: '06:30 م', actual: '', reason: '', note: '', amount: 355, driver: B('نايف القحطاني','Nayef Al-Qahtani') },
+        { id: 'D-1032', client: B('بقالة المنار','Al-Manar Grocery'), city: 'riyadh', branch: 'malqa', status: 'transit', eta: '07:00 م', actual: '', reason: '', note: '', amount: 180, driver: B('سعد الأحمدي','Saad Al-Ahmadi'), phone: '0554455667', address: B('حي الياسمين، شارع 30، محل رقم 4','Al-Yasmin, St 30, Shop 4') },
+        { id: 'D-1033', client: B('شركة البناء الحديث','Modern Construction Co.'), city: 'dammam', branch: 'sahara', status: 'transit', eta: '07:15 م', actual: '', reason: '', note: '', amount: 920, driver: B('خالد الشمري','Khalid Al-Shammari') },
+        { id: 'D-1034', client: B('صيدلية الشفاء','Al-Shifa Pharmacy'), city: 'riyadh', branch: 'malqa', status: 'canceled', eta: '—', actual: '', reason: 'address', note: B('العنوان غير صحيح','Address is incorrect'), amount: 0, driver: '—' },
+        { id: 'D-1035', client: B('متجر الإلكترونيات','Electronics Store'), city: 'jeddah', branch: 'sahara', status: 'preparing', eta: '08:00 م', actual: '', reason: '', note: '', amount: 1500, driver: '—' },
+      ],
+      vehicles: [
+        { id: uid('V'), plate: 'أ ب ج 1234', model: 'Hyundai H1 2021', driver: B('سعد الأحمدي','Saad Al-Ahmadi'), status: 'moving', odo: 84200, service: 'oil', nextDate: '2025-05-20', cost: 450, photo: '' },
+        { id: uid('V'), plate: 'د هـ و 5678', model: 'Toyota HiAce 2020', driver: B('ماجد العتيبي','Majed Al-Otaibi'), status: 'moving', odo: 132500, service: 'brakes', nextDate: '2025-05-10', cost: 900, photo: '' },
+        { id: uid('V'), plate: 'ز ح ط 9012', model: 'Isuzu NPR 2019', driver: B('نايف القحطاني','Nayef Al-Qahtani'), status: 'service', odo: 210300, service: 'inspection', nextDate: '2025-05-06', cost: 1800, photo: '' },
+        { id: uid('V'), plate: 'ي ك ل 3456', model: 'Ford Transit 2022', driver: B('فهد الدوسري','Fahd Al-Dosari'), status: 'moving', odo: 45120, service: 'oil', nextDate: '2025-06-15', cost: 400, photo: '' },
+        { id: uid('V'), plate: 'م ن س 7890', model: 'Mercedes Sprinter 2021', driver: B('خالد الشمري','Khalid Al-Shammari'), status: 'idle', odo: 98750, service: 'tires', nextDate: '2025-05-25', cost: 1200, photo: '' },
+        { id: uid('V'), plate: 'ع ف ص 2345', model: 'Hyundai Porter 2018', driver: '—', status: 'idle', odo: 176400, service: 'transmission', nextDate: '2025-05-04', cost: 2600, photo: '' },
+        { id: uid('V'), plate: 'ق ر ش 6789', model: 'Toyota Dyna 2020', driver: B('عبدالله الغامدي','Abdullah Al-Ghamdi'), status: 'moving', odo: 120000, service: 'oil', nextDate: '2025-06-01', cost: 450, photo: '' },
+        { id: uid('V'), plate: 'ت ث خ 0123', model: 'Isuzu D-Max 2023', driver: B('سلطان المطيري','Sultan Al-Mutairi'), status: 'moving', odo: 22300, service: 'first', nextDate: '2025-07-10', cost: 300, photo: '' },
+      ],
+      invoices: [
+        { id: 'INV-2041', shipment: 'D-1024', amount: 320, status: 'unpaid', due: '2025-05-15' },
+        { id: 'INV-2042', shipment: 'D-1025', amount: 540, status: 'paid', due: '2025-05-05' },
+        { id: 'INV-2043', shipment: 'D-1026', amount: 210, status: 'unpaid', due: '2025-05-01' },
+        { id: 'INV-2044', shipment: 'D-1027', amount: 730, status: 'unpaid', due: '2025-05-20' },
+        { id: 'INV-2045', shipment: 'D-1028', amount: 410, status: 'paid', due: '2025-05-04' },
+        { id: 'INV-2046', shipment: 'D-1029', amount: 260, status: 'paid', due: '2025-05-06' },
+        { id: 'INV-2047', shipment: 'D-1030', amount: 600, status: 'paid', due: '2025-05-08' },
+        { id: 'INV-2048', shipment: 'D-1033', amount: 920, status: 'unpaid', due: '2025-05-25' },
+        { id: 'INV-2049', shipment: 'D-1034', amount: 0, status: 'canceled', due: '—' },
+        { id: 'INV-2050', shipment: 'D-1035', amount: 1500, status: 'unpaid', due: '2025-06-01' },
+      ],
+      delayHistoryWeek: { traffic: 5, vehicle: 3, noreply: 2, address: 1, weather: 1, other: 1 },
+      lists: {
+        cities: [
+          { id: 'riyadh', ar: 'الرياض', en: 'Riyadh' }, { id: 'jeddah', ar: 'جدة', en: 'Jeddah' },
+          { id: 'dammam', ar: 'الدمام', en: 'Dammam' }, { id: 'makkah', ar: 'مكة', en: 'Makkah' },
+        ],
+        branches: [
+          { id: 'malqa', ar: 'الملقا', en: 'Al-Malqa' }, { id: 'sahara', ar: 'صحارى', en: 'Sahara' },
+        ],
+        drivers: [
+          { id: 'd1', ar: 'سعد الأحمدي', en: 'Saad Al-Ahmadi' }, { id: 'd2', ar: 'ماجد العتيبي', en: 'Majed Al-Otaibi' },
+          { id: 'd3', ar: 'فهد الدوسري', en: 'Fahd Al-Dosari' }, { id: 'd4', ar: 'نايف القحطاني', en: 'Nayef Al-Qahtani' },
+          { id: 'd5', ar: 'خالد الشمري', en: 'Khalid Al-Shammari' }, { id: 'd6', ar: 'عبدالله الغامدي', en: 'Abdullah Al-Ghamdi' },
+          { id: 'd7', ar: 'سلطان المطيري', en: 'Sultan Al-Mutairi' },
+        ],
+      },
+    };
+  }
+
+  /* الجذر متعدد الشركات: حساب مدير المنصة + قائمة الشركات + بيانات كل شركة معزولة */
+  function seedRoot() {
+    return {
+      lang: 'ar',
+      admin: { user: 'owner', hash: null }, // hash يُحسب عند الإقلاع لكلمة Owner@1234
+      companies: [
+        {
+          id: 'c1', name: { ar: 'شركة الرياض السريعة', en: 'Riyadh Express Co.' }, mode: 'commercial',
+          wa: '', sched: { on: false, day: 4, time: '08:00' }, sub: { plan: 'الأساسية', amount: 499, renew: '2025-06-01', status: 'active' },
+          users: [
+            { id: 'u1', user: 'riyadh', pass: 'Riyadh@1234', hash: null, role: 'manager', name: { ar: 'أحمد محمد', en: 'Ahmad Mohammed' } },
+            { id: 'u2', user: 'riyadh-c', pass: 'Coord@1234', hash: null, role: 'coordinator', name: { ar: 'منسق العمليات', en: 'Ops Coordinator' }, perms: { dashboard: true, shipments: true, delays: true, invoices: false, fleet: true, reports: false } },
+            { id: 'u3', user: 'riyadh-d', pass: 'Driver@1234', hash: null, role: 'driver', name: { ar: 'سعد الأحمدي', en: 'Saad Al-Ahmadi' }, driverId: 'd1' },
+          ],
+        },
+        {
+          id: 'c2', name: { ar: 'جمعية العطاء الخيرية', en: 'Al-Ataa Charity' }, mode: 'charity',
+          wa: '', sched: { on: false, day: 4, time: '08:00' }, sub: { plan: 'الجمعيات', amount: 0, renew: '2025-06-01', status: 'active' },
+          users: [
+            { id: 'u1', user: 'ataa', pass: 'Ataa@1234', hash: null, role: 'manager', name: { ar: 'مدير الجمعية', en: 'Charity Manager' } },
+          ],
+        },
+      ],
+      data: { c1: seedTenant(), c2: seedTenant() },
+    };
+  }
+
+  let ROOT, state, ctx = null; // ctx: {role:'admin'} أو {role:'company', id}
+  function loadRoot() { try { const s = JSON.parse(localStorage.getItem(ROOT_KEY)); if (s && s.companies && s.data) return s; } catch (e) {} return seedRoot(); }
+  function saveRoot() { try { localStorage.setItem(ROOT_KEY, JSON.stringify(ROOT)); } catch (e) {} }
+  function save() { saveRoot(); }
+  ROOT = loadRoot();
+
+  const company = () => (ctx && ctx.role === 'company') ? ROOT.companies.find((c) => c.id === ctx.id) : null;
+  const managerOf = (c) => (c && c.users || []).find((u) => u.role === 'manager') || (c && c.users || [])[0];
+  const cu = () => { const c = company(); return (c && ctx && ctx.uid) ? c.users.find((u) => u.id === ctx.uid) : null; };
+  const myRole = () => { if (ctx && ctx.role === 'admin') return 'admin'; const u = cu(); return u ? u.role : null; };
+  const ALL_ROUTES = ['dashboard', 'shipments', 'delays', 'invoices', 'fleet', 'reports', 'settings'];
+  function allowedRoutes() {
+    const u = cu();
+    if (!u || u.role === 'manager') return ALL_ROUTES.slice();
+    if (u.role === 'coordinator') { const p = u.perms || {}; return ['dashboard', 'shipments', 'delays', 'invoices', 'fleet', 'reports'].filter((r) => p[r]); }
+    if (u.role === 'driver') return ['mytrips'];
+    return ['dashboard'];
+  }
+  function bindTenant(id) {
+    const c = ROOT.companies.find((x) => x.id === id);
+    if (!ROOT.data[id]) ROOT.data[id] = seedTenant();
+    state = ROOT.data[id];
+    if (!state.lists) state.lists = seedTenant().lists;
+    state.today = TODAY;
+    state.mode = c.mode;
+    state.lang = ROOT.lang;
+  }
+  // حالة مؤقتة قبل الدخول (لتفادي أخطاء الوصول المبكر)
+  state = { today: TODAY, mode: 'commercial', lang: ROOT.lang, shipments: [], vehicles: [], invoices: [], delayHistoryWeek: {}, targets: { onTime: 95, deliveryHours: 2 }, kmToday: 0 };
+
+  const Session = {
+    _m: null,
+    get(k) { try { return sessionStorage.getItem(k); } catch (e) { return this._m; } },
+    set(k, v) { try { sessionStorage.setItem(k, v); } catch (e) { this._m = v; } },
+    clear(k) { try { sessionStorage.removeItem(k); } catch (e) { this._m = null; } },
+  };
+
+  /* أرقام / عملة / تواريخ حسب اللغة */
+  const locale = () => (state.lang === 'ar' ? 'ar-EG-u-nu-latn' : 'en-US');
+  const nf = () => new Intl.NumberFormat(locale());
+  const money = (n) => {
+    if (n === null || n === undefined || n === '') return T('na');
+    const v = nf().format(Math.round(+n || 0));
+    return state.lang === 'ar' ? v + ' ريال' : 'SAR ' + v;
+  };
+  function nowDateStr() {
+    const d = new Date();
+    return d.toLocaleDateString(locale(), { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+      + (state.lang === 'ar' ? ' — الساعة ' : ' — ') + d.toLocaleTimeString(locale(), { hour: '2-digit', minute: '2-digit' });
+  }
+
+  /* ===================== مشتقات ===================== */
+  const REASONS = ['traffic', 'vehicle', 'noreply', 'address', 'weather', 'other'];
+  const REASON_COLOR = { traffic: '#FF2A2A', vehicle: '#E50914', noreply: '#F59E0B', weather: '#FBBF24', address: '#8B5CF6', other: '#6B7280' };
+  const STATUS_BADGE = { late: 'badge-red', delivered: 'badge-green', transit: 'badge-blue', preparing: 'badge-amber', canceled: 'badge-gray' };
+  const STATUSES = ['preparing', 'transit', 'delivered', 'late', 'canceled'];
+
+  const M = {
+    get late()      { return state.shipments.filter((s) => s.status === 'late'); },
+    get delivered() { return state.shipments.filter((s) => s.status === 'delivered'); },
+    get transit()   { return state.shipments.filter((s) => s.status === 'transit'); },
+    get preparing() { return state.shipments.filter((s) => s.status === 'preparing'); },
+    get canceled()  { return state.shipments.filter((s) => s.status === 'canceled'); },
+    get issued()    { return state.invoices.filter((i) => i.status !== 'canceled').reduce((a, i) => a + i.amount, 0); },
+    get collected() { return state.invoices.filter((i) => i.status === 'paid').reduce((a, i) => a + i.amount, 0); },
+    get pending()   { return state.invoices.filter((i) => i.status === 'unpaid').reduce((a, i) => a + i.amount, 0); },
+    get overdueInv(){ return state.invoices.filter((i) => i.status === 'unpaid' && i.due !== '—' && daysBetween(state.today, i.due) < 0); },
+    get maint()     { return state.vehicles.reduce((a, v) => a + (+v.cost || 0), 0); },
+    get urgentVeh() { return state.vehicles.filter((v) => v.status === 'service' || (v.nextDate && daysBetween(state.today, v.nextDate) <= 3)); },
+    get onTimeRate(){ const d = M.delivered; return d.length ? Math.round(d.filter((s) => s.onTime).length / d.length * 100) : 0; },
+    delayCounts() {
+      const c = {}; REASONS.forEach((r) => (c[r] = state.delayHistoryWeek[r] || 0));
+      M.late.concat(M.canceled).forEach((s) => { if (s.reason) c[s.reason] = (c[s.reason] || 0) + 1; });
+      return REASONS.map((r) => ({ code: r, n: c[r] })).filter((x) => x.n > 0).sort((a, b) => b.n - a.n);
+    },
+  };
+  const hasInvoice = (shipId) => state.invoices.some((i) => i.shipment === shipId);
+
+  /* ===================== الشعار + الشبكة ===================== */
+  function logoSVG(size = 42) {
+    return `<svg width="${size}" height="${size}" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Mowasil logo">
+      <defs><linearGradient id="lg${size}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FF2A2A"/><stop offset="1" stop-color="#B00610"/></linearGradient></defs>
+      <rect x="2" y="2" width="60" height="60" rx="16" fill="#0D0F12" stroke="url(#lg${size})" stroke-width="2.5"/>
+      <g stroke="#E50914" stroke-width="1.4" opacity="0.55"><line x1="10" y1="14" x2="22" y2="20"/><line x1="54" y1="12" x2="42" y2="22"/><line x1="12" y1="50" x2="24" y2="44"/><line x1="52" y1="52" x2="44" y2="42"/></g>
+      <g fill="#FF2A2A"><circle cx="10" cy="14" r="2"/><circle cx="54" cy="12" r="2"/><circle cx="12" cy="50" r="2"/><circle cx="52" cy="52" r="2"/></g>
+      <path d="M32 16c-7.2 0-13 5.6-13 12.6 0 8.4 10.6 17.2 12.3 18.6.4.3 1 .3 1.4 0C34.4 45.8 45 37 45 28.6 45 21.6 39.2 16 32 16z" fill="url(#lg${size})"/>
+      <path d="M24 31.5l1.6-4.2c.2-.6.8-1 1.5-1h9.8c.7 0 1.3.4 1.5 1l1.6 4.2v4.2c0 .5-.4.9-.9.9h-1.2c-.5 0-.9-.4-.9-.9v-1H28.4v1c0 .5-.4.9-.9.9h-1.2c-.5 0-.9-.4-.9-.9v-4.2z" fill="#0D0F12"/>
+      <g fill="#FF2A2A"><circle cx="28.4" cy="33.2" r="1.5"/><circle cx="35.6" cy="33.2" r="1.5"/></g>
+    </svg>`;
+  }
+
+  function networkCanvas(canvas) {
+    const ctx = canvas.getContext('2d');
+    let w, h, pts, raf;
+    function resize() {
+      const r = canvas.getBoundingClientRect();
+      w = canvas.width = Math.max(1, r.width * devicePixelRatio);
+      h = canvas.height = Math.max(1, r.height * devicePixelRatio);
+      const count = Math.max(14, Math.min(56, Math.round((r.width * r.height) / 15000)));
+      pts = Array.from({ length: count }, () => ({ x: Math.random() * w, y: Math.random() * h, vx: (Math.random() - 0.5) * 0.25 * devicePixelRatio, vy: (Math.random() - 0.5) * 0.25 * devicePixelRatio }));
+    }
+    function tick() {
+      ctx.clearRect(0, 0, w, h);
+      for (const p of pts) { p.x += p.vx; p.y += p.vy; if (p.x < 0 || p.x > w) p.vx *= -1; if (p.y < 0 || p.y > h) p.vy *= -1; }
+      for (let i = 0; i < pts.length; i++) for (let j = i + 1; j < pts.length; j++) {
+        const a = pts[i], b = pts[j], d = Math.hypot(a.x - b.x, a.y - b.y), max = 120 * devicePixelRatio;
+        if (d < max) { ctx.strokeStyle = `rgba(229,9,20,${0.5 * (1 - d / max)})`; ctx.lineWidth = devicePixelRatio; ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke(); }
+      }
+      ctx.fillStyle = '#FF2A2A';
+      for (const p of pts) { ctx.beginPath(); ctx.arc(p.x, p.y, 1.6 * devicePixelRatio, 0, 7); ctx.fill(); }
+      raf = requestAnimationFrame(tick);
+    }
+    resize(); tick();
+    addEventListener('resize', () => { cancelAnimationFrame(raf); resize(); tick(); });
+  }
+
+  /* ===================== رسوم ===================== */
+  function barChart(items, opts = {}) {
+    const max = Math.max(...items.map((i) => i.n), 1);
+    return `<div class="space-y-3">${items.map((i) => {
+      const pct = Math.round(i.n / max * 100);
+      const share = opts.total ? Math.round(i.n / opts.total * 100) + '%' : nf().format(i.n);
+      return `<div class="flex items-center gap-3">
+        <span class="w-32 shrink-0 text-sm text-slate-300 truncate" title="${esc(i.label)}">${esc(i.label)}</span>
+        <div class="flex-1 h-2.5 rounded-full bg-ink-600 overflow-hidden"><div class="h-full rounded-full" style="width:${pct}%;background:${i.color || '#E50914'}"></div></div>
+        <span class="w-12 text-end text-sm font-bold tabular-nums text-slate-200">${share}</span>
+      </div>`;
+    }).join('')}</div>`;
+  }
+  function donutChart(segments, size = 168, stroke = 26) {
+    const total = segments.reduce((a, s) => a + s.n, 0) || 1;
+    const r = (size - stroke) / 2, c = 2 * Math.PI * r, cx = size / 2;
+    let off = 0;
+    const arcs = segments.map((s) => { const len = c * (s.n / total); const el = `<circle cx="${cx}" cy="${cx}" r="${r}" fill="none" stroke="${s.color}" stroke-width="${stroke}" stroke-dasharray="${len} ${c - len}" stroke-dashoffset="${-off}" transform="rotate(-90 ${cx} ${cx})"/>`; off += len; return el; }).join('');
+    return `<svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}" aria-hidden="true">
+      <circle cx="${cx}" cy="${cx}" r="${r}" fill="none" stroke="#1E2430" stroke-width="${stroke}"/>${arcs}
+      <text x="${cx}" y="${cx - 4}" text-anchor="middle" fill="#fff" font-size="26" font-weight="800">${nf().format(total)}</text>
+      <text x="${cx}" y="${cx + 16}" text-anchor="middle" fill="#9AA4B2" font-size="11">${esc(t('shipment_word'))} ${esc(T('late_lower'))}</text>
+    </svg>`;
+  }
+  function kpiCard(o) {
+    return `<div class="card card-hover p-4">
+      <div class="flex items-start justify-between gap-3">
+        <div><div class="text-sm text-slate-400">${esc(o.label)}</div>
+          <div class="text-2xl font-extrabold mt-1 ${o.danger ? 'text-brand-bright' : ''}">${o.value}</div>
+          ${o.sub ? `<div class="text-[11px] text-slate-500 mt-1">${esc(o.sub)}</div>` : ''}</div>
+        <div class="w-11 h-11 rounded-xl flex items-center justify-center shrink-0" style="background:${o.iconBg || 'rgba(229,9,20,.14)'}">${o.icon}</div>
+      </div><div class="kpi-line mt-3"></div>
+    </div>`;
+  }
+  const IC = {
+    truck: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#60A5FA" stroke-width="2"><path d="M3 13l2-5a2 2 0 012-1h10a2 2 0 012 1l2 5v5h-3M6 18H3v-5M7 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM17 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/></svg>',
+    clock: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FBBF24" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+    cash:  '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#34D399" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/></svg>',
+    wrench:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FF6B72" stroke-width="2"><path d="M14 7a4 4 0 01-5 5L4 17l3 3 5-5a4 4 0 005-5l-2 2-3-1-1-3z"/></svg>',
+    check: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#34D399" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>',
+    alert: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FF6B72" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z"/></svg>',
+    box:   '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#60A5FA" stroke-width="2"><path d="M21 8l-9-5-9 5 9 5 9-5zM3 8v8l9 5 9-5V8"/></svg>',
+    road:  '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FBBF24" stroke-width="2"><path d="M4 21L8 3M20 21L16 3M12 5v3M12 12v3M12 19v1"/></svg>',
+  };
+
+  /* ===================== العروض ===================== */
+  function view_dashboard() {
+    const late = M.late, counts = M.delayCounts(), top = counts[0];
+    const kpisOps = [
+      kpiCard({ label: t('shipments_total'), value: nf().format(state.shipments.length), sub: `${nf().format(M.transit.length)} ${EN('status','transit')} • ${nf().format(M.preparing.length)} ${EN('status','preparing')}`, icon: IC.truck, iconBg: 'rgba(59,130,246,.14)' }),
+      kpiCard({ label: T('late_lower'), value: nf().format(late.length), sub: top ? `${T('most_common')}: ${EN('reason', top.code)}` : '—', icon: IC.alert, iconBg: 'rgba(229,9,20,.16)', danger: true }),
+      kpiCard({ label: EN('status','delivered'), value: nf().format(M.delivered.length), sub: `${T('on_time_rate')} ${M.onTimeRate}%`, icon: IC.check, iconBg: 'rgba(16,185,129,.14)' }),
+      kpiCard({ label: T('vehicles_on_road'), value: nf().format(state.vehicles.filter((v) => v.status === 'moving').length) + ' / ' + nf().format(state.vehicles.length), sub: `${nf().format(M.urgentVeh.length)} ${T('need_urgent_service')}`, icon: IC.wrench, iconBg: 'rgba(229,9,20,.14)' }),
+    ].join('');
+    const kpisFin = [
+      kpiCard({ label: t('issued'), value: money(M.issued), icon: IC.box, iconBg: 'rgba(59,130,246,.14)' }),
+      kpiCard({ label: t('collected'), value: money(M.collected), sub: `${Math.round(M.collected / (M.issued || 1) * 100)}%`, icon: IC.cash, iconBg: 'rgba(16,185,129,.14)' }),
+      kpiCard({ label: t('pending'), value: money(M.pending), sub: `${nf().format(M.overdueInv.length)} ${t('invoice_word')} ${T('overdue_due')}`, icon: IC.clock, iconBg: 'rgba(245,158,11,.14)', danger: M.overdueInv.length > 0 }),
+      kpiCard({ label: T('maint_costs'), value: money(M.maint), sub: `${nf().format(state.vehicles.length)} ${T('vehicle_sing')}`, icon: IC.wrench, iconBg: 'rgba(229,9,20,.14)' }),
+    ].join('');
+
+    const totalDelays = counts.reduce((a, c) => a + c.n, 0) || 1;
+    const bars = counts.map((c) => ({ label: EN('reason', c.code), n: c.n, color: REASON_COLOR[c.code] }));
+    const donut = counts.map((c) => ({ n: c.n, color: REASON_COLOR[c.code] }));
+    const legend = counts.map((c) => `<div class="flex items-center justify-between gap-2 text-sm">
+        <span class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full" style="background:${REASON_COLOR[c.code]}"></span>${esc(EN('reason', c.code))}</span>
+        <span class="tabular-nums font-bold text-slate-300">${Math.round(c.n / totalDelays * 100)}%</span></div>`).join('');
+
+    const lateRows = late.length ? late.map((s) => `<tr class="row-late border-b border-ink-600/60">
+        <td class="py-2.5 px-3 font-bold">#${esc(s.id)}</td>
+        <td class="py-2.5 px-3">${esc(disp(s.client))}</td>
+        <td class="py-2.5 px-3 text-slate-400">${esc(listName('cities', s.city))} — ${esc(listName('branches', s.branch))}</td>
+        <td class="py-2.5 px-3">${s.reason ? `<span class="badge badge-red">${esc(EN('reason', s.reason))}</span>` : `<span class="text-slate-500 text-xs">${esc(T('not_logged'))}</span>`}</td>
+        <td class="py-2.5 px-3 no-print"><button class="btn btn-brand !py-1 !px-2 text-xs" data-delay="${esc(s.id)}">${esc(T('update_reason'))}</button></td>
+      </tr>`).join('') : `<tr><td colspan="5" class="py-6 text-center text-slate-500">${esc(T('no_late_shipments'))}</td></tr>`;
+
+    return `<section class="view-enter space-y-6">
+      <div class="flex flex-wrap items-end justify-between gap-3">
+        <div><h2 class="text-xl font-extrabold">${esc(T('welcome'))}</h2><p class="text-sm text-slate-400">${esc(nowDateStr())}</p></div>
+        <button class="btn btn-brand no-print" id="btn-weekly">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2h9l5 5v15H6zM14 2v6h6M9 13h6M9 17h6"/></svg>${esc(T('gen_weekly'))}</button>
+      </div>
+
+      <div><h3 class="text-sm font-bold text-slate-400 mb-2">${esc(T('ops_kpis'))}</h3><div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">${kpisOps}</div></div>
+      <div><h3 class="text-sm font-bold text-slate-400 mb-2">${esc(T('fin_kpis'))}</h3><div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">${kpisFin}</div></div>
+
+      <div class="grid gap-6 lg:grid-cols-3">
+        <div class="card p-5 lg:col-span-2">
+          <div class="flex items-center justify-between mb-4"><h3 class="font-extrabold">${esc(T('delay_analysis_week'))}</h3><span class="badge badge-red">${nf().format(totalDelays)} ${esc(T('delay_cases'))}</span></div>
+          ${barChart(bars, { total: totalDelays })}
+          <p class="text-[11px] text-slate-500 mt-4">${esc(T('delay_note'))}</p>
+        </div>
+        <div class="card p-5"><h3 class="font-extrabold mb-3">${esc(T('delay_dist'))}</h3>
+          <div class="flex items-center gap-4"><div class="shrink-0">${donutChart(donut)}</div><div class="flex-1 space-y-2">${legend}</div></div>
+        </div>
+      </div>
+
+      <div class="card p-5">
+        <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
+          <h3 class="font-extrabold flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-brand-bright pulse-dot"></span> ${esc(t('shipments_word'))} ${esc(T('late_lower'))} ${esc(T('urgent_action'))}</h3>
+          <button class="btn btn-ghost no-print" data-route="delays">${esc(T('manage_delays_arrow'))}</button>
+        </div>
+        <div class="overflow-x-auto"><table class="w-full text-sm">
+          <thead class="text-slate-400 border-b border-ink-500" style="text-align:start">
+            <tr><th class="py-2 px-3 font-semibold" style="text-align:start">${esc(t('shipment_word'))}</th><th class="py-2 px-3 font-semibold" style="text-align:start">${esc(t('client_word'))}</th><th class="py-2 px-3 font-semibold" style="text-align:start">${esc(T('destination'))}</th><th class="py-2 px-3 font-semibold" style="text-align:start">${esc(T('delay_reason'))}</th><th class="py-2 px-3 font-semibold no-print" style="text-align:start">${esc(T('action'))}</th></tr>
+          </thead><tbody>${lateRows}</tbody>
+        </table></div>
+      </div>
+
+      <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        ${kpiCard({ label: T('on_time_rate'), value: M.onTimeRate + '%', sub: `${T('target')} ${state.targets.onTime}%`, icon: IC.check, iconBg: 'rgba(16,185,129,.14)' })}
+        ${kpiCard({ label: T('avg_delivery'), value: T('hour_18'), sub: `${T('target')} ${state.targets.deliveryHours} ${T('hours')}`, icon: IC.clock, iconBg: 'rgba(245,158,11,.14)' })}
+        ${kpiCard({ label: T('total_distance'), value: nf().format(state.kmToday) + (state.lang === 'ar' ? ' كم' : ' km'), sub: T('today'), icon: IC.road, iconBg: 'rgba(245,158,11,.14)' })}
+        ${kpiCard({ label: T('vehicles_need_service'), value: nf().format(M.urgentVeh.length), sub: T('urgent_near'), icon: IC.wrench, iconBg: 'rgba(229,9,20,.14)', danger: M.urgentVeh.length > 0 })}
+      </div>
+    </section>`;
+  }
+
+  function shipmentsTable(list, { showAction = true } = {}) {
+    const rows = list.map((s) => {
+      const late = s.status === 'late';
+      const mkInv = !hasInvoice(s.id) && s.status !== 'canceled';
+      return `<tr class="border-b border-ink-600/60 ${late ? 'row-late' : ''}">
+        <td class="py-2.5 px-3 font-bold">#${esc(s.id)}</td>
+        <td class="py-2.5 px-3">${esc(disp(s.client))}</td>
+        <td class="py-2.5 px-3 text-slate-400">${esc(listName('cities', s.city))}</td>
+        <td class="py-2.5 px-3 text-slate-400">${esc(listName('branches', s.branch))}</td>
+        <td class="py-2.5 px-3"><span class="badge ${STATUS_BADGE[s.status] || 'badge-gray'}">${esc(EN('status', s.status))}</span></td>
+        <td class="py-2.5 px-3">${s.reason ? `<span class="badge badge-red">${esc(EN('reason', s.reason))}</span>` : (late ? `<span class="text-xs text-slate-500">${esc(T('not_logged'))}</span>` : '—')}</td>
+        <td class="py-2.5 px-3 text-slate-400 tabular-nums">${esc(s.eta || '—')}${s.actual ? ` <span class="text-brand-bright">/ ${esc(s.actual)}</span>` : ''}</td>
+        <td class="py-2.5 px-3 tabular-nums">${s.amount == null ? esc(T('na')) : (s.amount ? money(s.amount) : '—')}</td>
+        ${showAction ? `<td class="py-2.5 px-3 no-print"><div class="flex gap-1.5">
+          <button class="btn ${late ? 'btn-brand' : 'btn-ghost'} !py-1 !px-2 text-xs" data-delay="${esc(s.id)}">${esc(late ? T('update_reason') : T('edit'))}</button>
+          ${mkInv ? `<button class="btn btn-ghost !py-1 !px-2 text-xs" data-mkinv="${esc(s.id)}">${esc(T('add_inv_short'))}</button>` : ''}
+        </div></td>` : ''}
+      </tr>`;
+    }).join('');
+    const th = (x) => `<th class="py-2 px-3 font-semibold" style="text-align:start">${esc(x)}</th>`;
+    return `<div class="overflow-x-auto"><table class="w-full text-sm">
+      <thead class="text-slate-400 border-b border-ink-500">
+        <tr>${th(t('shipment_word'))}${th(t('client_word'))}${th(T('city'))}${th(t('branch_word'))}${th(T('status'))}${th(T('delay_reason'))}${th(T('expected_actual'))}${th(T('amount'))}${showAction ? `<th class="py-2 px-3 font-semibold no-print" style="text-align:start">${esc(T('action'))}</th>` : ''}</tr>
+      </thead><tbody>${rows || `<tr><td colspan="9" class="py-6 text-center text-slate-500">${esc(T('no_results'))}</td></tr>`}</tbody>
+    </table></div>`;
+  }
+
+  let shipFilter = { q: '', status: 'all', branch: 'all' };
+  function view_shipments() {
+    let list = state.shipments.slice();
+    if (shipFilter.q) { const q = shipFilter.q.trim().toLowerCase(); list = list.filter((s) => (s.id + ' ' + disp(s.client)).toLowerCase().includes(q)); }
+    if (shipFilter.status !== 'all') list = list.filter((s) => s.status === shipFilter.status);
+    if (shipFilter.branch !== 'all') list = list.filter((s) => s.branch === shipFilter.branch);
+
+    return `<section class="view-enter space-y-5">
+      <div class="flex flex-wrap items-end justify-between gap-3">
+        <div><h2 class="text-xl font-extrabold">${esc(T('track_manage'))} ${esc(t('shipments_word'))}</h2>
+          <p class="text-sm text-slate-400">${nf().format(state.shipments.length)} ${esc(t('shipment_word'))} ${esc(T('total_word'))} • <span class="text-brand-bright">${nf().format(M.late.length)} ${esc(T('late_lower'))}</span></p></div>
+        <button class="btn btn-brand no-print" id="btn-add-ship">+ ${esc(T('add_shipment'))}</button>
+      </div>
+
+      <div class="card p-4 grid gap-3 md:grid-cols-4">
+        <div class="md:col-span-2"><label>${esc(T('search_ship'))}</label><input id="f-q" value="${esc(shipFilter.q)}" placeholder="D-1024" /></div>
+        <div><label>${esc(T('status'))}</label><select id="f-status">
+          <option value="all">${esc(T('all_statuses'))}</option>
+          ${STATUSES.map((s) => `<option value="${s}" ${shipFilter.status === s ? 'selected' : ''}>${esc(EN('status', s))}</option>`).join('')}
+        </select></div>
+        <div><label>${esc(t('branch_word'))}</label><select id="f-branch">
+          <option value="all">${esc(T('all'))}</option>
+          ${LIST('branches').map((b) => `<option value="${b.id}" ${shipFilter.branch === b.id ? 'selected' : ''}>${esc(disp(b))}</option>`).join('')}
+        </select></div>
+      </div>
+
+      <div class="card p-4">
+        <div class="flex items-center gap-2 mb-3 text-sm text-slate-400 flex-wrap">
+          <span class="badge badge-red">■</span> ${esc(T('red_rows_hint'))}
+          <span class="ms-auto">${esc(T('showing'))} ${nf().format(list.length)} ${esc(T('of'))} ${nf().format(state.shipments.length)}</span>
+        </div>
+        ${shipmentsTable(list)}
+      </div>
+    </section>`;
+  }
+
+  function view_delays() {
+    const late = M.late, counts = M.delayCounts();
+    const unlogged = late.filter((s) => !s.reason).length;
+    return `<section class="view-enter space-y-5">
+      <div><h2 class="text-xl font-extrabold">${esc(T('delays_title'))}</h2>
+        <p class="text-sm text-slate-400">${nf().format(late.length)} ${esc(t('shipment_word'))} ${esc(T('late_lower'))} • <span class="${unlogged ? 'text-brand-bright' : 'text-emerald-400'}">${nf().format(unlogged)} ${esc(T('without_reason'))}</span></p></div>
+      <div class="grid gap-6 lg:grid-cols-3">
+        <div class="card p-5 lg:col-span-2"><h3 class="font-extrabold mb-4">${esc(T('top_delay_reasons'))}</h3>
+          ${barChart(counts.map((c) => ({ label: EN('reason', c.code), n: c.n, color: REASON_COLOR[c.code] })), { total: counts.reduce((a, c) => a + c.n, 0) })}</div>
+        <div class="card p-5"><h3 class="font-extrabold mb-3">${esc(T('distribution'))}</h3>${donutChart(counts.map((c) => ({ n: c.n, color: REASON_COLOR[c.code] })))}</div>
+      </div>
+      <div class="card p-4"><h3 class="font-extrabold mb-3">${esc(T('delays_title'))}</h3>${shipmentsTable(late)}</div>
+    </section>`;
+  }
+
+  function view_fleet() {
+    const cards = state.vehicles.map((v) => {
+      const urgent = v.status === 'service' || (v.nextDate && daysBetween(state.today, v.nextDate) <= 3);
+      const overdue = v.nextDate && daysBetween(state.today, v.nextDate) < 0;
+      const sBadge = v.status === 'moving' ? 'badge-green' : v.status === 'service' ? 'badge-red' : 'badge-gray';
+      return `<div class="card card-hover p-4 ${urgent ? 'ring-1 ring-brand/60' : ''}">
+        <div class="flex items-start justify-between gap-3">
+          <div><div class="font-extrabold text-lg tracking-wide">${esc(v.plate)}</div><div class="text-sm text-slate-400">${esc(v.model)}</div></div>
+          <span class="badge ${sBadge}">${esc(EN('drive', v.status))}</span>
+        </div>
+        ${v.photo ? `<img src="${v.photo}" alt="" class="mt-3 rounded-lg border border-ink-500 w-full h-28 object-cover" />` : ''}
+        <div class="grid grid-cols-2 gap-2 mt-3 text-sm">
+          <div class="text-slate-400">${esc(T('driver'))}</div><div>${esc(disp(v.driver) || '—')}</div>
+          <div class="text-slate-400">${esc(T('odometer'))}</div><div class="tabular-nums">${nf().format(v.odo)} ${state.lang === 'ar' ? 'كم' : 'km'}</div>
+          <div class="text-slate-400">${esc(T('next_service'))}</div><div>${esc(EN('servicetype', v.service))}</div>
+          <div class="text-slate-400">${esc(T('due'))}</div>
+          <div class="${overdue ? 'text-brand-bright font-bold' : urgent ? 'text-amber-400' : ''}">${esc(v.nextDate || '—')}${overdue ? ' (' + esc(T('overdue')) + ')' : urgent ? ' (' + esc(T('soon')) + ')' : ''}</div>
+          <div class="text-slate-400">${esc(T('expected_cost'))}</div><div class="tabular-nums">${money(v.cost)}</div>
+        </div>
+        ${urgent ? `<div class="mt-3 text-xs badge badge-red w-full justify-center py-1.5">${esc(T('requires_urgent'))}</div>` : ''}
+        <div class="flex gap-2 mt-3 no-print">
+          <button class="btn btn-ghost !py-1.5 flex-1 justify-center text-xs" data-veh-edit="${v.id}">${esc(T('edit'))}</button>
+          <button class="btn btn-ghost !py-1.5 text-xs" data-veh-del="${v.id}">${esc(T('delete'))}</button>
+        </div>
+      </div>`;
+    }).join('');
+    return `<section class="view-enter space-y-5">
+      <div class="flex flex-wrap items-end justify-between gap-3">
+        <div><h2 class="text-xl font-extrabold">${esc(T('fleet_title'))}</h2>
+          <p class="text-sm text-slate-400">${nf().format(state.vehicles.length)} ${esc(T('vehicle_sing'))} • <span class="text-brand-bright">${nf().format(M.urgentVeh.length)} ${esc(T('need_urgent_service'))}</span> • ${esc(T('maint_costs'))} ${money(M.maint)}</p></div>
+        <button class="btn btn-brand no-print" id="btn-add-veh">+ ${esc(T('add_vehicle'))}</button>
+      </div>
+      ${M.urgentVeh.length ? `<div class="card p-4 border-brand/40">
+        <div class="flex items-center gap-2 font-bold text-brand-bright mb-2">${IC.alert} ${esc(T('preventive_alert'))}</div>
+        <p class="text-sm text-slate-300">${M.urgentVeh.map((v) => esc(v.plate) + ' (' + esc(EN('servicetype', v.service)) + ')').join('، ')}</p></div>` : ''}
+      <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">${cards}</div>
+    </section>`;
+  }
+
+  let invFilter = 'all';
+  function view_invoices() {
+    let list = state.invoices.slice();
+    if (invFilter !== 'all') list = list.filter((i) => i.status === invFilter);
+    const rows = list.map((i) => {
+      const overdue = i.status === 'unpaid' && i.due !== '—' && daysBetween(state.today, i.due) < 0;
+      const b = i.status === 'paid' ? 'badge-green' : i.status === 'unpaid' ? 'badge-amber' : 'badge-gray';
+      return `<tr class="border-b border-ink-600/60 ${overdue ? 'row-late' : ''}">
+        <td class="py-2.5 px-3 font-bold">${esc(i.id)}</td>
+        <td class="py-2.5 px-3"><button class="text-brand-bright hover:underline" data-goship="${esc(i.shipment)}">#${esc(i.shipment)}</button></td>
+        <td class="py-2.5 px-3 tabular-nums">${money(i.amount)}</td>
+        <td class="py-2.5 px-3"><span class="badge ${b}">${esc(EN('invstatus', i.status))}</span></td>
+        <td class="py-2.5 px-3 tabular-nums ${overdue ? 'text-brand-bright font-bold' : 'text-slate-400'}">${esc(i.due)}${overdue ? ' (' + esc(T('overdue_due')) + ')' : ''}</td>
+        <td class="py-2.5 px-3 no-print"><div class="flex gap-1.5">
+          <button class="btn btn-brand !py-1 !px-2 text-xs" data-inv-export="${esc(i.id)}">${esc(T('export_invoice'))}</button>
+          ${i.status === 'unpaid' ? `<button class="btn btn-ghost !py-1 !px-2 text-xs" data-inv-pay="${esc(i.id)}">${esc(T('mark_collected'))}</button>` : ''}
+        </div></td>
+      </tr>`;
+    }).join('');
+    const th = (x) => `<th class="py-2 px-3 font-semibold" style="text-align:start">${esc(x)}</th>`;
+    const filters = [['all', T('all')], ['paid', EN('invstatus', 'paid')], ['unpaid', EN('invstatus', 'unpaid')], ['canceled', EN('invstatus', 'canceled')]];
+    return `<section class="view-enter space-y-5">
+      <div class="flex flex-wrap items-end justify-between gap-3">
+        <div><h2 class="text-xl font-extrabold">${esc(t('nav_invoices'))}</h2>
+          <p class="text-sm text-slate-400">${esc(t('collected'))}: ${money(M.collected)} • ${esc(t('pending'))}: ${money(M.pending)} • ${nf().format(M.overdueInv.length)} ${esc(T('overdue_due'))}</p></div>
+        <button class="btn btn-brand no-print" id="btn-add-invoice">+ ${esc(t('invmod_title'))}</button>
+      </div>
+      <div class="grid gap-4 sm:grid-cols-3">
+        ${kpiCard({ label: t('issued'), value: money(M.issued), icon: IC.box, iconBg: 'rgba(59,130,246,.14)' })}
+        ${kpiCard({ label: t('collected'), value: money(M.collected), icon: IC.cash, iconBg: 'rgba(16,185,129,.14)' })}
+        ${kpiCard({ label: t('pending'), value: money(M.pending), icon: IC.clock, iconBg: 'rgba(245,158,11,.14)', danger: M.overdueInv.length > 0 })}
+      </div>
+      <div class="card p-4">
+        <div class="flex flex-wrap items-center gap-2 mb-3 no-print">
+          ${filters.map(([v, l]) => `<button class="btn ${invFilter === v ? 'btn-brand' : 'btn-ghost'} !py-1.5 text-xs" data-invf="${v}">${esc(l)}</button>`).join('')}
+        </div>
+        <div class="overflow-x-auto"><table class="w-full text-sm">
+          <thead class="text-slate-400 border-b border-ink-500"><tr>${th(t('invoice_word'))}${th(t('shipment_word') + ' ' + T('linked_to'))}${th(T('amount'))}${th(T('pay_status'))}${th(T('due_date'))}<th class="py-2 px-3 font-semibold no-print" style="text-align:start">${esc(T('action'))}</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table></div>
+      </div>
+    </section>`;
+  }
+
+  function view_reports() {
+    return `<section class="view-enter space-y-5">
+      <div><h2 class="text-xl font-extrabold">${esc(T('reports_title'))}</h2><p class="text-sm text-slate-400">${esc(T('reports_sub'))}</p></div>
+      <div class="grid gap-4 md:grid-cols-2">
+        <div class="card card-hover p-6">
+          <div class="w-12 h-12 rounded-xl bg-brand/15 flex items-center justify-center mb-4">${IC.box}</div>
+          <h3 class="font-extrabold text-lg">${esc(T('weekly_card_title'))}</h3>
+          <p class="text-sm text-slate-400 mt-2 leading-relaxed">${esc(T('weekly_card_desc'))}</p>
+          <button class="btn btn-brand mt-4" id="btn-weekly2">${esc(T('gen_now'))}</button>
+        </div>
+        <div class="card p-6">
+          <h3 class="font-extrabold text-lg mb-3">${esc(T('quick_snapshot'))}</h3>
+          <ul class="text-sm space-y-2 text-slate-300">
+            <li class="flex justify-between"><span>${esc(t('shipments_word'))}</span><b>${nf().format(state.shipments.length)}</b></li>
+            <li class="flex justify-between"><span>${esc(T('late_lower'))}</span><b class="text-brand-bright">${nf().format(M.late.length)}</b></li>
+            <li class="flex justify-between"><span>${esc(t('collected'))}</span><b>${money(M.collected)}</b></li>
+            <li class="flex justify-between"><span>${esc(t('pending'))}</span><b>${money(M.pending)}</b></li>
+            <li class="flex justify-between"><span>${esc(T('maint_costs'))}</span><b>${money(M.maint)}</b></li>
+            <li class="flex justify-between"><span>${esc(T('on_time_rate'))}</span><b>${M.onTimeRate}%</b></li>
+          </ul>
+        </div>
+      </div>
+    </section>`;
+  }
+
+  /* واجهة السائق: شحناته فقط + بيانات تواصل العميل */
+  function myShipments() {
+    const u = cu(); if (!u || !u.driverId) return [];
+    const d = LIST('drivers').find((x) => x.id === u.driverId);
+    if (!d) return [];
+    return state.shipments.filter((s) => { const dn = disp(s.driver); return dn === d.ar || dn === d.en; });
+  }
+  function view_mytrips() {
+    const list = myShipments();
+    const done = list.filter((s) => s.status === 'delivered').length;
+    const late = list.filter((s) => s.status === 'late').length;
+    const stat = (k, v, cls) => `<div class="card p-3 text-center"><div class="text-xs text-slate-400">${esc(k)}</div><div class="text-xl font-extrabold ${cls || ''}">${v}</div></div>`;
+    const cards = list.length ? list.map((s) => {
+      const b = STATUS_BADGE[s.status] || 'badge-gray';
+      const tel = String(s.phone || '').replace(/[^\d+]/g, '');
+      return `<div class="card p-4 ${s.status === 'late' ? 'ring-1 ring-brand/50' : ''}">
+        <div class="flex items-start justify-between gap-2">
+          <div><div class="font-extrabold">#${esc(s.id)}</div><div class="text-sm text-slate-300">${esc(disp(s.client))}</div></div>
+          <span class="badge ${b}">${esc(EN('status', s.status))}</span>
+        </div>
+        <div class="text-sm text-slate-400 mt-2 space-y-1">
+          <div>${esc(listName('cities', s.city))} — ${esc(listName('branches', s.branch))} · ${esc(T('eta'))}: ${esc(s.eta || '—')}</div>
+          ${s.address ? `<div><span class="text-slate-500">${esc(T('cust_address'))}:</span> ${esc(disp(s.address))}</div>` : ''}
+          ${s.reason ? `<div><span class="badge badge-red">${esc(EN('reason', s.reason))}</span></div>` : ''}
+        </div>
+        <div class="flex flex-wrap gap-2 mt-3">
+          ${tel ? `<a href="tel:${esc(tel)}" class="btn btn-ghost !py-1.5 text-xs">📞 ${esc(T('call_customer'))} (${esc(s.phone)})</a>` : ''}
+          ${s.status !== 'delivered' && s.status !== 'canceled' ? `<button class="btn btn-brand !py-1.5 text-xs" data-mydone="${esc(s.id)}">${esc(T('mark_delivered'))}</button>` : ''}
+          ${s.status === 'preparing' ? `<button class="btn btn-ghost !py-1.5 text-xs" data-mytransit="${esc(s.id)}">${esc(T('mark_transit'))}</button>` : ''}
+          <button class="btn btn-ghost !py-1.5 text-xs" data-delay="${esc(s.id)}">${esc(T('report_delay'))}</button>
+        </div>
+      </div>`;
+    }).join('') : `<div class="card p-6 text-center text-slate-500">${esc(T('mytrips_none'))}</div>`;
+    return `<section class="view-enter space-y-5">
+      <div><h2 class="text-xl font-extrabold">${esc(T('mytrips_title'))}</h2><p class="text-sm text-slate-400">${esc(nowDateStr())}</p></div>
+      <div class="grid grid-cols-3 gap-3">
+        ${stat(T('assigned'), nf().format(list.length))}${stat(EN('status', 'delivered'), nf().format(done), 'text-emerald-400')}${stat(T('late_lower'), nf().format(late), 'text-brand-bright')}
+      </div>
+      <div class="grid gap-3 sm:grid-cols-2">${cards}</div>
+    </section>`;
+  }
+
+  function usersCard() {
+    const c = company(); if (!c) return '';
+    const rb = { manager: 'badge-blue', coordinator: 'badge-amber', driver: 'badge-gray' };
+    const rows = c.users.map((u) => `<tr class="border-b border-ink-600/60">
+      <td class="py-2 px-3 font-bold">${esc(disp(u.name))}</td>
+      <td class="py-2 px-3 text-slate-400">@${esc(u.user)}</td>
+      <td class="py-2 px-3"><span class="badge ${rb[u.role] || 'badge-gray'}">${esc(T('role_' + u.role))}</span>${u.role === 'driver' && u.driverId ? ` <span class="text-[11px] text-slate-500">${esc(listName('drivers', u.driverId))}</span>` : ''}</td>
+      <td class="py-2 px-3"><div class="flex gap-1.5">
+        <button class="btn btn-ghost !py-1 !px-2 text-xs" data-user-edit="${u.id}">${esc(T('edit'))}</button>
+        ${u.role !== 'manager' ? `<button class="btn btn-ghost !py-1 !px-2 text-xs" data-user-del="${u.id}">${esc(T('delete'))}</button>` : ''}
+      </div></td>
+    </tr>`).join('');
+    return `<div class="card p-5">
+      <div class="flex items-center justify-between mb-2 flex-wrap gap-2">
+        <h3 class="font-extrabold">${esc(T('users_title'))}</h3>
+        <button class="btn btn-brand !py-1.5 text-xs" id="btn-add-user">+ ${esc(T('add_user'))}</button>
+      </div>
+      <p class="text-sm text-slate-400 mb-3">${esc(T('users_desc'))}</p>
+      <div class="overflow-x-auto"><table class="w-full text-sm"><tbody>${rows}</tbody></table></div>
+    </div>`;
+  }
+
+  function listCard(kind, title) {
+    const items = LIST(kind).map((it) => `<span class="badge badge-gray gap-2">${esc(disp(it))}<button class="text-brand-bright font-bold" data-li-del="${kind}:${esc(it.id)}" title="${esc(T('delete'))}">✕</button></span>`).join(' ');
+    return `<div class="card p-5"><h3 class="font-extrabold mb-3">${esc(title)}</h3>
+      <div class="flex flex-wrap gap-2 mb-3">${items || `<span class="text-xs text-slate-500">—</span>`}</div>
+      <div class="grid grid-cols-[1fr_1fr_auto] gap-2 items-end">
+        <div><label>${esc(T('li_ar'))}</label><input data-li-ar="${kind}" /></div>
+        <div><label>${esc(T('li_en'))}</label><input data-li-en="${kind}" /></div>
+        <button class="btn btn-ghost" data-li-add="${kind}">+ ${esc(T('li_add'))}</button>
+      </div>
+    </div>`;
+  }
+  function listUsed(kind, id) {
+    if (kind === 'cities') return state.shipments.some((s) => s.city === id);
+    if (kind === 'branches') return state.shipments.some((s) => s.branch === id);
+    const it = LIST('drivers').find((x) => x.id === id); if (!it) return false;
+    const names = [it.ar, it.en].filter(Boolean);
+    return state.shipments.some((s) => names.includes(disp(s.driver))) || state.vehicles.some((v) => names.includes(disp(v.driver)));
+  }
+  function listAdd(kind) {
+    const ar = $(`[data-li-ar="${kind}"]`).value.trim();
+    const en = $(`[data-li-en="${kind}"]`).value.trim() || ar;
+    if (!ar) { toast(T('li_need_ar'), 'err'); return; }
+    const id = (kind[0]) + '_' + Math.random().toString(36).slice(2, 7);
+    state.lists[kind].push({ id, ar, en });
+    save(); render(); toast(T('li_added'));
+  }
+  function listDel(kind, id) {
+    if (listUsed(kind, id)) { toast(T('li_inuse'), 'err'); return; }
+    state.lists[kind] = state.lists[kind].filter((x) => x.id !== id);
+    save(); render(); toast(T('li_removed'));
+  }
+
+  function view_settings() {
+    return `<section class="view-enter space-y-5 max-w-2xl">
+      <div><h2 class="text-xl font-extrabold">${esc(T('settings_title'))}</h2></div>
+      <div class="card p-5"><h3 class="font-extrabold mb-3">${esc(T('language'))}</h3>
+        <p class="text-sm text-slate-400 mb-3">${esc(T('language_desc'))}</p>
+        <div class="flex gap-2">
+          <button class="btn ${state.lang === 'ar' ? 'btn-brand' : 'btn-ghost'}" data-setlang="ar">العربية</button>
+          <button class="btn ${state.lang === 'en' ? 'btn-brand' : 'btn-ghost'}" data-setlang="en">English</button>
+        </div>
+      </div>
+      <div class="card p-5"><h3 class="font-extrabold mb-3">${esc(T('platform_mode'))}</h3>
+        <p class="text-sm text-slate-400 mb-3">${esc(T('platform_mode_desc'))}</p>
+        <div class="flex gap-2">
+          <button class="btn ${state.mode === 'commercial' ? 'btn-brand' : 'btn-ghost'}" data-setmode="commercial">${esc(LABELS.mode_name.commercial[state.lang])}</button>
+          <button class="btn ${state.mode === 'charity' ? 'btn-brand' : 'btn-ghost'}" data-setmode="charity">${esc(LABELS.mode_name.charity[state.lang])}</button>
+        </div>
+      </div>
+      ${usersCard()}
+      ${listCard('cities', T('list_cities'))}
+      ${listCard('branches', T('list_branches'))}
+      ${listCard('drivers', T('list_drivers'))}
+      <div class="card p-5"><h3 class="font-extrabold mb-3">${esc(T('wa_report_title'))}</h3>
+        <p class="text-sm text-slate-400 mb-3">${esc(T('wa_report_desc'))}</p>
+        <form id="wa-form" class="space-y-3">
+          <div><label for="wa-num">${esc(T('wa_number'))}</label><input id="wa-num" inputmode="numeric" placeholder="9665xxxxxxxx" value="${esc(company()?.wa || '')}" /></div>
+          <div class="grid grid-cols-2 gap-3">
+            <div><label for="wa-day">${esc(T('wa_day'))}</label><select id="wa-day">${[0,1,2,3,4,5,6].map((d) => `<option value="${d}" ${(company()?.sched?.day ?? 4) === d ? 'selected' : ''}>${esc(T('day_' + d))}</option>`).join('')}</select></div>
+            <div><label for="wa-time">${esc(T('wa_time'))}</label><input id="wa-time" type="time" value="${esc(company()?.sched?.time || '08:00')}" /></div>
+          </div>
+          <label class="flex items-center gap-2 cursor-pointer text-sm"><input type="checkbox" id="wa-on" class="!w-auto" ${company()?.sched?.on ? 'checked' : ''} /> <span>${esc(T('wa_enable'))}</span></label>
+          <div class="flex flex-wrap gap-2">
+            <button type="submit" class="btn btn-brand">${esc(T('save_settings'))}</button>
+            <button type="button" class="btn btn-ghost" id="wa-preview">${esc(T('wa_preview'))}</button>
+            <button type="button" class="btn btn-ghost" id="wa-copy">${esc(T('wa_copy'))}</button>
+          </div>
+          <pre id="wa-text" class="hidden whitespace-pre-wrap text-xs bg-ink-900 border border-ink-500 rounded-lg p-3 text-slate-300 leading-relaxed" style="font-family:inherit"></pre>
+          <p class="text-[11px] text-slate-500">${esc(T('wa_backend_note'))}</p>
+        </form>
+      </div>
+      <div class="card p-5"><h3 class="font-extrabold mb-3">${esc(T('change_pw_ctx'))}</h3>
+        <form id="pw-form" class="space-y-3">
+          <div><label for="pw-old">${esc(T('current_pw'))}</label><input id="pw-old" type="password" required /></div>
+          <div><label for="pw-new">${esc(T('new_pw'))}</label><input id="pw-new" type="password" minlength="8" required /></div>
+          <p class="text-[11px] text-slate-500">${esc(T('pw_note'))}</p>
+          <button class="btn btn-brand">${esc(T('update_pw'))}</button>
+        </form>
+      </div>
+      <div class="card p-5"><h3 class="font-extrabold mb-3">${esc(T('data'))}</h3>
+        <div class="flex flex-wrap gap-2">
+          <button class="btn btn-ghost" id="btn-export">${esc(T('export_json'))}</button>
+          <label class="btn btn-ghost cursor-pointer">${esc(T('import_json'))}<input id="imp" type="file" accept="application/json" class="hidden" /></label>
+          <button class="btn btn-ghost" id="btn-reset">${esc(T('reset_demo'))}</button>
+        </div>
+      </div>
+    </section>`;
+  }
+
+  function buildWeeklyReport() {
+    const counts = M.delayCounts();
+    const totalDelays = counts.reduce((a, c) => a + c.n, 0) || 1;
+    const rReasons = counts.map((c) => `<tr><td>${esc(EN('reason', c.code))}</td><td class="tabular-nums">${nf().format(c.n)}</td><td class="tabular-nums">${Math.round(c.n / totalDelays * 100)}%</td></tr>`).join('');
+    const rInv = state.invoices.map((i) => `<tr><td>${esc(i.id)}</td><td>#${esc(i.shipment)}</td><td class="tabular-nums">${money(i.amount)}</td><td>${esc(EN('invstatus', i.status))}</td><td>${esc(i.due)}</td></tr>`).join('');
+    const rVeh = state.vehicles.filter((v) => M.urgentVeh.includes(v)).map((v) => `<tr><td>${esc(v.plate)}</td><td>${esc(v.model)}</td><td>${esc(EN('servicetype', v.service))}</td><td>${esc(v.nextDate)}</td><td class="tabular-nums">${money(v.cost)}</td></tr>`).join('') || `<tr><td colspan="5">${esc(T('rep_no_urgent'))}</td></tr>`;
+    const cell = (k, v, red) => `<div class="card p-3 text-center"><div class="text-xs text-slate-400">${esc(k)}</div><div class="text-xl font-extrabold ${red ? 'text-brand-bright' : ''}">${v}</div></div>`;
+    return `<div class="space-y-6 text-sm leading-relaxed">
+      <div class="flex items-center justify-between border-b border-ink-500 pb-4 flex-wrap gap-3">
+        <div class="flex items-center gap-3">${logoSVG(48)}<div><div class="font-extrabold text-lg">مُوصل | MOWASIL DELIVERY</div>
+          <div class="text-slate-400 text-xs">${esc(T('rep_weekly_on'))} ${esc(nowDateStr())}</div></div></div>
+        <div class="text-xs text-slate-400">${esc(T('rep_mode'))} ${esc(t('mode_name'))}</div>
+      </div>
+      <div><h4 class="font-extrabold mb-2">${esc(T('rep_s1'))}</h4>
+        <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+          ${cell(T('total'), nf().format(state.shipments.length))}${cell(EN('status','preparing'), nf().format(M.preparing.length))}${cell(EN('status','transit'), nf().format(M.transit.length))}${cell(T('late_lower'), nf().format(M.late.length), true)}${cell(EN('status','delivered'), nf().format(M.delivered.length))}
+        </div>
+        <p class="mt-2 text-slate-400 text-xs">${esc(T('rep_ontime'))} <b class="text-slate-200">${M.onTimeRate}%</b> (${esc(T('target'))} ${state.targets.onTime}%).</p>
+      </div>
+      <div><h4 class="font-extrabold mb-2">${esc(T('rep_s2'))}</h4>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-3">
+          ${cell(t('issued'), money(M.issued))}${cell(t('collected'), money(M.collected))}${cell(t('pending'), money(M.pending))}${cell(T('overdue_due'), money(M.overdueInv.reduce((a, i) => a + i.amount, 0)))}
+        </div>
+        <table class="w-full text-xs report-table"><thead><tr><th>${esc(t('invoice_word'))}</th><th>${esc(t('shipment_word'))}</th><th>${esc(T('amount'))}</th><th>${esc(T('status'))}</th><th>${esc(T('due_date'))}</th></tr></thead><tbody>${rInv}</tbody></table>
+      </div>
+      <div><h4 class="font-extrabold mb-2">${esc(T('rep_s3'))}</h4>
+        <table class="w-full text-xs report-table"><thead><tr><th>${esc(T('reason_col'))}</th><th>${esc(T('cases_count'))}</th><th>${esc(T('share'))}</th></tr></thead><tbody>${rReasons}</tbody></table>
+      </div>
+      <div><h4 class="font-extrabold mb-2">${esc(T('rep_s4'))}</h4>
+        <p class="text-slate-400 text-xs mb-2">${esc(T('rep_total_maint'))} <b class="text-slate-200">${money(M.maint)}</b> — ${esc(T('rep_veh_count'))} ${nf().format(state.vehicles.length)}.</p>
+        <table class="w-full text-xs report-table"><thead><tr><th>${esc(T('plate'))}</th><th>${esc(T('model'))}</th><th>${esc(T('service_type'))}</th><th>${esc(T('due'))}</th><th>${esc(T('expected_cost'))}</th></tr></thead><tbody>${rVeh}</tbody></table>
+      </div>
+      <div class="border-t border-ink-500 pt-3 text-[11px] text-slate-500">${esc(T('rep_generated'))}</div>
+    </div>
+    <style>.report-table{border-collapse:collapse}.report-table th,.report-table td{border:1px solid #2A313F;padding:6px 8px;text-align:start}.report-table th{background:#12151B}</style>`;
+  }
+
+  /* نص التقرير الأسبوعي لرسالة واتساب (يُبنى على الخادم أسبوعياً في مرحلة الإنتاج) */
+  function weeklyReportText() {
+    const c = M.delayCounts()[0];
+    const name = company() ? disp(company().name) : 'مُوصل';
+    const L = state.lang === 'ar';
+    const lines = L ? [
+      `📦 تقرير مُوصل الأسبوعي — ${name}`,
+      `التاريخ: ${new Date().toLocaleDateString('ar-EG-u-nu-latn', { year: 'numeric', month: 'long', day: 'numeric' })}`,
+      ``,
+      `• ${t('shipments_word')}: ${nf().format(state.shipments.length)}`,
+      `• ${T('late_lower')}: ${nf().format(M.late.length)}`,
+      `• ${EN('status', 'delivered')}: ${nf().format(M.delivered.length)} (${M.onTimeRate}% ${T('on_time_rate')})`,
+      `• ${t('collected')}: ${money(M.collected)}`,
+      `• ${t('pending')}: ${money(M.pending)} (${nf().format(M.overdueInv.length)} ${T('overdue_due')})`,
+      `• ${T('maint_costs')}: ${money(M.maint)}`,
+      c ? `• ${T('most_common')} ${T('delay_reason')}: ${EN('reason', c.code)}` : '',
+    ] : [
+      `📦 Mowasil weekly report — ${name}`,
+      `Date: ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`,
+      ``,
+      `• ${t('shipments_word')}: ${nf().format(state.shipments.length)}`,
+      `• ${T('late_lower')}: ${nf().format(M.late.length)}`,
+      `• ${EN('status', 'delivered')}: ${nf().format(M.delivered.length)} (${M.onTimeRate}% on-time)`,
+      `• ${t('collected')}: ${money(M.collected)}`,
+      `• ${t('pending')}: ${money(M.pending)} (${nf().format(M.overdueInv.length)} past due)`,
+      `• ${T('maint_costs')}: ${money(M.maint)}`,
+      c ? `• Top delay cause: ${EN('reason', c.code)}` : '',
+    ];
+    return lines.filter(Boolean).join('\n');
+  }
+  function saveWhatsApp(e) {
+    e.preventDefault();
+    const c = company(); if (!c) return;
+    const num = $('#wa-num').value.replace(/[^\d]/g, '');
+    if ($('#wa-on').checked && num.length < 8) { toast(T('wa_need_number'), 'err'); return; }
+    c.wa = num;
+    c.sched = { on: $('#wa-on').checked, day: +$('#wa-day').value, time: $('#wa-time').value || '08:00' };
+    save(); toast(T('wa_saved'));
+  }
+
+  /* ===================== التوجيه ===================== */
+  const VIEWS = { dashboard: view_dashboard, shipments: view_shipments, delays: view_delays, fleet: view_fleet, invoices: view_invoices, reports: view_reports, settings: view_settings, mytrips: view_mytrips };
+  let activeRoute = 'dashboard';
+  function currentRoute() { const h = (location.hash || '').replace(/^#\/?/, ''); return (h && VIEWS[h]) ? h : activeRoute; }
+  function go(route) { activeRoute = VIEWS[route] ? route : 'dashboard'; try { if (location.hash !== '#/' + activeRoute) location.hash = '#/' + activeRoute; } catch (e) {} render(); }
+  function render() {
+    let r = currentRoute();
+    const allowed = allowedRoutes();
+    if (!allowed.includes(r)) r = allowed[0] || 'dashboard';
+    activeRoute = r;
+    $('#view').innerHTML = (VIEWS[r] || view_dashboard)();
+    $$('[data-route]').forEach((el) => el.classList.toggle('active', el.dataset.route === r));
+    $('#view').scrollTop = 0;
+    wireView();
+  }
+  function applyNav() {
+    const allowed = allowedRoutes();
+    $$('aside .nav-link').forEach((a) => { a.hidden = !allowed.includes(a.dataset.route); });
+    const driver = myRole() === 'driver';
+    $('aside').classList.toggle('lg:flex', !driver);
+    const ms = $('#mode-seg'); if (ms) ms.style.display = (myRole() === 'manager') ? '' : 'none';
+    buildMobileNav();
+  }
+
+  function wireView() {
+    $$('[data-delay]').forEach((b) => b.addEventListener('click', () => openDelayModal(b.dataset.delay)));
+    $$('[data-mydone]').forEach((b) => b.addEventListener('click', () => { const s = state.shipments.find((x) => x.id === b.dataset.mydone); if (s) { s.status = 'delivered'; s.actual = s.actual || '—'; s.onTime = true; save(); render(); toast(T('marked_delivered') + ' ' + s.id); } }));
+    $$('[data-mytransit]').forEach((b) => b.addEventListener('click', () => { const s = state.shipments.find((x) => x.id === b.dataset.mytransit); if (s) { s.status = 'transit'; save(); render(); toast(T('shipment_updated') + ' ' + s.id); } }));
+    $$('[data-mkinv]').forEach((b) => b.addEventListener('click', () => openInvoiceModal(b.dataset.mkinv)));
+    $('#btn-weekly')?.addEventListener('click', openWeekly);
+    $('#btn-weekly2')?.addEventListener('click', openWeekly);
+
+    const q = $('#f-q');
+    if (q) {
+      q.addEventListener('input', () => { shipFilter.q = q.value; const p = q.selectionStart; render(); const nq = $('#f-q'); nq.focus(); try { nq.setSelectionRange(p, p); } catch (e) {} });
+      $('#f-status').addEventListener('change', (e) => { shipFilter.status = e.target.value; render(); });
+      $('#f-branch').addEventListener('change', (e) => { shipFilter.branch = e.target.value; render(); });
+    }
+    $('#btn-add-ship')?.addEventListener('click', () => openShipmentModal());
+    $('#btn-add-invoice')?.addEventListener('click', () => openInvoiceModal());
+
+    $('#btn-add-veh')?.addEventListener('click', () => openVehicleModal(null));
+    $$('[data-veh-edit]').forEach((b) => b.addEventListener('click', () => openVehicleModal(b.dataset.vehEdit)));
+    $$('[data-veh-del]').forEach((b) => b.addEventListener('click', () => { if (confirm(T('del_vehicle_q'))) { state.vehicles = state.vehicles.filter((v) => v.id !== b.dataset.vehDel); save(); render(); toast(T('vehicle_deleted')); } }));
+
+    $$('[data-invf]').forEach((b) => b.addEventListener('click', () => { invFilter = b.dataset.invf; render(); }));
+    $$('[data-inv-pay]').forEach((b) => b.addEventListener('click', () => { const inv = state.invoices.find((i) => i.id === b.dataset.invPay); if (inv) { inv.status = 'paid'; save(); render(); toast(T('collection_logged') + ': ' + inv.id); } }));
+    $$('[data-inv-export]').forEach((b) => b.addEventListener('click', () => openInvoiceDoc(b.dataset.invExport)));
+    $$('[data-goship]').forEach((b) => b.addEventListener('click', () => { shipFilter = { q: b.dataset.goship, status: 'all', branch: 'all' }; go('shipments'); }));
+
+    $$('[data-setmode]', $('#view')).forEach((b) => b.addEventListener('click', () => setMode(b.dataset.setmode)));
+    $$('[data-setlang]').forEach((b) => b.addEventListener('click', () => setLang(b.dataset.setlang)));
+    $$('[data-li-add]').forEach((b) => b.addEventListener('click', () => listAdd(b.dataset.liAdd)));
+    $$('[data-li-del]').forEach((b) => b.addEventListener('click', () => { const [k, id] = b.dataset.liDel.split(':'); listDel(k, id); }));
+    $('#btn-add-user')?.addEventListener('click', () => openUserModal(null));
+    $$('[data-user-edit]').forEach((b) => b.addEventListener('click', () => openUserModal(b.dataset.userEdit)));
+    $$('[data-user-del]').forEach((b) => b.addEventListener('click', () => delUser(b.dataset.userDel)));
+    $('#pw-form')?.addEventListener('submit', changePassword);
+    $('#wa-form')?.addEventListener('submit', saveWhatsApp);
+    $('#wa-preview')?.addEventListener('click', () => { const el = $('#wa-text'); el.textContent = weeklyReportText(); el.classList.remove('hidden'); });
+    $('#wa-copy')?.addEventListener('click', async () => { try { await navigator.clipboard.writeText(weeklyReportText()); toast(T('wa_copied')); } catch (e) { const el = $('#wa-text'); el.textContent = weeklyReportText(); el.classList.remove('hidden'); } });
+    $('#btn-export')?.addEventListener('click', exportJSON);
+    $('#imp')?.addEventListener('change', importJSON);
+    $('#btn-reset')?.addEventListener('click', () => { if (confirm(T('reset_confirm'))) { ROOT.data[ctx.id] = seedTenant(); bindTenant(ctx.id); save(); applyLang(); toast(T('reset_done')); } });
+  }
+
+  /* ===================== نوافذ الإدخال ===================== */
+  function fillSelect(sel, options, value) {
+    sel.innerHTML = options.map((o) => `<option value="${esc(o.v)}" ${o.v === value ? 'selected' : ''}>${esc(o.l)}</option>`).join('');
+  }
+
+  /* ربط زر «حفظ» في النوافذ عبر النقر مباشرةً (لا نعتمد على حدث close للحوار)
+     fn ترجع false عند فشل التحقق للإبقاء على النافذة مفتوحة */
+  function onModalSave(sel, fn) {
+    const modal = $(sel);
+    const btn = $(sel + ' button[value="save"]');
+    if (!btn) return;
+    btn.type = 'button';
+    btn.addEventListener('click', () => { const ok = fn(); if (ok !== false) modal.close(); });
+    // مفتاح Enter داخل الحقول = حفظ
+    const form = $(sel + ' form');
+    form && form.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && e.target.tagName === 'INPUT') { e.preventDefault(); btn.click(); }
+    });
+  }
+  /* أزرار الإلغاء/الإغلاق: اجعلها خارج نطاق الإرسال حتى لا يمنعها التحقق من الحقول المطلوبة */
+  $$('dialog button[value="cancel"]').forEach((b) => {
+    b.type = 'button';
+    b.addEventListener('click', () => { const d = b.closest('dialog'); if (d) d.close(); });
+  });
+
+  let delayTarget = null;
+  function openDelayModal(id) {
+    const s = state.shipments.find((x) => x.id === id); if (!s) return;
+    delayTarget = id;
+    $('#dm-ship').textContent = '#' + s.id;
+    $('#dm-client').textContent = disp(s.client);
+    fillSelect($('#dm-reason'), [{ v: '', l: T('none') }].concat(REASONS.map((r) => ({ v: r, l: EN('reason', r) }))), s.reason || '');
+    fillSelect($('#dm-status'), STATUSES.map((st) => ({ v: st, l: EN('status', st) })), s.status);
+    $('#dm-note').value = disp(s.note) || '';
+    $('#delay-modal').showModal();
+  }
+  onModalSave('#delay-modal', () => {
+    if (!delayTarget) return;
+    const s = state.shipments.find((x) => x.id === delayTarget);
+    s.reason = $('#dm-reason').value;
+    s.note = $('#dm-note').value.trim();
+    s.status = $('#dm-status').value;
+    save(); render(); toast(T('shipment_updated') + ' ' + s.id);
+    delayTarget = null;
+  });
+
+  function nextShipId() {
+    const n = state.shipments.map((s) => +(String(s.id).match(/(\d+)$/) || [])[1] || 0);
+    return 'D-' + (Math.max(1023, ...n) + 1);
+  }
+  function openShipmentModal() {
+    const charity = state.mode === 'charity';
+    $('#sm-title').textContent = T('new_shipment');
+    $('#sm-client').value = '';
+    fillSelect($('#sm-city'), LIST('cities').map((c) => ({ v: c.id, l: disp(c) })), LIST('cities')[0]?.id);
+    fillSelect($('#sm-branch'), LIST('branches').map((b) => ({ v: b.id, l: disp(b) })), LIST('branches')[0]?.id);
+    fillSelect($('#sm-status'), STATUSES.map((st) => ({ v: st, l: EN('status', st) })), 'preparing');
+    $('#sm-drivers-dl').innerHTML = LIST('drivers').map((d) => `<option value="${esc(disp(d))}"></option>`).join('');
+    $('#sm-amount').value = 300; $('#sm-amount').disabled = false;
+    $('#sm-eta').value = ''; $('#sm-driver').value = '';
+    $('#sm-noamount').checked = false;
+    $('#sm-noamount-wrap').classList.toggle('hidden', !charity);
+    $('#sm-invno-wrap').classList.toggle('hidden', charity);
+    $('#sm-invno').value = charity ? '' : nextInvId();
+    $('#shipment-modal').showModal();
+  }
+  $('#sm-noamount').addEventListener('change', (e) => { $('#sm-amount').disabled = e.target.checked; if (e.target.checked) $('#sm-amount').value = ''; });
+  onModalSave('#shipment-modal', () => {
+    const charity = state.mode === 'charity';
+    const client = $('#sm-client').value.trim();
+    if (!client) { toast(T('client_required'), 'err'); return false; }
+    const noAmount = charity && $('#sm-noamount').checked;
+    const amount = noAmount ? null : (+$('#sm-amount').value || 0);
+    let invno = '';
+    if (!charity) {
+      invno = $('#sm-invno').value.trim();
+      if (!invno) { toast(T('invoice_no_required'), 'err'); return false; }
+      if (state.invoices.some((i) => i.id === invno)) { toast(T('invoice_no_dup'), 'err'); return false; }
+    }
+    const id = nextShipId();
+    state.shipments.unshift({
+      id, client, city: $('#sm-city').value, branch: $('#sm-branch').value,
+      status: $('#sm-status').value, eta: $('#sm-eta').value.trim() || '—', actual: '',
+      reason: '', note: '', amount, driver: $('#sm-driver').value.trim() || '—',
+    });
+    if (invno) {
+      const due = new Date(state.today); due.setDate(due.getDate() + 14);
+      state.invoices.unshift({ id: invno, shipment: id, amount: amount || 0, status: 'unpaid', due: due.toISOString().slice(0, 10) });
+    }
+    save(); render();
+    toast(T('shipment_added') + (invno ? ' — ' + T('invoice_auto_created') : ''));
+  });
+
+  function nextInvId() {
+    const n = state.invoices.map((i) => +(String(i.id).match(/(\d+)$/) || [])[1] || 0);
+    return 'INV-' + (Math.max(2040, ...n) + 1);
+  }
+  function openInvoiceModal(shipId) {
+    if (shipId && hasInvoice(shipId)) { toast(T('invoice_exists'), 'warn'); return; }
+    $('#im-title').textContent = t('invmod_title');
+    $('#im-id').value = nextInvId();
+    const opts = state.shipments.filter((s) => shipId ? s.id === shipId : !hasInvoice(s.id));
+    const pool = opts.length ? opts : state.shipments;
+    fillSelect($('#im-ship'), pool.map((s) => ({ v: s.id, l: `#${s.id} — ${disp(s.client)}` })), shipId || pool[0]?.id);
+    const s = state.shipments.find((x) => x.id === (shipId || pool[0]?.id));
+    $('#im-amount').value = s ? s.amount : 0;
+    const due = new Date(state.today); due.setDate(due.getDate() + 14);
+    $('#im-due').value = due.toISOString().slice(0, 10);
+    fillSelect($('#im-status'), ['unpaid', 'paid', 'canceled'].map((v) => ({ v, l: EN('invstatus', v) })), 'unpaid');
+    $('#invoice-modal').showModal();
+    $('#im-ship').onchange = () => { const sh = state.shipments.find((x) => x.id === $('#im-ship').value); if (sh) $('#im-amount').value = sh.amount; };
+  }
+  onModalSave('#invoice-modal', () => {
+    if (!$('#im-ship').value) return false;
+    state.invoices.unshift({
+      id: $('#im-id').value, shipment: $('#im-ship').value,
+      amount: +$('#im-amount').value || 0, status: $('#im-status').value,
+      due: $('#im-due').value || '—',
+    });
+    save(); render(); toast(T('invoice_added'));
+  });
+
+  let vehTarget = null, vehPhoto = '';
+  function openVehicleModal(id) {
+    vehTarget = id; vehPhoto = '';
+    const v = id ? state.vehicles.find((x) => x.id === id) : null;
+    $('#vm-title').textContent = v ? T('edit_vehicle') : T('add_vehicle');
+    $('#vm-plate').value = v?.plate || '';
+    $('#vm-model').value = v?.model || '';
+    $('#vm-driver').value = v ? (disp(v.driver) || '') : '';
+    $('#vm-drivers-dl').innerHTML = LIST('drivers').map((d) => `<option value="${esc(disp(d))}"></option>`).join('');
+    fillSelect($('#vm-status'), ['moving', 'idle', 'service'].map((s) => ({ v: s, l: EN('drive', s) })), v?.status || 'moving');
+    fillSelect($('#vm-service'), Object.keys(ENUM.servicetype).map((s) => ({ v: s, l: EN('servicetype', s) })), v?.service || 'oil');
+    $('#vm-odo').value = v?.odo || '';
+    $('#vm-date').value = v?.nextDate || '';
+    $('#vm-cost').value = v?.cost || '';
+    $('#vm-photo-info').textContent = '';
+    const pv = $('#vm-photo-preview');
+    if (v?.photo) { pv.src = v.photo; pv.classList.remove('hidden'); } else { pv.classList.add('hidden'); }
+    $('#vm-photo').value = '';
+    $('#vehicle-modal').showModal();
+  }
+  $('#vm-photo').addEventListener('change', async (e) => {
+    const f = e.target.files[0]; if (!f) return;
+    $('#vm-photo-info').textContent = T('compressing');
+    try {
+      const r = await compressImage(f);
+      vehPhoto = r.dataUrl;
+      $('#vm-photo-info').textContent = `${T('orig')} ${kb(r.before)} ← ${T('after_compress')} ${kb(r.size)} (${Math.max(0, Math.round((1 - r.size / r.before) * 100))}% ${T('less')}) — ${r.w}×${r.h}`;
+      const pv = $('#vm-photo-preview'); pv.src = r.dataUrl; pv.classList.remove('hidden');
+    } catch (err) { $('#vm-photo-info').textContent = T('photo_read_err'); }
+  });
+  onModalSave('#vehicle-modal', () => {
+    const data = {
+      plate: $('#vm-plate').value.trim(), model: $('#vm-model').value.trim(), driver: $('#vm-driver').value.trim() || '—',
+      status: $('#vm-status').value, odo: +$('#vm-odo').value || 0, nextDate: $('#vm-date').value,
+      service: $('#vm-service').value, cost: +$('#vm-cost').value || 0,
+    };
+    if (!data.plate || !data.model) { toast(T('plate_model_required'), 'err'); return false; }
+    if (vehTarget) { const v = state.vehicles.find((x) => x.id === vehTarget); Object.assign(v, data); if (vehPhoto) v.photo = vehPhoto; toast(T('vehicle_updated')); }
+    else { state.vehicles.push({ id: uid('V'), photo: vehPhoto, ...data }); toast(T('vehicle_added')); }
+    save(); render();
+  });
+
+  function openWeekly() { $('#report-body').innerHTML = buildWeeklyReport(); $('#report-modal').showModal(); }
+  $('#report-close').addEventListener('click', () => $('#report-modal').close());
+  $('#report-print').addEventListener('click', () => window.print());
+
+  /* مستند الفاتورة القابل للتصدير (طباعة المتصفح → حفظ PDF) */
+  function buildInvoiceDoc(invId) {
+    const i = state.invoices.find((x) => x.id === invId);
+    if (!i) return '';
+    const sh = state.shipments.find((s) => s.id === i.shipment);
+    const customer = sh ? disp(sh.client) : '—';
+    const city = sh ? listName('cities', sh.city) : '';
+    const isCharity = state.mode === 'charity';
+    const docTitle = isCharity ? T('disbursement_doc_title') : T('invoice_doc_title');
+    const vat = i.status === 'canceled' ? 0 : Math.round(i.amount * 0.15);
+    const total = i.amount + vat;
+    const stBadge = i.status === 'paid' ? 'badge-green' : i.status === 'unpaid' ? 'badge-amber' : 'badge-gray';
+    return `<div class="text-sm leading-relaxed">
+      <div class="flex items-start justify-between gap-4 border-b border-ink-500 pb-4 flex-wrap">
+        <div class="flex items-center gap-3">${logoSVG(48)}
+          <div><div class="font-extrabold text-lg">مُوصل | MOWASIL DELIVERY</div>
+          <div class="text-slate-400 text-xs">${esc(T('issued_by'))}: مُوصل</div></div>
+        </div>
+        <div class="text-end">
+          <div class="text-2xl font-extrabold tracking-wide">${esc(docTitle)}</div>
+          <div class="text-slate-400 text-xs mt-1">${esc(i.id)}</div>
+          <span class="badge ${stBadge} mt-2">${esc(EN('invstatus', i.status))}</span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4 py-4">
+        <div>
+          <div class="text-slate-400 text-xs mb-1">${esc(T('bill_to'))}</div>
+          <div class="font-bold">${esc(customer)}</div>
+          <div class="text-slate-400">${esc(city)}</div>
+        </div>
+        <div class="text-end">
+          <div class="text-xs text-slate-400">${esc(T('issue_date'))}: <span class="text-slate-200">${esc(state.today)}</span></div>
+          <div class="text-xs text-slate-400 mt-1">${esc(T('due_date'))}: <span class="text-slate-200">${esc(i.due)}</span></div>
+          <div class="text-xs text-slate-400 mt-1">${esc(t('shipment_word'))}: <span class="text-slate-200">#${esc(i.shipment)}</span></div>
+        </div>
+      </div>
+
+      <table class="w-full doc-table">
+        <thead><tr><th style="text-align:start">${esc(T('description'))}</th><th style="text-align:end">${esc(T('amount'))}</th></tr></thead>
+        <tbody>
+          <tr><td>${esc(T('delivery_service_for'))} #${esc(i.shipment)} — ${esc(customer)}</td><td style="text-align:end" class="tabular-nums">${money(i.amount)}</td></tr>
+        </tbody>
+      </table>
+
+      <div class="flex justify-end mt-4">
+        <table class="doc-totals">
+          <tr><td>${esc(T('subtotal'))}</td><td class="tabular-nums">${money(i.amount)}</td></tr>
+          <tr><td>${esc(T('vat15'))}</td><td class="tabular-nums">${money(vat)}</td></tr>
+          <tr class="grand"><td>${esc(T('grand_total'))}</td><td class="tabular-nums">${money(total)}</td></tr>
+        </table>
+      </div>
+
+      <p class="text-[11px] text-slate-500 border-t border-ink-500 mt-5 pt-3">${esc(T('invoice_doc_note'))}</p>
+    </div>
+    <style>
+      .doc-table{border-collapse:collapse}.doc-table th,.doc-table td{border:1px solid #2A313F;padding:8px 10px}
+      .doc-table th{background:#12151B}
+      .doc-totals{border-collapse:collapse;min-width:260px}
+      .doc-totals td{border:1px solid #2A313F;padding:7px 10px}
+      .doc-totals td:last-child{text-align:end;font-weight:700}
+      .doc-totals .grand td{background:#1E2430;font-size:1rem}
+    </style>`;
+  }
+  function openInvoiceDoc(invId) {
+    const i = state.invoices.find((x) => x.id === invId); if (!i) return;
+    $('#invoice-doc-heading').textContent = (state.mode === 'charity' ? T('disbursement_doc_title') : T('invoice_doc_title')) + ' · ' + i.id;
+    $('#invoice-doc-body').innerHTML = buildInvoiceDoc(invId);
+    $('#invoice-doc-modal').showModal();
+  }
+  $('#invoice-doc-close').addEventListener('click', () => $('#invoice-doc-modal').close());
+  $('#invoice-doc-print').addEventListener('click', () => window.print());
+
+  /* ===================== اللغة + الوضع ===================== */
+  function applyStatic() {
+    $$('[data-t]').forEach((el) => { el.textContent = T(el.dataset.t); });
+    $$('[data-t-title]').forEach((el) => { el.title = T(el.dataset.tTitle); });
+    $$('[data-mt]').forEach((el) => { el.textContent = t(el.dataset.mt); });
+    $('#header-sub').textContent = t('tagline');
+    $('#mode-label-side').textContent = t('mode_name');
+    const c = company(), u = cu();
+    if (c) {
+      $('#hdr-name').textContent = u ? disp(u.name) : disp(c.name);
+      $('#hdr-role').textContent = (u ? T('role_' + u.role) : '') + ' · ' + disp(c.name);
+    }
+    $$('#lang-seg button, #lang-seg-login button, #lang-seg-admin button').forEach((b) => b.classList.toggle('on', b.dataset.lang === state.lang));
+    $$('#mode-seg button').forEach((b) => b.classList.toggle('on', b.dataset.setmode === state.mode));
+    applyNav();
+    buildBell();
+    buildUserMenu();
+  }
+  function applyLang() {
+    document.documentElement.lang = state.lang;
+    document.documentElement.dir = state.lang === 'ar' ? 'rtl' : 'ltr';
+    applyStatic();
+    render();
+  }
+  function setLang(l) { if (l === state.lang) return; state.lang = l; ROOT.lang = l; save(); if (ctx && ctx.role === 'admin') { applyStaticAdmin(); renderAdmin(); } else { applyLang(); } toast(T('switched_lang')); }
+  function setMode(m) { state.mode = m; if (company()) company().mode = m; save(); applyStatic(); render(); toast(T('switched_mode') + ' ' + t('mode_name')); }
+
+  function buildMobileNav() {
+    const labels = { dashboard: T('nav_home'), shipments: t('nav_shipments'), delays: T('nav_delays'), invoices: t('nav_invoices'), fleet: T('nav_fleet'), reports: T('nav_reports'), settings: T('nav_settings'), mytrips: T('nav_mytrips') };
+    const items = allowedRoutes();
+    $('#mobile-nav').innerHTML = items.map((r) => `<button class="btn btn-ghost !py-1.5 shrink-0 text-xs" data-route="${r}">${esc(labels[r] || r)}</button>`).join('');
+  }
+  function buildBell() {
+    const items = [];
+    if (M.late.length) items.push({ c: 'badge-red', t: `${nf().format(M.late.length)} ${T('n_late_ship')}` });
+    if (M.urgentVeh.length) items.push({ c: 'badge-amber', t: `${nf().format(M.urgentVeh.length)} ${T('n_veh_urgent')}` });
+    if (M.overdueInv.length) items.push({ c: 'badge-red', t: `${nf().format(M.overdueInv.length)} ${T('n_inv_overdue')}` });
+    if (!items.length) items.push({ c: 'badge-green', t: T('no_alerts') });
+    $('#bell-count').textContent = items.filter((i) => i.c !== 'badge-green').length;
+    $('#bell-menu').innerHTML = items.map((i) => `<div class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-ink-700"><span class="badge ${i.c}">●</span><span>${esc(i.t)}</span></div>`).join('');
+  }
+  $('#bell-btn').addEventListener('click', (e) => { e.stopPropagation(); $('#bell-menu').classList.toggle('hidden'); $('#user-menu').classList.add('hidden'); });
+  document.addEventListener('click', () => { $('#bell-menu').classList.add('hidden'); $('#user-menu').classList.add('hidden'); });
+
+  /* قائمة تبديل الحساب داخل الشركة */
+  const roleBadge = { manager: 'badge-blue', coordinator: 'badge-amber', driver: 'badge-gray' };
+  function buildUserMenu() {
+    const c = company(), menu = $('#user-menu');
+    if (!c) { menu.innerHTML = ''; return; }
+    const rows = c.users.map((u) => `<button class="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg hover:bg-ink-700 ${u.id === ctx.uid ? 'bg-ink-700' : ''}" data-switch="${u.id}">
+        <span class="truncate">${esc(disp(u.name))}</span>
+        <span class="badge ${roleBadge[u.role] || 'badge-gray'} shrink-0">${esc(T('role_' + u.role))}</span>
+      </button>`).join('');
+    menu.innerHTML = `<div class="px-3 pt-1 pb-2 text-[11px] text-slate-500 font-bold">${esc(T('switch_account'))}</div>${rows}
+      <div class="border-t border-ink-500 mt-1 pt-1"><button class="w-full text-start px-3 py-2 rounded-lg hover:bg-ink-700 text-brand-bright" id="um-logout">${esc(T('logout'))}</button></div>`;
+    $$('#user-menu [data-switch]').forEach((b) => b.addEventListener('click', (e) => { e.stopPropagation(); switchUser(b.dataset.switch); }));
+    $('#um-logout').addEventListener('click', logout);
+  }
+  function switchUser(uid) {
+    const c = company(); if (!c) return;
+    const u = c.users.find((x) => x.id === uid); if (!u) return;
+    ctx.uid = uid;
+    if (!ctx.viaAdmin) Session.set('mowasil.sess', JSON.stringify({ role: 'company', id: c.id, uid }));
+    $('#user-menu').classList.add('hidden');
+    if (!allowedRoutes().includes(activeRoute)) activeRoute = allowedRoutes()[0] || 'dashboard';
+    applyStatic(); render();
+    toast(T('switched_user') + ' ' + disp(u.name));
+  }
+  $('#user-btn').addEventListener('click', (e) => { e.stopPropagation(); $('#user-menu').classList.toggle('hidden'); $('#bell-menu').classList.add('hidden'); });
+
+  /* ===================== الإعدادات: كلمة المرور / البيانات ===================== */
+  async function changePassword(e) {
+    e.preventDefault();
+    const acct = (ctx && ctx.role === 'admin') ? ROOT.admin : company();
+    if (!acct) return;
+    const oldH = await sha256($('#pw-old').value);
+    if (oldH !== acct.hash) { toast(T('pw_wrong'), 'err'); return; }
+    acct.hash = await sha256($('#pw-new').value);
+    save(); e.target.reset(); toast(T('pw_updated'));
+  }
+  function exportJSON() {
+    const payload = ctx && ctx.role === 'company' ? ROOT.data[ctx.id] : ROOT;
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: 'mowasil-data.json' });
+    a.click(); URL.revokeObjectURL(a.href);
+  }
+  function importJSON(e) {
+    const f = e.target.files[0]; if (!f) return;
+    const fr = new FileReader();
+    fr.onload = () => {
+      try {
+        const d = JSON.parse(fr.result); if (!d.shipments) throw 0;
+        ROOT.data[ctx.id] = d; bindTenant(ctx.id); save(); applyLang(); toast(T('imported'));
+      } catch { toast(T('bad_file'), 'err'); }
+    };
+    fr.readAsText(f);
+  }
+
+  /* ===================== المصادقة متعددة الشركات ===================== */
+  function transientState() {
+    return { today: TODAY, mode: 'commercial', lang: ROOT.lang, shipments: [], vehicles: [], invoices: [], delayHistoryWeek: {}, targets: { onTime: 95, deliveryHours: 2 }, kmToday: 0 };
+  }
+  async function ensureHashes() {
+    if (!ROOT.admin.hash) ROOT.admin.hash = await sha256('Owner@1234');
+    for (const c of ROOT.companies) {
+      // ترحيل: الشكل القديم user/hash على الشركة → مستخدم مدير واحد
+      if (!c.users) {
+        c.users = [{ id: 'u_mgr', user: c.user || 'manager', hash: c.hash || (c.pass ? await sha256(c.pass) : await sha256('changeme')), role: 'manager', name: { ar: 'المدير', en: 'Manager' } }];
+      }
+      delete c.user; delete c.pass; delete c.hash;
+      for (const u of c.users) { if (!u.hash && u.pass) u.hash = await sha256(u.pass); delete u.pass; }
+      if (!c.sub) c.sub = { plan: '', amount: 0, renew: '', status: 'active' };
+      if (!c.sched) c.sched = { on: false, day: 4, time: '08:00' };
+    }
+    saveRoot();
+  }
+  async function tryLogin(e) {
+    e.preventDefault();
+    const u = $('#lg-user').value.trim();
+    const h = await sha256($('#lg-pass').value);
+    if (u === ROOT.admin.user && h === ROOT.admin.hash) {
+      $('#lg-error').classList.add('hidden');
+      Session.set('mowasil.sess', JSON.stringify({ role: 'admin' }));
+      ctx = { role: 'admin' }; state = transientState(); showAdmin(); return;
+    }
+    for (const c of ROOT.companies) {
+      const usr = (c.users || []).find((x) => x.user === u && x.hash === h);
+      if (usr) {
+        $('#lg-error').classList.add('hidden');
+        Session.set('mowasil.sess', JSON.stringify({ role: 'company', id: c.id, uid: usr.id }));
+        enterCompany(c.id, false, usr.id); return;
+      }
+    }
+    $('#lg-error').classList.remove('hidden');
+  }
+  function enterCompany(id, viaAdmin, uid) {
+    bindTenant(id);
+    const c = ROOT.companies.find((x) => x.id === id);
+    ctx = { role: 'company', id, viaAdmin: !!viaAdmin, uid: uid || (managerOf(c) && managerOf(c).id) };
+    showApp();
+  }
+  function showApp() {
+    $('#login').classList.add('hidden');
+    $('#admin-shell').classList.add('hidden');
+    $('#shell').classList.remove('hidden');
+    const bar = ctx && ctx.viaAdmin;
+    $('#impersonate-bar').classList.toggle('hidden', !bar);
+    if (bar) $('#imp-name').textContent = disp(company().name);
+    applyLang();
+    if (!$('#net-header').dataset.on) { $('#net-header').dataset.on = '1'; networkCanvas($('#net-header')); }
+  }
+  function showAdmin() {
+    ctx = { role: 'admin' }; state = transientState();
+    $('#login').classList.add('hidden');
+    $('#shell').classList.add('hidden');
+    $('#admin-shell').classList.remove('hidden');
+    applyStaticAdmin(); renderAdmin();
+    if (!$('#net-admin').dataset.on) { $('#net-admin').dataset.on = '1'; networkCanvas($('#net-admin')); }
+  }
+  function logout() { Session.clear('mowasil.sess'); location.reload(); }
+
+  function applyStaticAdmin() {
+    document.documentElement.lang = state.lang;
+    document.documentElement.dir = state.lang === 'ar' ? 'rtl' : 'ltr';
+    $$('[data-t]').forEach((el) => { el.textContent = T(el.dataset.t); });
+    $$('[data-t-title]').forEach((el) => { el.title = T(el.dataset.tTitle); });
+    $$('#lang-seg-admin button').forEach((b) => b.classList.toggle('on', b.dataset.lang === state.lang));
+  }
+  function renderAdmin() {
+    const subBadge = { active: 'badge-green', due: 'badge-red', canceled: 'badge-gray' };
+    const rows = ROOT.companies.map((c) => {
+      const n = (ROOT.data[c.id] && ROOT.data[c.id].shipments || []).length;
+      const s = c.sub || { plan: '', amount: 0, status: 'active', renew: '' };
+      return `<tr class="border-b border-ink-600/60">
+        <td class="py-2.5 px-3 font-bold">${esc(disp(c.name))}</td>
+        <td class="py-2.5 px-3 text-slate-400">@${esc(managerOf(c).user)} · ${nf().format(c.users.length)}👤</td>
+        <td class="py-2.5 px-3"><span class="badge ${c.mode === 'charity' ? 'badge-amber' : 'badge-blue'}">${esc(LABELS.mode_name[c.mode][state.lang])}</span></td>
+        <td class="py-2.5 px-3 tabular-nums text-slate-400">${nf().format(n)}</td>
+        <td class="py-2.5 px-3"><span class="badge ${subBadge[s.status] || 'badge-gray'}">${esc(s.plan || '—')} · ${esc(T('sub_' + s.status))}</span><div class="text-[11px] text-slate-500 mt-0.5">${money(s.amount)}${s.renew ? ' · ' + esc(s.renew) : ''}</div></td>
+        <td class="py-2.5 px-3"><div class="flex gap-1.5 flex-wrap">
+          <button class="btn btn-brand !py-1 !px-2 text-xs" data-adm="enter" data-id="${c.id}">${esc(T('enter_workspace'))}</button>
+          <button class="btn btn-ghost !py-1 !px-2 text-xs" data-adm="edit" data-id="${c.id}">${esc(T('edit'))}</button>
+          <button class="btn btn-ghost !py-1 !px-2 text-xs" data-adm="del" data-id="${c.id}">${esc(T('delete'))}</button>
+        </div></td>
+      </tr>`;
+    }).join('');
+    const active = ROOT.companies.filter((c) => (c.sub || {}).status === 'active');
+    const due = ROOT.companies.filter((c) => (c.sub || {}).status === 'due');
+    const mrr = active.reduce((a, c) => a + (+c.sub.amount || 0), 0);
+    const nextRenew = ROOT.companies.map((c) => c.sub && c.sub.renew).filter(Boolean).sort()[0] || '—';
+    const rcell = (k, v, danger) => `<div class="card p-3"><div class="text-xs text-slate-400">${esc(k)}</div><div class="text-lg font-extrabold ${danger ? 'text-brand-bright' : ''}">${v}</div></div>`;
+    $('#admin-view').innerHTML = `
+      <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+        <h2 class="text-xl font-extrabold">${esc(T('companies'))} (${nf().format(ROOT.companies.length)})</h2>
+        <button class="btn btn-brand" id="adm-add">+ ${esc(T('add_company'))}</button>
+      </div>
+      <div class="mb-5">
+        <h3 class="text-sm font-bold text-slate-400 mb-2">${esc(T('revenue_title'))}</h3>
+        <div class="grid gap-3 grid-cols-2 sm:grid-cols-4">
+          ${rcell(T('mrr'), money(mrr))}${rcell(T('active_subs'), nf().format(active.length))}${rcell(T('due_subs'), nf().format(due.length), due.length > 0)}${rcell(T('next_renewal'), esc(nextRenew))}
+        </div>
+      </div>
+      <div class="card p-4 overflow-x-auto"><table class="w-full text-sm">
+        <thead class="text-slate-400 border-b border-ink-500"><tr>
+          <th class="py-2 px-3" style="text-align:start">${esc(T('company_name'))}</th>
+          <th class="py-2 px-3" style="text-align:start">${esc(T('login_user'))}</th>
+          <th class="py-2 px-3" style="text-align:start">${esc(T('default_mode'))}</th>
+          <th class="py-2 px-3" style="text-align:start">${esc(T('shipments_count'))}</th>
+          <th class="py-2 px-3" style="text-align:start">${esc(T('subscription'))}</th>
+          <th class="py-2 px-3" style="text-align:start">${esc(T('action'))}</th>
+        </tr></thead><tbody>${rows}</tbody>
+      </table></div>
+      <p class="text-[11px] text-slate-500 mt-4">${esc(T('pw_note'))}</p>`;
+    $('#adm-add').addEventListener('click', () => openCompanyModal(null));
+    $$('#admin-view [data-adm]').forEach((b) => b.addEventListener('click', () => admAction(b.dataset.adm, b.dataset.id)));
+  }
+  function admAction(act, id) {
+    const c = ROOT.companies.find((x) => x.id === id); if (!c) return;
+    if (act === 'enter') { enterCompany(id, true); }
+    else if (act === 'edit') { openCompanyModal(id); }
+    else if (act === 'del') {
+      if (!confirm(T('del_company_q'))) return;
+      ROOT.companies = ROOT.companies.filter((x) => x.id !== id);
+      delete ROOT.data[id]; saveRoot(); renderAdmin(); toast(T('company_deleted'));
+    }
+  }
+  let compTarget = null;
+  function openCompanyModal(id) {
+    compTarget = id;
+    const c = id ? ROOT.companies.find((x) => x.id === id) : null;
+    $('#cm-title').textContent = c ? T('edit_company') : T('add_company');
+    $('#cm-name-ar').value = c ? (c.name.ar || '') : '';
+    $('#cm-name-en').value = c ? (c.name.en || '') : '';
+    $('#cm-user').value = c ? (managerOf(c).user || '') : '';
+    $('#cm-pass').value = '';
+    $('#cm-pass').placeholder = c ? '••••••• (اتركه فارغاً للإبقاء)' : '';
+    $('#cm-pass').required = !c;
+    fillSelect($('#cm-mode'), [{ v: 'commercial', l: LABELS.mode_name.commercial[state.lang] }, { v: 'charity', l: LABELS.mode_name.charity[state.lang] }], c ? c.mode : 'commercial');
+    const sub = (c && c.sub) || { plan: '', amount: 0, renew: '', status: 'active' };
+    $('#cm-plan').value = sub.plan || '';
+    $('#cm-amount').value = sub.amount || 0;
+    $('#cm-renew').value = sub.renew || '';
+    fillSelect($('#cm-substatus'), ['active', 'due', 'canceled'].map((v) => ({ v, l: T('sub_' + v) })), sub.status || 'active');
+    $('#company-modal').showModal();
+  }
+  onModalSave('#company-modal', () => {
+    const nameAr = $('#cm-name-ar').value.trim();
+    const user = $('#cm-user').value.trim();
+    const pass = $('#cm-pass').value;
+    const mode = $('#cm-mode').value;
+    const nameEn = $('#cm-name-en').value.trim() || nameAr;
+    if (!nameAr || !user || (!compTarget && !pass)) { toast(T('fields_required'), 'err'); return false; }
+    if (ROOT.companies.some((co) => co.users.some((x) => x.user === user && x.id !== (compTarget ? managerOf(ROOT.companies.find((z) => z.id === compTarget)).id : null)))) { toast(T('user_dup'), 'err'); return false; }
+    const sub = { plan: $('#cm-plan').value.trim(), amount: +$('#cm-amount').value || 0, renew: $('#cm-renew').value || '', status: $('#cm-substatus').value };
+    (async () => {
+      if (compTarget) {
+        const c = ROOT.companies.find((x) => x.id === compTarget);
+        c.name = { ar: nameAr, en: nameEn }; c.mode = mode; c.sub = sub;
+        const mgr = managerOf(c); mgr.user = user;
+        if (pass) mgr.hash = await sha256(pass);
+        if (ctx.role === 'company' && ctx.id === c.id) state.mode = c.mode;
+        saveRoot(); renderAdmin(); toast(T('company_updated'));
+      } else {
+        const nid = 'c' + (Math.max(0, ...ROOT.companies.map((x) => +String(x.id).replace(/\D/g, '') || 0)) + 1);
+        ROOT.companies.push({ id: nid, name: { ar: nameAr, en: nameEn }, mode, wa: '', sched: { on: false, day: 4, time: '08:00' }, sub, users: [{ id: 'u_mgr', user, hash: await sha256(pass), role: 'manager', name: { ar: 'المدير', en: 'Manager' } }] });
+        ROOT.data[nid] = seedTenant();
+        saveRoot(); renderAdmin(); toast(T('company_added'));
+      }
+    })();
+  });
+
+  /* ===================== مستخدمو الشركة (المدير) ===================== */
+  let userTarget = null;
+  const PERM_KEYS = ['dashboard', 'shipments', 'delays', 'invoices', 'fleet', 'reports'];
+  function umToggleRole() {
+    const r = $('#um-role').value;
+    $('#um-perms-wrap').classList.toggle('hidden', r !== 'coordinator');
+    $('#um-driver-wrap').classList.toggle('hidden', r !== 'driver');
+  }
+  $('#um-role').addEventListener('change', umToggleRole);
+  function openUserModal(id) {
+    const c = company(); if (!c) return;
+    userTarget = id;
+    const u = id ? c.users.find((x) => x.id === id) : null;
+    $('#um-title').textContent = u ? T('edit_user') : T('add_user');
+    $('#um-name-ar').value = u ? (u.name.ar || '') : '';
+    $('#um-name-en').value = u ? (u.name.en || '') : '';
+    $('#um-user').value = u ? u.user : '';
+    $('#um-pass').value = '';
+    $('#um-pass').placeholder = u ? '••••••• (اتركه فارغاً للإبقاء)' : '';
+    const isMgr = !!(u && u.role === 'manager');
+    fillSelect($('#um-role'), isMgr ? [{ v: 'manager', l: T('role_manager') }] : [{ v: 'coordinator', l: T('role_coordinator') }, { v: 'driver', l: T('role_driver') }], u ? u.role : 'coordinator');
+    $('#um-role').disabled = isMgr;
+    const p = (u && u.perms) || { dashboard: true, shipments: true, delays: true, invoices: false, fleet: true, reports: false };
+    PERM_KEYS.forEach((k) => { $('#um-perm-' + k).checked = !!p[k]; });
+    fillSelect($('#um-driver'), LIST('drivers').map((d) => ({ v: d.id, l: disp(d) })), (u && u.driverId) || LIST('drivers')[0]?.id);
+    umToggleRole();
+    $('#user-modal').showModal();
+  }
+  onModalSave('#user-modal', () => {
+    const c = company();
+    const nameAr = $('#um-name-ar').value.trim();
+    const nameEn = $('#um-name-en').value.trim() || nameAr;
+    const user = $('#um-user').value.trim();
+    const pass = $('#um-pass').value;
+    const role = $('#um-role').value;
+    if (!nameAr || !user || (!userTarget && !pass)) { toast(T('user_fields_req'), 'err'); return false; }
+    if (ROOT.companies.some((co) => co.users.some((x) => x.user === user && x.id !== userTarget))) { toast(T('user_dup'), 'err'); return false; }
+    if (role === 'driver' && !$('#um-driver').value) { toast(T('pick_driver_req'), 'err'); return false; }
+    const perms = {}; PERM_KEYS.forEach((k) => { perms[k] = $('#um-perm-' + k).checked; });
+    (async () => {
+      if (userTarget) {
+        const u = c.users.find((x) => x.id === userTarget);
+        u.name = { ar: nameAr, en: nameEn }; u.user = user;
+        if (pass) u.hash = await sha256(pass);
+        if (u.role !== 'manager') {
+          u.role = role;
+          if (role === 'coordinator') { u.perms = perms; delete u.driverId; }
+          else { u.driverId = $('#um-driver').value; delete u.perms; }
+        }
+        toast(T('user_updated'));
+      } else {
+        const nu = { id: uid('u'), user, hash: await sha256(pass), role, name: { ar: nameAr, en: nameEn } };
+        if (role === 'coordinator') nu.perms = perms; else nu.driverId = $('#um-driver').value;
+        c.users.push(nu);
+        toast(T('user_added'));
+      }
+      saveRoot(); render();
+    })();
+  });
+  function delUser(id) {
+    const c = company(); const u = c.users.find((x) => x.id === id); if (!u) return;
+    if (u.role === 'manager') { toast(T('cant_del_manager'), 'err'); return; }
+    if (ctx.uid === id) { toast(T('cant_del_self'), 'err'); return; }
+    if (!confirm(T('del_user_q'))) return;
+    c.users = c.users.filter((x) => x.id !== id);
+    saveRoot(); render(); toast(T('user_deleted'));
+  }
+
+  /* ===================== الإقلاع ===================== */
+  async function boot() {
+    await ensureHashes();
+    $('#logo-login').innerHTML = logoSVG(44);
+    $('#logo-side').innerHTML = logoSVG(38);
+    $('#logo-header').innerHTML = logoSVG(34);
+    $('#logo-footer').innerHTML = logoSVG(20);
+    $('#logo-admin').innerHTML = logoSVG(38);
+    networkCanvas($('#net-login'));
+
+    document.documentElement.lang = state.lang;
+    document.documentElement.dir = state.lang === 'ar' ? 'rtl' : 'ltr';
+    $$('[data-t]').forEach((el) => { el.textContent = T(el.dataset.t); });
+    $$('#lang-seg-login button').forEach((b) => b.classList.toggle('on', b.dataset.lang === state.lang));
+
+    $('#login-form').addEventListener('submit', tryLogin);
+    const QUICK = { owner: ['owner', 'Owner@1234'], riyadh: ['riyadh', 'Riyadh@1234'], ataa: ['ataa', 'Ataa@1234'] };
+    $$('[data-quick]').forEach((b) => b.addEventListener('click', () => {
+      const [u, p] = QUICK[b.dataset.quick]; $('#lg-user').value = u; $('#lg-pass').value = p; $('#login-form').requestSubmit();
+    }));
+    $('#lg-reset').addEventListener('click', () => {
+      if (!confirm(T('reset_all_confirm'))) return;
+      try { localStorage.removeItem('mowasil.root.v1'); localStorage.removeItem('mowasil.state.v2'); } catch (e) {}
+      Session.clear('mowasil.sess'); location.reload();
+    });
+    $('#logout-btn').addEventListener('click', logout);
+    $('#admin-logout').addEventListener('click', logout);
+    $('#imp-back').addEventListener('click', () => showAdmin());
+    addEventListener('hashchange', render);
+
+    document.addEventListener('click', (e) => {
+      const rt = e.target.closest('[data-route]');
+      if (rt && !$('#shell').classList.contains('hidden')) { e.preventDefault(); go(rt.dataset.route); return; }
+      const lg = e.target.closest('[data-lang]');
+      if (lg) { e.preventDefault(); setLang(lg.dataset.lang); return; }
+      const md = e.target.closest('#mode-seg [data-setmode]');
+      if (md) { e.preventDefault(); setMode(md.dataset.setmode); }
+    });
+
+    let sess = null; try { sess = JSON.parse(Session.get('mowasil.sess') || 'null'); } catch (e) {}
+    if (sess && sess.role === 'admin') showAdmin();
+    else if (sess && sess.role === 'company' && ROOT.companies.find((c) => c.id === sess.id)) enterCompany(sess.id, false, sess.uid);
+
+    if (!location.hash) location.hash = '#/dashboard';
+  }
+  boot();
+})();
+</script>
+</body>
+</html>
