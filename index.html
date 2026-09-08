@@ -338,12 +338,13 @@
       <div class="col-span-2 sm:col-span-1"><label data-t="fulfil_method">طريقة التنفيذ</label><select id="sm-fulfil"></select></div>
       <div class="col-span-2 sm:col-span-1" id="sm-driver-wrap"><label data-t="driver">السائق</label><input id="sm-driver" list="sm-drivers-dl" placeholder="—" /><datalist id="sm-drivers-dl"></datalist></div>
       <div class="col-span-2 sm:col-span-1 hidden" id="sm-carrier-wrap"><label data-t="carrier_word">شركة الشحن</label><input id="sm-carrier" list="sm-carriers-dl" placeholder="أرامكس" /><datalist id="sm-carriers-dl"></datalist></div>
+      <p class="col-span-2 text-[11px] text-amber-400 hidden" id="sm-ext-hint" data-t="ext_hint"></p>
       <div class="col-span-2 border-t border-ink-500 pt-3"><div class="text-xs font-bold text-slate-300 mb-2" data-t="eta_datetime">الموعد المتوقع</div>
         <div class="grid grid-cols-2 gap-3">
           <div><label data-t="eta_date">التاريخ</label><input id="sm-eta-date" type="date" /></div>
           <div><label data-t="eta_time">الوقت</label><input id="sm-eta-time" type="time" /></div>
         </div>
-        <div class="flex items-end gap-2 mt-2">
+        <div class="flex items-end gap-2 mt-2" id="sm-eta-calc-row">
           <div class="flex-1"><label data-t="eta_days">أيام من الآن</label><input id="sm-eta-days" type="number" min="0" placeholder="0" /></div>
           <div class="flex-1"><label data-t="eta_hours">ساعات</label><input id="sm-eta-hours" type="number" min="0" placeholder="0" /></div>
           <button type="button" id="sm-eta-calc" class="btn btn-ghost !py-2 text-xs" data-t="calc_btn">احسب</button>
@@ -816,11 +817,13 @@
     reschedule_reason_default: { ar: 'إعادة جدولة الموعد', en: 'Schedule change' },
 
     fulfil_method: { ar: 'طريقة التنفيذ', en: 'Fulfilment' },
-    fulfil_internal: { ar: 'توصيل داخلي', en: 'Own fleet' },
-    fulfil_external: { ar: 'شحن خارجي', en: 'External carrier' },
+    fulfil_internal: { ar: 'توصيل عن طريق الشركة', en: 'In-house delivery' },
+    fulfil_external: { ar: 'توصيل خارجي', en: 'External delivery' },
     carrier_word: { ar: 'شركة الشحن', en: 'Carrier' },
     list_carriers: { ar: 'شركات الشحن الخارجي', en: 'External carriers' },
     via_carrier: { ar: 'عبر', en: 'via' },
+    ext_hint: { ar: 'الموعد المتوقع ورسالة العميل اختياريان — التنسيق عبر شركة الشحن.', en: 'Expected time and customer message are optional — coordination is via the carrier.' },
+    eta_per_carrier: { ar: 'حسب شركة الشحن', en: 'Per carrier' },
 
     nav_review: { ar: 'المراجعة الشهرية', en: 'Monthly review' },
     review_title: { ar: 'المراجعة الشهرية لحالة المركبات', en: 'Monthly vehicle review' },
@@ -1158,7 +1161,8 @@
   };
   function etaCell(s) {
     if (s.status === 'delivered') return `<span class="text-emerald-400">${esc(etaFmt(s.actualAt || s.etaAt))}</span>`;
-    if (s.status === 'canceled' || !s.etaAt) return '—';
+    if (!s.etaAt) return (s.fulfil === 'external' && s.status !== 'canceled') ? `<span class="text-[11px] text-slate-500">${esc(T('eta_per_carrier'))}</span>` : '—';
+    if (s.status === 'canceled') return esc(etaFmt(s.etaAt));
     const r = etaRel(s.etaAt);
     return `${esc(etaFmt(s.etaAt))}<span class="block text-[11px] ${r.cls}">${esc(r.text)}</span>`;
   }
@@ -1203,7 +1207,7 @@
     try { window.open(custWaLink(s), '_blank', 'noopener'); } catch (e) {}
     if (!silent) toast(T('cust_notified'));
   }
-  function autoNotify(s) { if (s && s.phone && company() && company().custWa !== false) notifyCustomer(s, true); }
+  function autoNotify(s) { if (s && s.fulfil !== 'external' && s.phone && company() && company().custWa !== false) notifyCustomer(s, true); }
 
   /* ===================== مشتقات ===================== */
   const REASONS = ['traffic', 'vehicle', 'noreply', 'address', 'weather', 'other'];
@@ -1923,6 +1927,8 @@
     const ext = $('#sm-fulfil').value === 'external';
     $('#sm-driver-wrap').classList.toggle('hidden', ext);
     $('#sm-carrier-wrap').classList.toggle('hidden', !ext);
+    $('#sm-ext-hint').classList.toggle('hidden', !ext);
+    $('#sm-eta-calc-row').classList.toggle('hidden', ext);
   }
   $('#sm-fulfil').addEventListener('change', smFulfilToggle);
   $('#sm-eta-calc').addEventListener('click', () => {
