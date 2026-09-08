@@ -303,6 +303,10 @@
       <div><label data-t="delay_reason">سبب التأخير</label><select id="dm-reason"></select></div>
       <div><label data-t="note_opt">ملاحظة (اختياري)</label><textarea id="dm-note" rows="2"></textarea></div>
       <div><label data-t="update_status">تحديث الحالة</label><select id="dm-status"></select></div>
+      <div class="grid grid-cols-2 gap-3">
+        <div><label data-t="fulfil_method">طريقة التنفيذ</label><select id="dm-fulfil"></select></div>
+        <div id="dm-carrier-wrap" class="hidden"><label data-t="carrier_word">شركة الشحن</label><input id="dm-carrier" list="dm-carriers-dl" placeholder="أرامكس" /><datalist id="dm-carriers-dl"></datalist></div>
+      </div>
       <div class="border-t border-ink-500 pt-3"><div class="text-xs font-bold text-slate-300 mb-2" data-t="new_eta">الموعد الجديد المتوقع (اختياري)</div>
         <div class="grid grid-cols-2 gap-3">
           <div><label data-t="eta_date">التاريخ</label><input id="dm-eta-date" type="date" /></div>
@@ -331,7 +335,9 @@
       <div class="col-span-2 sm:col-span-1"><label data-mt="branch_word"></label><select id="sm-branch"></select></div>
       <div class="col-span-2"><label data-t="cust_address">عنوان العميل</label><input id="sm-address" /></div>
       <div class="col-span-2 sm:col-span-1"><label data-t="status">الحالة</label><select id="sm-status"></select></div>
-      <div class="col-span-2 sm:col-span-1"><label data-t="driver">السائق</label><input id="sm-driver" list="sm-drivers-dl" placeholder="—" /><datalist id="sm-drivers-dl"></datalist></div>
+      <div class="col-span-2 sm:col-span-1"><label data-t="fulfil_method">طريقة التنفيذ</label><select id="sm-fulfil"></select></div>
+      <div class="col-span-2 sm:col-span-1" id="sm-driver-wrap"><label data-t="driver">السائق</label><input id="sm-driver" list="sm-drivers-dl" placeholder="—" /><datalist id="sm-drivers-dl"></datalist></div>
+      <div class="col-span-2 sm:col-span-1 hidden" id="sm-carrier-wrap"><label data-t="carrier_word">شركة الشحن</label><input id="sm-carrier" list="sm-carriers-dl" placeholder="أرامكس" /><datalist id="sm-carriers-dl"></datalist></div>
       <div class="col-span-2 border-t border-ink-500 pt-3"><div class="text-xs font-bold text-slate-300 mb-2" data-t="eta_datetime">الموعد المتوقع</div>
         <div class="grid grid-cols-2 gap-3">
           <div><label data-t="eta_date">التاريخ</label><input id="sm-eta-date" type="date" /></div>
@@ -809,6 +815,13 @@
     cust_wa_auto_desc: { ar: 'عند تغيّر حالة الشحنة (بدء التوصيل / تم التسليم / تأخير أو إعادة جدولة) تُفتح رسالة واتساب جاهزة لجوال العميل. الإرسال التلقائي الكامل بلا تدخّل يتم عبر خادم مُوصل + WhatsApp Cloud API (مرحلة الخادم).', en: 'When a shipment status changes, a ready WhatsApp draft opens for the customer. Full hands-off auto-send runs via the Mowasil server + WhatsApp Cloud API (server phase).' },
     reschedule_reason_default: { ar: 'إعادة جدولة الموعد', en: 'Schedule change' },
 
+    fulfil_method: { ar: 'طريقة التنفيذ', en: 'Fulfilment' },
+    fulfil_internal: { ar: 'توصيل داخلي', en: 'Own fleet' },
+    fulfil_external: { ar: 'شحن خارجي', en: 'External carrier' },
+    carrier_word: { ar: 'شركة الشحن', en: 'Carrier' },
+    list_carriers: { ar: 'شركات الشحن الخارجي', en: 'External carriers' },
+    via_carrier: { ar: 'عبر', en: 'via' },
+
     nav_review: { ar: 'المراجعة الشهرية', en: 'Monthly review' },
     review_title: { ar: 'المراجعة الشهرية لحالة المركبات', en: 'Monthly vehicle review' },
     review_intro: { ar: 'راجع كل مركبة: حدّث قراءة العدّاد ونوع/تاريخ الصيانة القادمة، أو علّم «لا تغيير». ثم اضغط «تمت المراجعة».', en: 'Review each vehicle: update the odometer and next-service type/date, or mark "No change", then click "Review done".' },
@@ -985,7 +998,7 @@
         { id: 'D-1024', client: B('أبو خالد','Abu Khalid'), city: 'riyadh', branch: 'malqa', status: 'late', etaAt: H(-5), actualAt: '', reason: 'traffic', note: B('الطريق الدائري مزدحم','Ring road congested'), driver: B('سعد الأحمدي','Saad Al-Ahmadi'), phone: '0551234567', address: B('حي الملقا، شارع الأمير محمد بن سلمان، مبنى 12','Al-Malqa, Prince Mohammed bin Salman St, Bldg 12'), schedule: [] },
         { id: 'D-1025', client: B('شركة النخبة','Al-Nukhba Co.'), city: 'riyadh', branch: 'sahara', status: 'late', etaAt: H(-3), actualAt: '', reason: 'vehicle', note: B('بطارية ضعيفة','Weak battery'), driver: B('ماجد العتيبي','Majed Al-Otaibi'), phone: '0553001122', address: B('حي المروج، طريق الملك عبدالعزيز','Al-Muruj, King Abdulaziz Rd'), schedule: [] },
         { id: 'D-1026', client: B('مطعم الورد','Al-Ward Restaurant'), city: 'jeddah', branch: 'malqa', status: 'late', etaAt: H(-2), actualAt: '', reason: 'noreply', note: B('لا يرد على الجوال','Not answering phone'), driver: B('فهد الدوسري','Fahd Al-Dosari'), phone: '0567889900', address: B('حي الروضة، شارع الأمير سلطان','Al-Rawdah, Prince Sultan St'), schedule: [] },
-        { id: 'D-1027', client: B('العربية للتجارة','Arabian Trading'), city: 'dammam', branch: 'sahara', status: 'late', etaAt: H(-1), actualAt: '', reason: 'weather', note: B('أمطار غزيرة','Heavy rain'), driver: B('نايف القحطاني','Nayef Al-Qahtani'), phone: '0561234599', address: B('حي الشاطئ، طريق الخليج','Al-Shati, Gulf Rd'), schedule: [] },
+        { id: 'D-1027', client: B('العربية للتجارة','Arabian Trading'), city: 'dammam', branch: 'sahara', status: 'late', etaAt: H(-1), actualAt: '', reason: 'weather', note: B('أمطار غزيرة','Heavy rain'), fulfil: 'external', carrier: 'أرامكس', driver: '—', phone: '0561234599', address: B('حي الشاطئ، طريق الخليج','Al-Shati, Gulf Rd'), schedule: [] },
         { id: 'D-1028', client: B('الدانة للمواد','Al-Danah Supplies'), city: 'riyadh', branch: 'malqa', status: 'delivered', etaAt: H(-26), actualAt: H(-27), reason: '', note: '', driver: B('سعد الأحمدي','Saad Al-Ahmadi'), onTime: true, phone: '0559876543', address: B('حي النرجس، طريق أنس بن مالك، فيلا 8','Al-Narjis, Anas bin Malik Rd, Villa 8'), schedule: [] },
         { id: 'D-1029', client: B('مؤسسة الريان','Al-Rayyan Est.'), city: 'riyadh', branch: 'sahara', status: 'delivered', etaAt: H(-24), actualAt: H(-23), reason: '', note: '', driver: B('ماجد العتيبي','Majed Al-Otaibi'), onTime: true, phone: '0552223344', address: B('حي الملز، شارع جرير','Al-Malaz, Jarir St'), schedule: [] },
         { id: 'D-1030', client: B('شركة الأفق','Al-Ufuq Co.'), city: 'makkah', branch: 'malqa', status: 'delivered', etaAt: H(-20), actualAt: H(-19), reason: '', note: '', driver: B('فهد الدوسري','Fahd Al-Dosari'), onTime: true, phone: '0568001122', address: B('حي العزيزية، شارع إبراهيم الخليل','Al-Aziziyah, Ibrahim Al-Khalil St'), schedule: [] },
@@ -993,7 +1006,7 @@
         { id: 'D-1032', client: B('بقالة المنار','Al-Manar Grocery'), city: 'riyadh', branch: 'malqa', status: 'transit', etaAt: H(3), actualAt: '', reason: '', note: '', driver: B('سعد الأحمدي','Saad Al-Ahmadi'), phone: '0554455667', address: B('حي الياسمين، شارع 30، محل رقم 4','Al-Yasmin, St 30, Shop 4'), schedule: [] },
         { id: 'D-1033', client: B('شركة البناء الحديث','Modern Construction Co.'), city: 'dammam', branch: 'sahara', status: 'transit', etaAt: H(5), actualAt: '', reason: '', note: '', driver: B('خالد الشمري','Khalid Al-Shammari'), phone: '0569900112', address: B('المنطقة الصناعية الثانية','2nd Industrial Area'), schedule: [] },
         { id: 'D-1034', client: B('صيدلية الشفاء','Al-Shifa Pharmacy'), city: 'riyadh', branch: 'malqa', status: 'canceled', etaAt: '', actualAt: '', reason: 'address', note: B('العنوان غير صحيح','Address is incorrect'), driver: '—', phone: '0550009988', address: B('—','—'), schedule: [] },
-        { id: 'D-1035', client: B('متجر الإلكترونيات','Electronics Store'), city: 'jeddah', branch: 'sahara', status: 'preparing', etaAt: H(22), actualAt: '', reason: '', note: '', driver: '—', phone: '0500112233', address: B('حي البوادي، شارع صاري','Al-Bawadi, Sari St'), schedule: [] },
+        { id: 'D-1035', client: B('متجر الإلكترونيات','Electronics Store'), city: 'jeddah', branch: 'sahara', status: 'preparing', etaAt: H(22), actualAt: '', reason: '', note: '', fulfil: 'external', carrier: 'أرامكس', driver: '—', phone: '0500112233', address: B('حي البوادي، شارع صاري','Al-Bawadi, Sari St'), schedule: [] },
       ],
       vehicles: [
         { id: uid('V'), plate: 'أ ب ج 1234', model: 'Hyundai H1 2021', driver: B('سعد الأحمدي','Saad Al-Ahmadi'), status: 'moving', odo: 84200, service: 'oil', nextDate: '2025-05-20', photo: '' },
@@ -1019,6 +1032,9 @@
           { id: 'd3', ar: 'فهد الدوسري', en: 'Fahd Al-Dosari' }, { id: 'd4', ar: 'نايف القحطاني', en: 'Nayef Al-Qahtani' },
           { id: 'd5', ar: 'خالد الشمري', en: 'Khalid Al-Shammari' }, { id: 'd6', ar: 'عبدالله الغامدي', en: 'Abdullah Al-Ghamdi' },
           { id: 'd7', ar: 'سلطان المطيري', en: 'Sultan Al-Mutairi' },
+        ],
+        carriers: [
+          { id: 'aramex', ar: 'أرامكس', en: 'Aramex' },
         ],
       },
     };
@@ -1087,6 +1103,7 @@
     if (!ROOT.data[id]) ROOT.data[id] = seedTenant();
     state = ROOT.data[id];
     if (!state.lists) state.lists = seedTenant().lists;
+    if (!state.lists.carriers) state.lists.carriers = [{ id: 'aramex', ar: 'أرامكس', en: 'Aramex' }];
     state.today = TODAY;
     state.mode = c.mode;
     state.lang = ROOT.lang;
@@ -1164,6 +1181,9 @@
     const ar = state.lang === 'ar';
     const co = company() ? disp(company().name) : 'مُوصل';
     const id = s.id, eta = etaFmt(s.etaAt);
+    if (s.fulfil === 'external' && s.carrier && s.status !== 'delivered') return ar
+      ? `عميلنا العزيز، شحنتك رقم ${id} ستُسلَّم عبر ${s.carrier}. الموعد المتوقع: ${eta}. — ${co}`
+      : `Dear customer, shipment ${id} will be delivered via ${s.carrier}. Expected: ${eta}. — ${co}`;
     if (s.status === 'delivered') return ar
       ? `عميلنا العزيز، تم تسليم شحنتك رقم ${id} بنجاح. شكراً لثقتك بـ${co}.`
       : `Dear customer, your shipment ${id} has been delivered. Thank you for choosing ${co}.`;
@@ -1359,7 +1379,7 @@
         <td class="py-2.5 px-3 font-bold">#${esc(s.id)}</td>
         <td class="py-2.5 px-3">${esc(disp(s.client))}${s.phone ? `<span class="block text-[11px] text-slate-500 tabular-nums">${esc(s.phone)}</span>` : ''}</td>
         <td class="py-2.5 px-3 text-slate-400">${esc(listName('cities', s.city))} — ${esc(listName('branches', s.branch))}</td>
-        <td class="py-2.5 px-3"><span class="badge ${STATUS_BADGE[s.status] || 'badge-gray'}">${esc(EN('status', s.status))}</span></td>
+        <td class="py-2.5 px-3"><span class="badge ${STATUS_BADGE[s.status] || 'badge-gray'}">${esc(EN('status', s.status))}</span>${s.fulfil === 'external' ? `<span class="block text-[11px] text-slate-400 mt-0.5">🚚 ${esc(T('via_carrier'))} ${esc(s.carrier || '—')}</span>` : ''}</td>
         <td class="py-2.5 px-3">${s.reason ? `<span class="badge badge-red">${esc(EN('reason', s.reason))}</span>` : (late ? `<span class="text-xs text-slate-500">${esc(T('not_logged'))}</span>` : '—')}</td>
         <td class="py-2.5 px-3 text-slate-400">${etaCell(s)}${nRes ? `<span class="block text-[11px] text-amber-400">${esc(T('rescheduled_n'))}${nRes > 1 ? ' ×' + nf().format(nRes) : ''}</span>` : ''}</td>
         ${showAction ? `<td class="py-2.5 px-3 no-print"><div class="flex gap-1.5 flex-wrap">
@@ -1595,8 +1615,9 @@
   function listUsed(kind, id) {
     if (kind === 'cities') return state.shipments.some((s) => s.city === id);
     if (kind === 'branches') return state.shipments.some((s) => s.branch === id);
-    const it = LIST('drivers').find((x) => x.id === id); if (!it) return false;
+    const it = LIST(kind).find((x) => x.id === id); if (!it) return false;
     const names = [it.ar, it.en].filter(Boolean);
+    if (kind === 'carriers') return state.shipments.some((s) => names.includes(s.carrier));
     return state.shipments.some((s) => names.includes(disp(s.driver))) || state.vehicles.some((v) => names.includes(disp(v.driver)));
   }
   function listAdd(kind) {
@@ -1634,6 +1655,7 @@
       ${listCard('cities', T('list_cities'))}
       ${listCard('branches', T('list_branches'))}
       ${listCard('drivers', T('list_drivers'))}
+      ${listCard('carriers', T('list_carriers'))}
       <div class="card p-5"><h3 class="font-extrabold mb-3">${esc(T('cust_wa_auto'))}</h3>
         <p class="text-sm text-slate-400 mb-3">${esc(T('cust_wa_auto_desc'))}</p>
         <label class="flex items-center gap-2 cursor-pointer text-sm"><input type="checkbox" id="custwa-on" class="!w-auto" ${company()?.custWa !== false ? 'checked' : ''} /> <span>${esc(T('cust_wa_auto'))}</span></label>
@@ -1839,6 +1861,8 @@
   });
 
   let delayTarget = null;
+  function dmFulfilToggle() { $('#dm-carrier-wrap').classList.toggle('hidden', $('#dm-fulfil').value !== 'external'); }
+  $('#dm-fulfil').addEventListener('change', dmFulfilToggle);
   function openDelayModal(id) {
     const s = state.shipments.find((x) => x.id === id); if (!s) return;
     delayTarget = id;
@@ -1847,6 +1871,10 @@
     fillSelect($('#dm-reason'), [{ v: '', l: T('none') }].concat(REASONS.map((r) => ({ v: r, l: EN('reason', r) }))), s.reason || '');
     fillSelect($('#dm-status'), STATUSES.map((st) => ({ v: st, l: EN('status', st) })), s.status);
     $('#dm-note').value = disp(s.note) || '';
+    fillSelect($('#dm-fulfil'), [{ v: 'internal', l: T('fulfil_internal') }, { v: 'external', l: T('fulfil_external') }], s.fulfil || 'internal');
+    $('#dm-carriers-dl').innerHTML = LIST('carriers').map((c) => `<option value="${esc(disp(c))}"></option>`).join('');
+    $('#dm-carrier').value = s.carrier || (LIST('carriers')[0] ? disp(LIST('carriers')[0]) : '');
+    dmFulfilToggle();
     $('#dm-eta-date').value = isoToDate(s.etaAt);
     $('#dm-eta-time').value = isoToTime(s.etaAt);
     const log = $('#dm-log');
@@ -1863,6 +1891,12 @@
     s.reason = $('#dm-reason').value;
     s.note = $('#dm-note').value.trim();
     s.status = $('#dm-status').value;
+    s.fulfil = $('#dm-fulfil').value;
+    if (s.fulfil === 'external') {
+      s.carrier = $('#dm-carrier').value.trim() || (LIST('carriers')[0] ? disp(LIST('carriers')[0]) : 'أرامكس');
+      if (!LIST('carriers').some((c) => c.ar === s.carrier || c.en === s.carrier)) state.lists.carriers.push({ id: 'x_' + Math.random().toString(36).slice(2, 7), ar: s.carrier, en: s.carrier });
+      s.driver = '—';
+    } else { s.carrier = ''; }
     const newEta = dtToIso($('#dm-eta-date').value, $('#dm-eta-time').value);
     if (newEta && newEta !== s.etaAt) {
       (s.schedule = s.schedule || []).push({ at: new Date().toISOString(), by: disp((cu() && cu().name)) || T('role_manager'), from: s.etaAt, to: newEta, reason: s.reason || '' });
@@ -1882,11 +1916,20 @@
     fillSelect($('#sm-city'), LIST('cities').map((c) => ({ v: c.id, l: disp(c) })), LIST('cities')[0]?.id);
     fillSelect($('#sm-branch'), LIST('branches').map((b) => ({ v: b.id, l: disp(b) })), LIST('branches')[0]?.id);
     fillSelect($('#sm-status'), STATUSES.map((st) => ({ v: st, l: EN('status', st) })), 'preparing');
+    fillSelect($('#sm-fulfil'), [{ v: 'internal', l: T('fulfil_internal') }, { v: 'external', l: T('fulfil_external') }], 'internal');
     $('#sm-drivers-dl').innerHTML = LIST('drivers').map((d) => `<option value="${esc(disp(d))}"></option>`).join('');
-    $('#sm-driver').value = '';
+    $('#sm-carriers-dl').innerHTML = LIST('carriers').map((c) => `<option value="${esc(disp(c))}"></option>`).join('');
+    $('#sm-driver').value = ''; $('#sm-carrier').value = LIST('carriers')[0] ? disp(LIST('carriers')[0]) : '';
+    smFulfilToggle();
     $('#sm-eta-date').value = ''; $('#sm-eta-time').value = ''; $('#sm-eta-days').value = ''; $('#sm-eta-hours').value = '';
     $('#shipment-modal').showModal();
   }
+  function smFulfilToggle() {
+    const ext = $('#sm-fulfil').value === 'external';
+    $('#sm-driver-wrap').classList.toggle('hidden', ext);
+    $('#sm-carrier-wrap').classList.toggle('hidden', !ext);
+  }
+  $('#sm-fulfil').addEventListener('change', smFulfilToggle);
   $('#sm-eta-calc').addEventListener('click', () => {
     const d = +$('#sm-eta-days').value || 0, h = +$('#sm-eta-hours').value || 0;
     if (!d && !h) return;
@@ -1903,11 +1946,21 @@
       if (d || h) etaAt = new Date(Date.now() + (d * 24 + h) * 3600000).toISOString();
     }
     const id = nextShipId();
+    const fulfil = $('#sm-fulfil').value;
+    let carrier = '';
+    if (fulfil === 'external') {
+      carrier = $('#sm-carrier').value.trim() || (LIST('carriers')[0] ? disp(LIST('carriers')[0]) : 'أرامكس');
+      // أضِف الشركة للقائمة إن كانت جديدة (يديرها المدير/المنسق بالاستخدام)
+      if (!LIST('carriers').some((c) => c.ar === carrier || c.en === carrier)) {
+        state.lists.carriers.push({ id: 'x_' + Math.random().toString(36).slice(2, 7), ar: carrier, en: carrier });
+      }
+    }
     state.shipments.unshift({
       id, client, phone: $('#sm-phone').value.trim(), address: $('#sm-address').value.trim(),
       city: $('#sm-city').value, branch: $('#sm-branch').value,
       status: $('#sm-status').value, etaAt, actualAt: '',
-      reason: '', note: '', driver: $('#sm-driver').value.trim() || '—', schedule: [],
+      reason: '', note: '', fulfil, carrier,
+      driver: fulfil === 'external' ? '—' : ($('#sm-driver').value.trim() || '—'), schedule: [],
     });
     save(); render(); toast(T('shipment_added'));
   });
