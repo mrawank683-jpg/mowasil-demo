@@ -824,6 +824,14 @@
     via_carrier: { ar: 'عبر', en: 'via' },
     ext_hint: { ar: 'الموعد المتوقع ورسالة العميل اختياريان — التنسيق عبر شركة الشحن.', en: 'Expected time and customer message are optional — coordination is via the carrier.' },
     eta_per_carrier: { ar: 'حسب شركة الشحن', en: 'Per carrier' },
+    list_fulfilments: { ar: 'طرق التنفيذ', en: 'Fulfilment methods' },
+    ff_desc: { ar: 'تظهر في نافذة الشحنة. «النوع» يحدّد إن كانت بسائق داخلي أو عبر شركة شحن.', en: 'Shown in the shipment modal. "Type" sets whether it uses an in-house driver or an external carrier.' },
+    ff_kind_driver: { ar: 'توصيل بسائق داخلي', en: 'In-house (driver)' },
+    ff_kind_carrier: { ar: 'عبر شركة شحن', en: 'External carrier' },
+    ff_add: { ar: 'إضافة طريقة', en: 'Add method' },
+    ff_min: { ar: 'لا يمكن حذف آخر طريقة', en: "Can't delete the last method" },
+    ff_used: { ar: 'طريقة مستخدمة في شحنات — لا يمكن حذفها', en: "Method is used by shipments — can't delete" },
+    ff_saved: { ar: 'تم حفظ التعديل', en: 'Saved' },
 
     nav_review: { ar: 'المراجعة الشهرية', en: 'Monthly review' },
     review_title: { ar: 'المراجعة الشهرية لحالة المركبات', en: 'Monthly vehicle review' },
@@ -987,6 +995,8 @@
   /* قوائم كل شركة (المدن/الفروع/السائقون) — تُدار من الإعدادات */
   const LIST = (kind) => (state.lists && state.lists[kind]) || [];
   const listName = (kind, id) => { const it = LIST(kind).find((x) => x.id === id); return it ? disp(it) : (id || '—'); };
+  const fulfilKind = (id) => { const it = LIST('fulfilments').find((x) => x.id === id); return it ? it.kind : (id === 'external' ? 'carrier' : 'driver'); };
+  const isCarrierFulfil = (s) => fulfilKind(s && s.fulfil) === 'carrier';
 
   /* ===================== الحالة ===================== */
   const ROOT_KEY = 'mowasil.root.v2';
@@ -1038,6 +1048,10 @@
         ],
         carriers: [
           { id: 'aramex', ar: 'أرامكس', en: 'Aramex' },
+        ],
+        fulfilments: [
+          { id: 'internal', ar: 'توصيل عن طريق الشركة', en: 'In-house delivery', kind: 'driver' },
+          { id: 'external', ar: 'توصيل خارجي', en: 'External delivery', kind: 'carrier' },
         ],
       },
     };
@@ -1107,6 +1121,7 @@
     state = ROOT.data[id];
     if (!state.lists) state.lists = seedTenant().lists;
     if (!state.lists.carriers) state.lists.carriers = [{ id: 'aramex', ar: 'أرامكس', en: 'Aramex' }];
+    if (!state.lists.fulfilments) state.lists.fulfilments = seedTenant().lists.fulfilments;
     state.today = TODAY;
     state.mode = c.mode;
     state.lang = ROOT.lang;
@@ -1161,7 +1176,7 @@
   };
   function etaCell(s) {
     if (s.status === 'delivered') return `<span class="text-emerald-400">${esc(etaFmt(s.actualAt || s.etaAt))}</span>`;
-    if (!s.etaAt) return (s.fulfil === 'external' && s.status !== 'canceled') ? `<span class="text-[11px] text-slate-500">${esc(T('eta_per_carrier'))}</span>` : '—';
+    if (!s.etaAt) return (isCarrierFulfil(s) && s.status !== 'canceled') ? `<span class="text-[11px] text-slate-500">${esc(T('eta_per_carrier'))}</span>` : '—';
     if (s.status === 'canceled') return esc(etaFmt(s.etaAt));
     const r = etaRel(s.etaAt);
     return `${esc(etaFmt(s.etaAt))}<span class="block text-[11px] ${r.cls}">${esc(r.text)}</span>`;
@@ -1185,7 +1200,7 @@
     const ar = state.lang === 'ar';
     const co = company() ? disp(company().name) : 'مُوصل';
     const id = s.id, eta = etaFmt(s.etaAt);
-    if (s.fulfil === 'external' && s.carrier && s.status !== 'delivered') return ar
+    if (isCarrierFulfil(s) && s.carrier && s.status !== 'delivered') return ar
       ? `عميلنا العزيز، شحنتك رقم ${id} ستُسلَّم عبر ${s.carrier}. الموعد المتوقع: ${eta}. — ${co}`
       : `Dear customer, shipment ${id} will be delivered via ${s.carrier}. Expected: ${eta}. — ${co}`;
     if (s.status === 'delivered') return ar
@@ -1207,7 +1222,7 @@
     try { window.open(custWaLink(s), '_blank', 'noopener'); } catch (e) {}
     if (!silent) toast(T('cust_notified'));
   }
-  function autoNotify(s) { if (s && s.fulfil !== 'external' && s.phone && company() && company().custWa !== false) notifyCustomer(s, true); }
+  function autoNotify(s) { if (s && !isCarrierFulfil(s) && s.phone && company() && company().custWa !== false) notifyCustomer(s, true); }
 
   /* ===================== مشتقات ===================== */
   const REASONS = ['traffic', 'vehicle', 'noreply', 'address', 'weather', 'other'];
@@ -1378,7 +1393,7 @@
         <td class="py-2.5 px-3 font-bold">#${esc(s.id)}</td>
         <td class="py-2.5 px-3">${esc(disp(s.client))}${s.phone ? `<span class="block text-[11px] text-slate-500 tabular-nums">${esc(s.phone)}</span>` : ''}</td>
         <td class="py-2.5 px-3 text-slate-400">${esc(listName('cities', s.city))} — ${esc(listName('branches', s.branch))}</td>
-        <td class="py-2.5 px-3"><span class="badge ${STATUS_BADGE[s.status] || 'badge-gray'}">${esc(EN('status', s.status))}</span>${s.fulfil === 'external' ? `<span class="block text-[11px] text-slate-400 mt-0.5">🚚 ${esc(T('via_carrier'))} ${esc(s.carrier || '—')}</span>` : ''}</td>
+        <td class="py-2.5 px-3"><span class="badge ${STATUS_BADGE[s.status] || 'badge-gray'}">${esc(EN('status', s.status))}</span>${isCarrierFulfil(s) ? `<span class="block text-[11px] text-slate-400 mt-0.5">🚚 ${esc(T('via_carrier'))} ${esc(s.carrier || '—')}</span>` : ''}</td>
         <td class="py-2.5 px-3">${s.reason ? `<span class="badge badge-red">${esc(EN('reason', s.reason))}</span>` : (late ? `<span class="text-xs text-slate-500">${esc(T('not_logged'))}</span>` : '—')}</td>
         <td class="py-2.5 px-3 text-slate-400">${etaCell(s)}${nRes ? `<span class="block text-[11px] text-amber-400">${esc(T('rescheduled_n'))}${nRes > 1 ? ' ×' + nf().format(nRes) : ''}</span>` : ''}</td>
         ${showAction ? `<td class="py-2.5 px-3 no-print"><div class="flex gap-1.5 flex-wrap">
@@ -1611,6 +1626,45 @@
       </div>
     </div>`;
   }
+  /* بطاقة طرق التنفيذ: تعديل الاسم (عربي/إنجليزي) + النوع، إضافة، حذف */
+  function fulfilmentsCard() {
+    const rows = LIST('fulfilments').map((f) => `<div class="grid grid-cols-[1fr_1fr_auto_auto] gap-2 items-center" data-ff-row="${f.id}">
+        <input value="${esc(f.ar || '')}" data-ff-ar="${f.id}" />
+        <input value="${esc(f.en || '')}" data-ff-en="${f.id}" />
+        <select data-ff-kind="${f.id}"><option value="driver" ${f.kind !== 'carrier' ? 'selected' : ''}>${esc(T('ff_kind_driver'))}</option><option value="carrier" ${f.kind === 'carrier' ? 'selected' : ''}>${esc(T('ff_kind_carrier'))}</option></select>
+        <button class="btn btn-ghost !py-1.5 !px-2 text-xs" data-ff-del="${f.id}">✕</button>
+      </div>`).join('');
+    return `<div class="card p-5"><h3 class="font-extrabold mb-1">${esc(T('list_fulfilments'))}</h3>
+      <p class="text-xs text-slate-500 mb-3">${esc(T('ff_desc'))}</p>
+      <div class="space-y-2">${rows}</div>
+      <div class="grid grid-cols-[1fr_1fr_auto_auto] gap-2 items-end mt-3 border-t border-ink-500 pt-3">
+        <div><label>${esc(T('li_ar'))}</label><input id="ff-new-ar" /></div>
+        <div><label>${esc(T('li_en'))}</label><input id="ff-new-en" /></div>
+        <select id="ff-new-kind"><option value="driver">${esc(T('ff_kind_driver'))}</option><option value="carrier">${esc(T('ff_kind_carrier'))}</option></select>
+        <button class="btn btn-ghost" id="ff-add">+ ${esc(T('ff_add'))}</button>
+      </div>
+    </div>`;
+  }
+  function ffSaveRow(id) {
+    const f = LIST('fulfilments').find((x) => x.id === id); if (!f) return;
+    f.ar = $(`[data-ff-ar="${id}"]`).value.trim() || f.ar;
+    f.en = $(`[data-ff-en="${id}"]`).value.trim() || f.ar;
+    f.kind = $(`[data-ff-kind="${id}"]`).value;
+    save(); toast(T('ff_saved'));
+  }
+  function ffAdd() {
+    const ar = $('#ff-new-ar').value.trim();
+    if (!ar) { toast(T('li_need_ar'), 'err'); return; }
+    state.lists.fulfilments.push({ id: 'f_' + Math.random().toString(36).slice(2, 7), ar, en: $('#ff-new-en').value.trim() || ar, kind: $('#ff-new-kind').value });
+    save(); render(); toast(T('li_added'));
+  }
+  function ffDel(id) {
+    if (LIST('fulfilments').length <= 1) { toast(T('ff_min'), 'err'); return; }
+    if (state.shipments.some((s) => s.fulfil === id)) { toast(T('ff_used'), 'err'); return; }
+    state.lists.fulfilments = LIST('fulfilments').filter((x) => x.id !== id);
+    save(); render(); toast(T('li_removed'));
+  }
+
   function listUsed(kind, id) {
     if (kind === 'cities') return state.shipments.some((s) => s.city === id);
     if (kind === 'branches') return state.shipments.some((s) => s.branch === id);
@@ -1655,6 +1709,7 @@
       ${listCard('branches', T('list_branches'))}
       ${listCard('drivers', T('list_drivers'))}
       ${listCard('carriers', T('list_carriers'))}
+      ${fulfilmentsCard()}
       <div class="card p-5"><h3 class="font-extrabold mb-3">${esc(T('cust_wa_auto'))}</h3>
         <p class="text-sm text-slate-400 mb-3">${esc(T('cust_wa_auto_desc'))}</p>
         <label class="flex items-center gap-2 cursor-pointer text-sm"><input type="checkbox" id="custwa-on" class="!w-auto" ${company()?.custWa !== false ? 'checked' : ''} /> <span>${esc(T('cust_wa_auto'))}</span></label>
@@ -1820,6 +1875,9 @@
     $$('[data-setmode]', $('#view')).forEach((b) => b.addEventListener('click', () => setMode(b.dataset.setmode)));
     $$('[data-setlang]').forEach((b) => b.addEventListener('click', () => setLang(b.dataset.setlang)));
     $$('[data-li-add]').forEach((b) => b.addEventListener('click', () => listAdd(b.dataset.liAdd)));
+    $$('[data-ff-ar],[data-ff-en],[data-ff-kind]').forEach((el) => el.addEventListener('change', (e) => ffSaveRow(e.target.dataset.ffAr || e.target.dataset.ffEn || e.target.dataset.ffKind)));
+    $$('[data-ff-del]').forEach((b) => b.addEventListener('click', () => ffDel(b.dataset.ffDel)));
+    $('#ff-add')?.addEventListener('click', ffAdd);
     $$('[data-li-del]').forEach((b) => b.addEventListener('click', () => { const [k, id] = b.dataset.liDel.split(':'); listDel(k, id); }));
     $('#btn-add-user')?.addEventListener('click', () => openUserModal(null));
     $$('[data-user-edit]').forEach((b) => b.addEventListener('click', () => openUserModal(b.dataset.userEdit)));
@@ -1860,7 +1918,7 @@
   });
 
   let delayTarget = null;
-  function dmFulfilToggle() { $('#dm-carrier-wrap').classList.toggle('hidden', $('#dm-fulfil').value !== 'external'); }
+  function dmFulfilToggle() { $('#dm-carrier-wrap').classList.toggle('hidden', fulfilKind($('#dm-fulfil').value) !== 'carrier'); }
   $('#dm-fulfil').addEventListener('change', dmFulfilToggle);
   function openDelayModal(id) {
     const s = state.shipments.find((x) => x.id === id); if (!s) return;
@@ -1870,7 +1928,7 @@
     fillSelect($('#dm-reason'), [{ v: '', l: T('none') }].concat(REASONS.map((r) => ({ v: r, l: EN('reason', r) }))), s.reason || '');
     fillSelect($('#dm-status'), STATUSES.map((st) => ({ v: st, l: EN('status', st) })), s.status);
     $('#dm-note').value = disp(s.note) || '';
-    fillSelect($('#dm-fulfil'), [{ v: 'internal', l: T('fulfil_internal') }, { v: 'external', l: T('fulfil_external') }], s.fulfil || 'internal');
+    fillSelect($('#dm-fulfil'), LIST('fulfilments').map((f) => ({ v: f.id, l: disp(f) })), s.fulfil || LIST('fulfilments')[0]?.id);
     $('#dm-carriers-dl').innerHTML = LIST('carriers').map((c) => `<option value="${esc(disp(c))}"></option>`).join('');
     $('#dm-carrier').value = s.carrier || (LIST('carriers')[0] ? disp(LIST('carriers')[0]) : '');
     dmFulfilToggle();
@@ -1891,7 +1949,7 @@
     s.note = $('#dm-note').value.trim();
     s.status = $('#dm-status').value;
     s.fulfil = $('#dm-fulfil').value;
-    if (s.fulfil === 'external') {
+    if (fulfilKind(s.fulfil) === 'carrier') {
       s.carrier = $('#dm-carrier').value.trim() || (LIST('carriers')[0] ? disp(LIST('carriers')[0]) : 'أرامكس');
       if (!LIST('carriers').some((c) => c.ar === s.carrier || c.en === s.carrier)) state.lists.carriers.push({ id: 'x_' + Math.random().toString(36).slice(2, 7), ar: s.carrier, en: s.carrier });
       s.driver = '—';
@@ -1915,7 +1973,7 @@
     fillSelect($('#sm-city'), LIST('cities').map((c) => ({ v: c.id, l: disp(c) })), LIST('cities')[0]?.id);
     fillSelect($('#sm-branch'), LIST('branches').map((b) => ({ v: b.id, l: disp(b) })), LIST('branches')[0]?.id);
     fillSelect($('#sm-status'), STATUSES.map((st) => ({ v: st, l: EN('status', st) })), 'preparing');
-    fillSelect($('#sm-fulfil'), [{ v: 'internal', l: T('fulfil_internal') }, { v: 'external', l: T('fulfil_external') }], 'internal');
+    fillSelect($('#sm-fulfil'), LIST('fulfilments').map((f) => ({ v: f.id, l: disp(f) })), LIST('fulfilments')[0]?.id);
     $('#sm-drivers-dl').innerHTML = LIST('drivers').map((d) => `<option value="${esc(disp(d))}"></option>`).join('');
     $('#sm-carriers-dl').innerHTML = LIST('carriers').map((c) => `<option value="${esc(disp(c))}"></option>`).join('');
     $('#sm-driver').value = ''; $('#sm-carrier').value = LIST('carriers')[0] ? disp(LIST('carriers')[0]) : '';
@@ -1924,7 +1982,7 @@
     $('#shipment-modal').showModal();
   }
   function smFulfilToggle() {
-    const ext = $('#sm-fulfil').value === 'external';
+    const ext = fulfilKind($('#sm-fulfil').value) === 'carrier';
     $('#sm-driver-wrap').classList.toggle('hidden', ext);
     $('#sm-carrier-wrap').classList.toggle('hidden', !ext);
     $('#sm-ext-hint').classList.toggle('hidden', !ext);
@@ -1949,7 +2007,7 @@
     const id = nextShipId();
     const fulfil = $('#sm-fulfil').value;
     let carrier = '';
-    if (fulfil === 'external') {
+    if (fulfilKind(fulfil) === 'carrier') {
       carrier = $('#sm-carrier').value.trim() || (LIST('carriers')[0] ? disp(LIST('carriers')[0]) : 'أرامكس');
       // أضِف الشركة للقائمة إن كانت جديدة (يديرها المدير/المنسق بالاستخدام)
       if (!LIST('carriers').some((c) => c.ar === carrier || c.en === carrier)) {
@@ -1961,7 +2019,7 @@
       city: $('#sm-city').value, branch: $('#sm-branch').value,
       status: $('#sm-status').value, etaAt, actualAt: '',
       reason: '', note: '', fulfil, carrier,
-      driver: fulfil === 'external' ? '—' : ($('#sm-driver').value.trim() || '—'), schedule: [],
+      driver: fulfilKind(fulfil) === 'carrier' ? '—' : ($('#sm-driver').value.trim() || '—'), schedule: [],
     });
     save(); render(); toast(T('shipment_added'));
   });
