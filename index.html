@@ -167,6 +167,13 @@
     <span><span data-t="signed_in_as_company">أنت داخل بصفة</span>: <b id="imp-name"></b></span>
     <button id="imp-back" class="btn btn-ghost !py-1 !px-3 text-xs" data-t="back_to_platform">رجوع للوحة المنصة</button>
   </div>
+  <div id="review-bar" class="hidden bg-brand/20 border-b border-brand/50 text-sm px-4 py-2 flex items-center justify-between gap-3">
+    <span class="flex items-center gap-2">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FF6B72" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z"/></svg>
+      <span id="review-bar-text"></span>
+    </span>
+    <button id="review-bar-open" class="btn btn-brand !py-1 !px-3 text-xs" data-t="open_review">افتح المراجعة</button>
+  </div>
   <div class="flex-1 min-h-0 flex">
 
   <aside class="w-64 shrink-0 border-e border-ink-500 bg-ink-800/70 backdrop-blur px-3 py-5 hidden lg:flex flex-col gap-2">
@@ -198,6 +205,10 @@
       <a class="nav-link" data-route="reports">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
         <span data-t="nav_reports">التقارير</span>
+      </a>
+      <a class="nav-link" data-route="review" hidden>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+        <span data-t="nav_review">المراجعة الشهرية</span>
       </a>
       <a class="nav-link" data-route="settings">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 00-.1-1l2-1.5-2-3.5-2.4 1a7 7 0 00-1.7-1L14.5 2h-4l-.3 2.5a7 7 0 00-1.7 1l-2.4-1-2 3.5 2 1.5a7 7 0 000 2l-2 1.5 2 3.5 2.4-1a7 7 0 001.7 1l.3 2.5h4l.3-2.5a7 7 0 001.7-1l2.4 1 2-3.5-2-1.5c.06-.33.1-.66.1-1z"/></svg>
@@ -429,6 +440,9 @@
         </div>
       </div>
       <div id="um-driver-wrap" class="hidden"><label data-t="linked_driver">السائق المرتبط</label><select id="um-driver"></select></div>
+      <div id="um-review-wrap" class="hidden border-t border-ink-500 pt-3">
+        <label class="flex items-center gap-2 cursor-pointer text-sm"><input type="checkbox" id="um-review" class="!w-auto" /> <span data-t="review_reminder_label">يتلقّى تذكير مراجعة المركبات الشهري</span></label>
+      </div>
     </div>
     <div class="flex gap-2 mt-6">
       <button value="save" class="btn btn-brand flex-1 justify-center" data-t="save">حفظ</button>
@@ -794,6 +808,24 @@
     cust_wa_auto_desc: { ar: 'عند تغيّر حالة الشحنة (بدء التوصيل / تم التسليم / تأخير أو إعادة جدولة) تُفتح رسالة واتساب جاهزة لجوال العميل. الإرسال التلقائي الكامل بلا تدخّل يتم عبر خادم مُوصل + WhatsApp Cloud API (مرحلة الخادم).', en: 'When a shipment status changes, a ready WhatsApp draft opens for the customer. Full hands-off auto-send runs via the Mowasil server + WhatsApp Cloud API (server phase).' },
     reschedule_reason_default: { ar: 'إعادة جدولة الموعد', en: 'Schedule change' },
 
+    nav_review: { ar: 'المراجعة الشهرية', en: 'Monthly review' },
+    review_title: { ar: 'المراجعة الشهرية لحالة المركبات', en: 'Monthly vehicle review' },
+    review_intro: { ar: 'راجع كل مركبة: حدّث قراءة العدّاد ونوع/تاريخ الصيانة القادمة، أو علّم «لا تغيير». ثم اضغط «تمت المراجعة».', en: 'Review each vehicle: update the odometer and next-service type/date, or mark "No change", then click "Review done".' },
+    review_reminder_label: { ar: 'يتلقّى تذكير مراجعة المركبات الشهري', en: 'Receives the monthly vehicle-review reminder' },
+    review_banner: { ar: 'تذكير: مراجعة حالة المركبات لهذا الشهر لم تُنجَز — حدّث العدّادات والصيانة.', en: 'Reminder: this month’s vehicle review is not done — update odometers and service.' },
+    review_banner_overdue: { ar: 'مراجعة المركبات متأخرة', en: 'Vehicle review overdue' },
+    open_review: { ar: 'افتح المراجعة', en: 'Open review' },
+    review_last: { ar: 'آخر مراجعة', en: 'Last review' },
+    review_never: { ar: 'لم تتم مراجعة بعد', en: 'No review yet' },
+    review_no_change: { ar: 'لا تغيير', en: 'No change' },
+    review_progress: { ar: 'مركبة روجعت', en: 'reviewed' },
+    review_done_btn: { ar: 'تمت المراجعة', en: 'Review done' },
+    review_completed: { ar: 'تم تسجيل المراجعة الشهرية', en: 'Monthly review recorded' },
+    review_odometer: { ar: 'قراءة العدّاد (كم)', en: 'Odometer (km)' },
+    start_review_now: { ar: 'بدء المراجعة الآن', en: 'Start review now' },
+    review_n_left: { ar: 'مركبة بلا مراجعة', en: 'vehicle(s) not reviewed' },
+    review_bell: { ar: 'مراجعة المركبات الشهرية مستحقة', en: 'Monthly vehicle review is due' },
+
     add_shipment: { ar: 'شحنة جديدة', en: 'New shipment' },
     new_shipment: { ar: 'إضافة شحنة', en: 'Add shipment' },
     shipment_added: { ar: 'تمت إضافة الشحنة', en: 'Shipment added' },
@@ -999,16 +1031,16 @@
       companies: [
         {
           id: 'c1', name: { ar: 'شركة الرياض السريعة', en: 'Riyadh Express Co.' }, mode: 'commercial',
-          wa: '', sched: { on: false, day: 4, time: '08:00' }, custWa: true, sub: { plan: 'الأساسية', amount: 499, renew: '2025-06-01', status: 'active' },
+          wa: '', sched: { on: false, day: 4, time: '08:00' }, custWa: true, lastVehReview: '', sub: { plan: 'الأساسية', amount: 499, renew: '2025-06-01', status: 'active' },
           users: [
             { id: 'u1', user: 'riyadh', pass: 'Riyadh@1234', hash: null, role: 'manager', name: { ar: 'أحمد محمد', en: 'Ahmad Mohammed' } },
-            { id: 'u2', user: 'riyadh-c', pass: 'Coord@1234', hash: null, role: 'coordinator', name: { ar: 'منسق العمليات', en: 'Ops Coordinator' }, perms: { dashboard: true, shipments: true, delays: true, fleet: true, reports: false } },
+            { id: 'u2', user: 'riyadh-c', pass: 'Coord@1234', hash: null, role: 'coordinator', name: { ar: 'منسق العمليات', en: 'Ops Coordinator' }, perms: { dashboard: true, shipments: true, delays: true, fleet: true, reports: false }, reviewReminder: true },
             { id: 'u3', user: 'riyadh-d', pass: 'Driver@1234', hash: null, role: 'driver', name: { ar: 'سعد الأحمدي', en: 'Saad Al-Ahmadi' }, driverId: 'd1' },
           ],
         },
         {
           id: 'c2', name: { ar: 'جمعية العطاء الخيرية', en: 'Al-Ataa Charity' }, mode: 'charity',
-          wa: '', sched: { on: false, day: 4, time: '08:00' }, custWa: true, sub: { plan: 'الجمعيات', amount: 0, renew: '2025-06-01', status: 'active' },
+          wa: '', sched: { on: false, day: 4, time: '08:00' }, custWa: true, lastVehReview: '', sub: { plan: 'الجمعيات', amount: 0, renew: '2025-06-01', status: 'active' },
           users: [
             { id: 'u1', user: 'ataa', pass: 'Ataa@1234', hash: null, role: 'manager', name: { ar: 'مدير الجمعية', en: 'Charity Manager' } },
           ],
@@ -1029,10 +1061,23 @@
   const cu = () => { const c = company(); return (c && ctx && ctx.uid) ? c.users.find((u) => u.id === ctx.uid) : null; };
   const myRole = () => { if (ctx && ctx.role === 'admin') return 'admin'; const u = cu(); return u ? u.role : null; };
   const ALL_ROUTES = ['dashboard', 'shipments', 'delays', 'fleet', 'reports', 'settings'];
+  /* تذكير المراجعة الشهرية للمركبات */
+  const REVIEW_DAYS = 30;
+  const wantsReview = () => { const u = cu(); return !!(u && u.reviewReminder && (u.role === 'coordinator' || u.role === 'manager')); };
+  function reviewDaysSince() {
+    const c = company(); if (!c || !c.lastVehReview) return Infinity;
+    return Math.floor((Date.now() - new Date(c.lastVehReview)) / 86400000);
+  }
+  const reviewDue = () => wantsReview() && reviewDaysSince() >= REVIEW_DAYS;
   function allowedRoutes() {
     const u = cu();
-    if (!u || u.role === 'manager') return ALL_ROUTES.slice();
-    if (u.role === 'coordinator') { const p = u.perms || {}; return ['dashboard', 'shipments', 'delays', 'fleet', 'reports'].filter((r) => p[r]); }
+    if (!u || u.role === 'manager') return ALL_ROUTES.concat('review');
+    if (u.role === 'coordinator') {
+      const p = u.perms || {};
+      const base = ['dashboard', 'shipments', 'delays', 'fleet', 'reports'].filter((r) => p[r]);
+      if (wantsReview()) base.push('review');
+      return base;
+    }
     if (u.role === 'driver') return ['mytrips'];
     return ['dashboard'];
   }
@@ -1422,6 +1467,30 @@
     </section>`;
   }
 
+  /* المراجعة الشهرية لحالة المركبات */
+  function view_review() {
+    const rows = state.vehicles.map((v) => `<div class="card p-4" data-rev-row="${v.id}">
+      <div class="flex items-center justify-between gap-2 mb-3">
+        <div><div class="font-extrabold tracking-wide">${esc(v.plate)}</div><div class="text-xs text-slate-400">${esc(v.model)} · ${esc(disp(v.driver) || '—')}</div></div>
+        <label class="flex items-center gap-2 text-xs cursor-pointer shrink-0"><input type="checkbox" class="!w-auto" data-rev-nochange="${v.id}" /> <span>${esc(T('review_no_change'))}</span></label>
+      </div>
+      <div class="grid sm:grid-cols-3 gap-3">
+        <div><label>${esc(T('review_odometer'))}</label><input type="number" min="0" data-rev-odo="${v.id}" data-orig="${v.odo}" value="${v.odo}" /></div>
+        <div><label>${esc(T('service_type'))}</label><select data-rev-svc="${v.id}" data-orig="${esc(v.service)}">${Object.keys(ENUM.servicetype).map((s) => `<option value="${s}" ${v.service === s ? 'selected' : ''}>${esc(EN('servicetype', s))}</option>`).join('')}</select></div>
+        <div><label>${esc(T('next_service_date'))}</label><input type="date" data-rev-date="${v.id}" data-orig="${esc(v.nextDate || '')}" value="${esc(v.nextDate || '')}" /></div>
+      </div>
+    </div>`).join('');
+    return `<section class="view-enter space-y-5">
+      <div><h2 class="text-xl font-extrabold">${esc(T('review_title'))}</h2>
+        <p class="text-sm text-slate-400">${esc(T('review_intro'))}</p></div>
+      <div class="grid gap-3 sm:grid-cols-2">${rows}</div>
+      <div class="card p-4 flex flex-wrap items-center justify-between gap-3">
+        <span class="text-sm text-slate-300"><b id="rev-count">0</b> / ${nf().format(state.vehicles.length)} ${esc(T('review_progress'))}</span>
+        <button class="btn btn-brand" id="rev-done" disabled>${esc(T('review_done_btn'))}</button>
+      </div>
+    </section>`;
+  }
+
   function view_reports() {
     return `<section class="view-enter space-y-5">
       <div><h2 class="text-xl font-extrabold">${esc(T('reports_title'))}</h2><p class="text-sm text-slate-400">${esc(T('reports_sub'))}</p></div>
@@ -1572,6 +1641,11 @@
         <label class="flex items-center gap-2 cursor-pointer text-sm"><input type="checkbox" id="custwa-on" class="!w-auto" ${company()?.custWa !== false ? 'checked' : ''} /> <span>${esc(T('cust_wa_auto'))}</span></label>
         <button class="btn btn-brand mt-3" id="custwa-save">${esc(T('save_settings'))}</button>
       </div>
+      <div class="card p-5"><h3 class="font-extrabold mb-3">${esc(T('review_title'))}</h3>
+        <p class="text-sm text-slate-400 mb-1">${esc(T('review_intro'))}</p>
+        <p class="text-xs text-slate-500 mb-3">${esc(T('review_last'))}: ${company()?.lastVehReview ? esc(etaFmt(company().lastVehReview)) : esc(T('review_never'))}${company()?.lastVehReview ? ` · ${nf().format(reviewDaysSince())} ${state.lang === 'ar' ? T('d_days') : T('d_days')}` : ''}</p>
+        <button class="btn btn-ghost" data-route="review">${esc(T('start_review_now'))}</button>
+      </div>
       <div class="card p-5"><h3 class="font-extrabold mb-3">${esc(T('wa_report_title'))}</h3>
         <p class="text-sm text-slate-400 mb-3">${esc(T('wa_report_desc'))}</p>
         <form id="wa-form" class="space-y-3">
@@ -1667,7 +1741,7 @@
   }
 
   /* ===================== التوجيه ===================== */
-  const VIEWS = { dashboard: view_dashboard, shipments: view_shipments, delays: view_delays, fleet: view_fleet, reports: view_reports, settings: view_settings, mytrips: view_mytrips };
+  const VIEWS = { dashboard: view_dashboard, shipments: view_shipments, delays: view_delays, fleet: view_fleet, reports: view_reports, settings: view_settings, mytrips: view_mytrips, review: view_review };
   let activeRoute = 'dashboard';
   function currentRoute() { const h = (location.hash || '').replace(/^#\/?/, ''); return (h && VIEWS[h]) ? h : activeRoute; }
   function go(route) { activeRoute = VIEWS[route] ? route : 'dashboard'; try { if (location.hash !== '#/' + activeRoute) location.hash = '#/' + activeRoute; } catch (e) {} render(); }
@@ -1683,10 +1757,23 @@
   }
   function applyNav() {
     const allowed = allowedRoutes();
-    $$('aside .nav-link').forEach((a) => { a.hidden = !allowed.includes(a.dataset.route); });
+    $$('aside .nav-link').forEach((a) => {
+      const r = a.dataset.route;
+      a.hidden = r === 'review' ? !(reviewDue() || wantsReview()) : !allowed.includes(r);
+    });
     const driver = myRole() === 'driver';
     $('aside').classList.toggle('lg:flex', !driver);
     const ms = $('#mode-seg'); if (ms) ms.style.display = (myRole() === 'manager') ? '' : 'none';
+    // شريط تذكير المراجعة الشهرية
+    const bar = $('#review-bar');
+    if (bar) {
+      const due = reviewDue();
+      bar.classList.toggle('hidden', !due);
+      if (due) {
+        const overdue = reviewDaysSince() - REVIEW_DAYS;
+        $('#review-bar-text').textContent = T('review_banner') + (overdue > 3 && isFinite(overdue) ? ` (${T('review_banner_overdue')})` : '');
+      }
+    }
     buildMobileNav();
   }
 
@@ -1697,6 +1784,7 @@
     $$('[data-mytransit]').forEach((b) => b.addEventListener('click', () => { const s = state.shipments.find((x) => x.id === b.dataset.mytransit); if (s) { s.status = 'transit'; save(); autoNotify(s); render(); toast(T('shipment_updated') + ' ' + s.id); } }));
     $('#btn-weekly')?.addEventListener('click', openWeekly);
     $('#btn-weekly2')?.addEventListener('click', openWeekly);
+    wireReview();
 
     const q = $('#f-q');
     if (q) {
@@ -1871,6 +1959,35 @@
   $('#report-close').addEventListener('click', () => $('#report-modal').close());
   $('#report-print').addEventListener('click', () => window.print());
 
+  /* شاشة المراجعة الشهرية للمركبات */
+  function wireReview() {
+    const done = $('#rev-done'); if (!done) return;
+    const rowAck = (id) => {
+      if ($(`[data-rev-nochange="${id}"]`).checked) return true;
+      const odo = $(`[data-rev-odo="${id}"]`), dt = $(`[data-rev-date="${id}"]`), sv = $(`[data-rev-svc="${id}"]`);
+      return (odo.value !== odo.dataset.orig) || (dt.value !== (dt.dataset.orig || '')) || (sv.value !== sv.dataset.orig);
+    };
+    const recount = () => {
+      const ids = state.vehicles.map((v) => v.id);
+      const n = ids.filter(rowAck).length;
+      $('#rev-count').textContent = nf().format(n);
+      done.disabled = n < ids.length;
+      $$('[data-rev-row]').forEach((r) => r.classList.toggle('ring-1', rowAck(r.dataset.revRow)));
+      $$('[data-rev-row]').forEach((r) => r.classList.toggle('ring-emerald-500/60', rowAck(r.dataset.revRow)));
+    };
+    $$('#view [data-rev-odo], #view [data-rev-date], #view [data-rev-svc], #view [data-rev-nochange]').forEach((el) => el.addEventListener('input', recount));
+    done.addEventListener('click', () => {
+      state.vehicles.forEach((v) => {
+        const odo = +$(`[data-rev-odo="${v.id}"]`).value; if (odo) v.odo = odo;
+        v.service = $(`[data-rev-svc="${v.id}"]`).value;
+        const d = $(`[data-rev-date="${v.id}"]`).value; if (d) v.nextDate = d;
+      });
+      company().lastVehReview = new Date().toISOString();
+      save(); applyStatic(); go('fleet'); toast(T('review_completed'));
+    });
+    recount();
+  }
+
   /* ===================== اللغة + الوضع ===================== */
   function applyStatic() {
     $$('[data-t]').forEach((el) => { el.textContent = T(el.dataset.t); });
@@ -1899,12 +2016,13 @@
   function setMode(m) { state.mode = m; if (company()) company().mode = m; save(); applyStatic(); render(); toast(T('switched_mode') + ' ' + t('mode_name')); }
 
   function buildMobileNav() {
-    const labels = { dashboard: T('nav_home'), shipments: t('nav_shipments'), delays: T('nav_delays'), fleet: T('nav_fleet'), reports: T('nav_reports'), settings: T('nav_settings'), mytrips: T('nav_mytrips') };
-    const items = allowedRoutes();
+    const labels = { dashboard: T('nav_home'), shipments: t('nav_shipments'), delays: T('nav_delays'), fleet: T('nav_fleet'), reports: T('nav_reports'), settings: T('nav_settings'), mytrips: T('nav_mytrips'), review: T('nav_review') };
+    const items = allowedRoutes().filter((r) => r !== 'review' || reviewDue() || wantsReview());
     $('#mobile-nav').innerHTML = items.map((r) => `<button class="btn btn-ghost !py-1.5 shrink-0 text-xs" data-route="${r}">${esc(labels[r] || r)}</button>`).join('');
   }
   function buildBell() {
     const items = [];
+    if (reviewDue()) items.push({ c: 'badge-red', t: T('review_bell') });
     if (M.late.length) items.push({ c: 'badge-red', t: `${nf().format(M.late.length)} ${T('n_late_ship')}` });
     if (M.urgentVeh.length) items.push({ c: 'badge-amber', t: `${nf().format(M.urgentVeh.length)} ${T('n_veh_urgent')}` });
     if (!items.length) items.push({ c: 'badge-green', t: T('no_alerts') });
@@ -1983,6 +2101,7 @@
       for (const u of c.users) { if (!u.hash && u.pass) u.hash = await sha256(u.pass); delete u.pass; }
       if (!c.sub) c.sub = { plan: '', amount: 0, renew: '', status: 'active' };
       if (!c.sched) c.sched = { on: false, day: 4, time: '08:00' };
+      if (c.lastVehReview === undefined) c.lastVehReview = '';
     }
     saveRoot();
   }
@@ -2148,6 +2267,7 @@
     const r = $('#um-role').value;
     $('#um-perms-wrap').classList.toggle('hidden', r !== 'coordinator');
     $('#um-driver-wrap').classList.toggle('hidden', r !== 'driver');
+    $('#um-review-wrap').classList.toggle('hidden', r === 'driver');
   }
   $('#um-role').addEventListener('change', umToggleRole);
   function openUserModal(id) {
@@ -2165,6 +2285,7 @@
     $('#um-role').disabled = isMgr;
     const p = (u && u.perms) || { dashboard: true, shipments: true, delays: true, fleet: true, reports: false };
     PERM_KEYS.forEach((k) => { $('#um-perm-' + k).checked = !!p[k]; });
+    $('#um-review').checked = !!(u && u.reviewReminder);
     fillSelect($('#um-driver'), LIST('drivers').map((d) => ({ v: d.id, l: disp(d) })), (u && u.driverId) || LIST('drivers')[0]?.id);
     umToggleRole();
     $('#user-modal').showModal();
@@ -2180,24 +2301,26 @@
     if (ROOT.companies.some((co) => co.users.some((x) => x.user === user && x.id !== userTarget))) { toast(T('user_dup'), 'err'); return false; }
     if (role === 'driver' && !$('#um-driver').value) { toast(T('pick_driver_req'), 'err'); return false; }
     const perms = {}; PERM_KEYS.forEach((k) => { perms[k] = $('#um-perm-' + k).checked; });
+    const review = $('#um-review').checked;
     (async () => {
       if (userTarget) {
         const u = c.users.find((x) => x.id === userTarget);
         u.name = { ar: nameAr, en: nameEn }; u.user = user;
         if (pass) u.hash = await sha256(pass);
+        if (u.role !== 'driver') u.reviewReminder = review; else delete u.reviewReminder;
         if (u.role !== 'manager') {
           u.role = role;
           if (role === 'coordinator') { u.perms = perms; delete u.driverId; }
-          else { u.driverId = $('#um-driver').value; delete u.perms; }
+          else { u.driverId = $('#um-driver').value; delete u.perms; delete u.reviewReminder; }
         }
         toast(T('user_updated'));
       } else {
         const nu = { id: uid('u'), user, hash: await sha256(pass), role, name: { ar: nameAr, en: nameEn } };
-        if (role === 'coordinator') nu.perms = perms; else nu.driverId = $('#um-driver').value;
+        if (role === 'coordinator') { nu.perms = perms; nu.reviewReminder = review; } else nu.driverId = $('#um-driver').value;
         c.users.push(nu);
         toast(T('user_added'));
       }
-      saveRoot(); render();
+      saveRoot(); applyStatic(); render();
     })();
   });
   function delUser(id) {
@@ -2237,6 +2360,7 @@
     $('#logout-btn').addEventListener('click', logout);
     $('#admin-logout').addEventListener('click', logout);
     $('#imp-back').addEventListener('click', () => showAdmin());
+    $('#review-bar-open').addEventListener('click', () => go('review'));
     addEventListener('hashchange', render);
 
     document.addEventListener('click', (e) => {
