@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>مُوصل | MOWASIL DELIVERY</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231A1D23'/%3E%3Cpath d='M32 5c-10.4 0-18.8 8.2-18.8 18.4 0 9 8.3 20.2 15.6 28.6 1.7 2 3.2 3.6 4 4.4.7.7 1.7.7 2.4 0 .8-.8 2.3-2.4 4-4.4 7.3-8.4 15.6-19.6 15.6-28.6C50.8 13.2 42.4 5 32 5z' fill='%23D71B14'/%3E%3Ccircle cx='32' cy='23' r='11.5' fill='%23B01410'/%3E%3Cg stroke='%23FF5A50' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M18.5 22.6h-5M20 18c-1.6.2-3 .5-4.2 1.2M20.5 27c-1.4.3-2.6.8-3.6 1.6'/%3E%3C/g%3E%3Cpath d='M23 18.6h9a1.4 1.4 0 011.4 1.4v2.9h3c.5 0 1 .2 1.35.58l2.9 3.05c.3.32.47.75.47 1.2v2A1.4 1.4 0 0140.7 33H23a1.4 1.4 0 01-1.4-1.4V20a1.4 1.4 0 011.4-1.4z' fill='%23FF5A50'/%3E%3Cg fill='%238E0B08'%3E%3Ccircle cx='26' cy='30.6' r='2.5'/%3E%3Ccircle cx='37' cy='30.6' r='2.5'/%3E%3C/g%3E%3C/svg%3E" />
+<link rel="icon" type="image/jpeg" href="logo.jpg" />
 <meta name="description" content="مُوصل: منصة الشركات لتنظيم ومتابعة شحناتها وإدارة أسطولها بأدوار (مدير/منسق/سائق) وواجهة عربية/إنجليزية." />
 
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -1227,38 +1227,10 @@
   };
 
   /* ===================== الشعار + الشبكة ===================== */
+  const LOGO_SRC = 'logo.jpg';
   function logoSVG(size = 42) {
-    const u = 'L' + size;
-    return `<svg width="${size}" height="${size}" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Mowasil logo">
-      <defs>
-        <linearGradient id="bg${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2C313B"/><stop offset="1" stop-color="#13151A"/></linearGradient>
-        <linearGradient id="pn${u}" x1=".2" y1="0" x2=".85" y2="1"><stop offset="0" stop-color="#F5372D"/><stop offset=".5" stop-color="#D01812"/><stop offset="1" stop-color="#A11009"/></linearGradient>
-        <radialGradient id="ds${u}" cx=".4" cy=".35" r=".7"><stop offset="0" stop-color="#E1231C"/><stop offset="1" stop-color="#AE130E"/></radialGradient>
-        <filter id="gl${u}" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="1.3"/></filter>
-        <pattern id="dt${u}" width="4" height="4" patternUnits="userSpaceOnUse"><rect width="1" height="1" fill="#3b414d" opacity=".5"/></pattern>
-        <clipPath id="cl${u}"><rect x="2" y="2" width="60" height="60" rx="14"/></clipPath>
-      </defs>
-      <rect x="2" y="2" width="60" height="60" rx="14" fill="url(#bg${u})"/>
-      <g clip-path="url(#cl${u})">
-        <rect x="2" y="2" width="60" height="60" fill="url(#dt${u})"/>
-        <g stroke="#F0473E" stroke-width=".7" opacity=".45" filter="url(#gl${u})"><path d="M32 30 10 10M32 30 32 6M32 30 54 10M32 30 58 30M32 30 54 52M32 30 32 56M32 30 10 52M32 30 6 30M21 21 43 21 45 40 19 40Z"/></g>
-        <g stroke="#F0473E" stroke-width=".7" opacity=".55"><path d="M32 30 10 10M32 30 32 6M32 30 54 10M32 30 58 30M32 30 54 52M32 30 32 56M32 30 10 52M32 30 6 30M21 21 43 21 45 40 19 40Z"/></g>
-        <g fill="#FF6A62" filter="url(#gl${u})" opacity=".7"><circle cx="10" cy="10" r="2"/><circle cx="54" cy="10" r="2"/><circle cx="54" cy="52" r="2"/><circle cx="10" cy="52" r="2"/><circle cx="32" cy="6" r="2"/><circle cx="32" cy="56" r="2"/></g>
-        <g fill="#FF4A42"><circle cx="10" cy="10" r="1.3"/><circle cx="32" cy="6" r="1.3"/><circle cx="54" cy="10" r="1.3"/><circle cx="58" cy="30" r="1.3"/><circle cx="54" cy="52" r="1.3"/><circle cx="32" cy="56" r="1.3"/><circle cx="10" cy="52" r="1.3"/><circle cx="6" cy="30" r="1.3"/><circle cx="21" cy="21" r="1.1"/><circle cx="43" cy="21" r="1.1"/><circle cx="45" cy="40" r="1.1"/><circle cx="19" cy="40" r="1.1"/></g>
-        <path d="M32 4.5c-10.4 0-18.8 8.2-18.8 18.4 0 9 8.3 20.2 15.6 28.6 1.7 2 3.2 3.6 4 4.4.7.7 1.7.7 2.4 0 .8-.8 2.3-2.4 4-4.4 7.3-8.4 15.6-19.6 15.6-28.6C50.8 12.7 42.4 4.5 32 4.5Z" fill="#000" opacity=".35" filter="url(#gl${u})" transform="translate(1.4 2.2)"/>
-        <path d="M32 4.5c-10.4 0-18.8 8.2-18.8 18.4 0 9 8.3 20.2 15.6 28.6 1.7 2 3.2 3.6 4 4.4.7.7 1.7.7 2.4 0 .8-.8 2.3-2.4 4-4.4 7.3-8.4 15.6-19.6 15.6-28.6C50.8 12.7 42.4 4.5 32 4.5Z" fill="url(#pn${u})" stroke="#7C0906" stroke-width=".8"/>
-        <ellipse cx="25" cy="15" rx="7" ry="5" fill="#fff" opacity=".13"/>
-        <circle cx="32" cy="22.6" r="12" fill="url(#ds${u})"/>
-        <circle cx="32" cy="22.6" r="12" fill="none" stroke="#8E0B08" stroke-width="2.2" opacity=".55"/>
-        <circle cx="32" cy="22.6" r="9.6" fill="none" stroke="#FF6157" stroke-width="1" opacity=".35"/>
-        <g stroke="#FF5A50" stroke-width="1.7" stroke-linecap="round" fill="none"><path d="M19.5 18c-1.8.2-3.4.5-4.7 1.3"/><path d="M18.7 22.6h-5.4"/><path d="M20 27.1c-1.5.3-2.8.9-3.8 1.8"/></g>
-        <path d="M22.6 18.4h9a1.4 1.4 0 0 1 1.4 1.4v2.9h3c.5 0 1 .2 1.35.58l2.9 3.05c.3.32.47.75.47 1.2v2.03a1.4 1.4 0 0 1-1.4 1.4H22.6a1.4 1.4 0 0 1-1.4-1.4V19.8a1.4 1.4 0 0 1 1.4-1.4Z" fill="#FF5A50"/>
-        <g fill="#8E0B08"><circle cx="25.6" cy="30.4" r="2.5"/><circle cx="37" cy="30.4" r="2.5"/></g>
-        <g fill="#FF5A50"><circle cx="25.6" cy="30.4" r="1" /><circle cx="37" cy="30.4" r="1"/></g>
-      </g>
-    </svg>`;
+    return `<img src="${LOGO_SRC}" width="${size}" height="${size}" alt="مُوصل" style="border-radius:22%;object-fit:cover;display:block" />`;
   }
-
   function networkCanvas(canvas) {
     const ctx = canvas.getContext('2d');
     let w, h, pts, raf;
