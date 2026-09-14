@@ -169,6 +169,8 @@ const DICT = {
     // Invoices
     invTitle: 'وحدة الفواتير والتحصيل المالي',
     inv_no: 'رقم الفاتورة', inv_ship: 'الشحنة المرتبطة', inv_party: '', inv_amount: 'المبلغ الإجمالي',
+    addInvoice: 'إضافة فاتورة', newInvoiceTitle: 'فاتورة جديدة',
+    inv_ship_optional: 'شحنة مرتبطة (اختياري)', inv_ship_none: 'بدون ربط',
     inv_issue: 'تاريخ الإصدار', inv_due: 'تاريخ الاستحقاق', inv_status: 'حالة الدفع',
     pay_collected: 'تم التحصيل', pay_pending: 'بانتظار الدفع', pay_cancelled: 'ملغاة',
     overdue: 'متأخرة السداد',
@@ -241,6 +243,8 @@ const DICT = {
     svc_oil: 'Oil change', svc_brakes: 'Brakes', svc_inspection: 'Inspection', svc_tires: 'Tires',
     invTitle: 'Invoice & collection module',
     inv_no: 'Invoice #', inv_ship: 'Linked shipment', inv_party: '', inv_amount: 'Total amount',
+    addInvoice: 'Add invoice', newInvoiceTitle: 'New invoice',
+    inv_ship_optional: 'Linked shipment (optional)', inv_ship_none: 'No linked shipment',
     inv_issue: 'Issued', inv_due: 'Due date', inv_status: 'Payment status',
     pay_collected: 'Collected', pay_pending: 'Awaiting payment', pay_cancelled: 'Cancelled',
     overdue: 'Overdue',
@@ -879,7 +883,12 @@ function viewInvoices() {
           <div class="font-display font-extrabold text-2xl mt-1 tabular-nums text-warn">${money(m.pending)}</div></div>
       </div>
       <div class="rounded-2xl bg-surface border border-line shadow-card overflow-hidden">
-        <div class="p-5 border-b border-line"><h2 class="font-display font-bold text-lg">${t('invTitle')}</h2></div>
+        <div class="p-5 border-b border-line flex items-center justify-between gap-3">
+          <h2 class="font-display font-bold text-lg">${t('invTitle')}</h2>
+          <button data-action="add-invoice"
+            class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-brand hover:bg-brand-bright text-white text-xs font-bold shadow-glow">
+            ${icon('receipt', 'w-4 h-4')}${t('addInvoice')}</button>
+        </div>
         <div class="overflow-x-auto">
           <table class="w-full min-w-[820px]">
             <thead><tr class="text-[11px] uppercase tracking-[.12em] text-faint bg-white/[.02]">
@@ -896,6 +905,83 @@ function viewInvoices() {
         </div>
       </div>
     </div>`;
+}
+
+function nextInvoiceId() {
+  const nums = INVOICES.map((iv) => parseInt(iv.id.replace(/\D/g, ''), 10)).filter((n) => !isNaN(n));
+  return `INV-${(nums.length ? Math.max(...nums) : 7780) + 1}`;
+}
+
+function openInvoiceDialog() {
+  const partyOpts = PARTIES[STATE.mode].map((p, i) =>
+    `<option value="${i}">${esc(p[STATE.lang])}</option>`).join('');
+  const shipOpts = SHIPMENTS.map((s) =>
+    `<option value="${esc(s.id)}">${esc(s.id)} — ${esc(party(s.p))}</option>`).join('');
+  const todayISO = `${TODAY.getFullYear()}-${String(TODAY.getMonth() + 1).padStart(2, '0')}-${String(TODAY.getDate()).padStart(2, '0')}`;
+  openModal(`
+    <div class="p-5 border-b border-line flex items-center justify-between">
+      <h3 class="font-display font-bold text-lg">${t('newInvoiceTitle')}</h3>
+      <button data-action="close-modal" class="text-faint hover:text-ink">${icon('x')}</button>
+    </div>
+    <form id="invoice-form" class="p-5 flex flex-col gap-4">
+      <label class="block">
+        <span class="text-xs font-semibold text-mute">${t('inv_ship_optional')}</span>
+        <select name="ship" class="mt-1.5 w-full bg-bg border border-line rounded-xl px-3 py-2.5 text-sm text-ink outline-none focus:border-brand">
+          <option value="">${t('inv_ship_none')}</option>
+          ${shipOpts}
+        </select>
+      </label>
+      <label class="block">
+        <span class="text-xs font-semibold text-mute">${t('party')}</span>
+        <select name="party" required class="mt-1.5 w-full bg-bg border border-line rounded-xl px-3 py-2.5 text-sm text-ink outline-none focus:border-brand">
+          ${partyOpts}
+        </select>
+      </label>
+      <label class="block">
+        <span class="text-xs font-semibold text-mute">${t('inv_amount')}</span>
+        <input name="amount" type="number" min="1" step="1" required
+          class="mt-1.5 w-full bg-bg border border-line rounded-xl px-3 py-2.5 text-sm text-ink outline-none focus:border-brand" />
+      </label>
+      <div class="grid grid-cols-2 gap-3">
+        <label class="block">
+          <span class="text-xs font-semibold text-mute">${t('inv_issue')}</span>
+          <input name="issue" type="date" required value="${todayISO}"
+            class="mt-1.5 w-full bg-bg border border-line rounded-xl px-3 py-2.5 text-sm text-ink outline-none focus:border-brand" />
+        </label>
+        <label class="block">
+          <span class="text-xs font-semibold text-mute">${t('inv_due')}</span>
+          <input name="due" type="date" required
+            class="mt-1.5 w-full bg-bg border border-line rounded-xl px-3 py-2.5 text-sm text-ink outline-none focus:border-brand" />
+        </label>
+      </div>
+      <label class="block">
+        <span class="text-xs font-semibold text-mute">${t('inv_status')}</span>
+        <select name="pstatus" class="mt-1.5 w-full bg-bg border border-line rounded-xl px-3 py-2.5 text-sm text-ink outline-none focus:border-brand">
+          <option value="pending">${t('pay_pending')}</option>
+          <option value="collected">${t('pay_collected')}</option>
+          <option value="cancelled">${t('pay_cancelled')}</option>
+        </select>
+      </label>
+      <div class="flex justify-end gap-2 pt-1">
+        <button type="button" data-action="close-modal" class="px-4 py-2 rounded-xl text-sm font-semibold text-mute hover:text-ink">${t('cancel')}</button>
+        <button type="submit" class="px-4 py-2 rounded-xl text-sm font-bold bg-brand hover:bg-brand-bright text-white shadow-glow">${t('save')}</button>
+      </div>
+    </form>`);
+  $('#invoice-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    INVOICES.push({
+      id: nextInvoiceId(),
+      ship: fd.get('ship') || '—',
+      p: Number(fd.get('party')),
+      amount: Number(fd.get('amount')),
+      issue: fd.get('issue'),
+      due: fd.get('due'),
+      pstatus: fd.get('pstatus'),
+    });
+    closeModal();
+    renderView();
+  });
 }
 
 function viewSettings() {
@@ -1273,6 +1359,7 @@ document.addEventListener('click', (e) => {
   else if (a === 'logout') { STATE.authed = false; STATE.view = 'dashboard'; render(); }
   else if (a === 'filter') { STATE.shipmentFilter = el.dataset.key; renderView(); }
   else if (a === 'edit-delay') openDelayDialog(el.dataset.id);
+  else if (a === 'add-invoice') openInvoiceDialog();
   else if (a === 'close-modal') closeModal();
   else if (a === 'print-report') window.print();
   else if (a === 'toggle-fin') {
