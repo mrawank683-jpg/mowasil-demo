@@ -2,6 +2,8 @@
 <meta name="description" content="MOWASIL DELIVERY operations console — shipments, fleet, collections" />
 
 <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800;900&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" />
@@ -169,7 +171,7 @@ const DICT = {
     waSendNow: 'إرسال الآن', waReportSaved: 'تم حفظ إعدادات التقرير',
     waBackendNote: 'الإرسال التلقائي الفعلي حسب الدورية المحددة يتم عبر خادم مُوصل + واجهة WhatsApp Business Cloud API (مرحلة الخادم). هذه الشاشة تحفظ الإعداد وتتيح إرسال تجريبي فوري.',
     waSummaryTitle: 'ملخص', waTotal: 'الإجمالي', waDelivered: 'تم التوصيل', waDelayed: 'المتأخرة', waActive: 'قيد التنفيذ',
-    waIssued: 'الصادر', waCollected: 'المحصَّل',
+    waIssued: 'الصادر', waCollected: 'المحصَّل', downloadPdf: 'تحميل PDF', generatingPdf: 'جاري التجهيز…',
     langLabel: 'EN',
     logout: 'خروج',
     nav_dashboard: 'لوحة التحكم', nav_fleet: 'الأسطول والصيانة', nav_invoices: 'الفواتير والتحصيل', nav_settings: 'الإعدادات',
@@ -287,7 +289,7 @@ const DICT = {
     waSendNow: 'Send now', waReportSaved: 'Report settings saved',
     waBackendNote: 'Actual automatic sending on the chosen frequency runs via the Mowasil server + WhatsApp Business Cloud API (server phase). This screen saves the setting and lets you send an instant test.',
     waSummaryTitle: 'Summary', waTotal: 'Total', waDelivered: 'Delivered', waDelayed: 'Delayed', waActive: 'Active',
-    waIssued: 'Issued', waCollected: 'Collected',
+    waIssued: 'Issued', waCollected: 'Collected', downloadPdf: 'Download PDF', generatingPdf: 'Generating…',
     langLabel: 'ع',
     logout: 'Sign out',
     nav_dashboard: 'Dashboard', nav_fleet: 'Fleet & maintenance', nav_invoices: 'Invoices & collection', nav_settings: 'Settings',
@@ -511,16 +513,18 @@ function etaCell(s) {
 function custMsg(s) {
   const eta = s.etaAt ? fmtDateTime(s.etaAt) : t('eta_per_carrier');
   const unit = t('unitPossessive');
-  const viaCarrier = isCarrier(s) && s.carrier ? (STATE.lang === 'ar' ? ` عبر ${s.carrier}` : ` via ${s.carrier}`) : '';
+  const viaCarrier = isCarrier(s) && s.carrier
+    ? (STATE.lang === 'ar' ? ` عبر شركة الشحن الخارجية ${s.carrier}` : ` via our external shipping partner ${s.carrier}`)
+    : '';
   if (s.status === 'delivered') {
     return STATE.lang === 'ar'
-      ? `عميلنا العزيز، تم تسليم ${unit} رقم ${s.id} بنجاح. شكراً لثقتك بـ${t('orgWord')}.`
-      : `Dear customer, ${unit} ${s.id} has been delivered successfully. Thank you for trusting us.`;
+      ? `عميلنا العزيز، تم تسليم ${unit} رقم ${s.id} بنجاح${viaCarrier}. شكراً لثقتك بـ${t('orgWord')}.`
+      : `Dear customer, ${unit} ${s.id} has been delivered successfully${viaCarrier}. Thank you for trusting us.`;
   }
   if (s.status === 'delayed') {
     return STATE.lang === 'ar'
-      ? `عميلنا العزيز، نعتذر عن تأخر ${unit} رقم ${s.id}. الموعد الجديد المتوقع: ${eta}. نشكر تفهّمك.`
-      : `Dear customer, we apologize for the delay of ${unit} ${s.id}. New expected time: ${eta}. Thank you for your patience.`;
+      ? `عميلنا العزيز، نعتذر عن تأخر ${unit} رقم ${s.id}${viaCarrier}. الموعد الجديد المتوقع: ${eta}. نشكر تفهّمك.`
+      : `Dear customer, we apologize for the delay of ${unit} ${s.id}${viaCarrier}. New expected time: ${eta}. Thank you for your patience.`;
   }
   if (s.status === 'in_transit') {
     return STATE.lang === 'ar'
@@ -1535,6 +1539,7 @@ function openWeeklyReport() {
           ${!STATE.showFinancials ? `<p class="text-[11px] text-warn italic mt-1">${t('finHiddenReportNote')}</p>` : ''}
         </div>
         <div class="flex gap-2 print-hide">
+          <button data-action="download-pdf" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-bold bg-surface2 ring-1 ring-line text-ink hover:ring-brand/50">${icon('file', 'w-4 h-4')}${t('downloadPdf')}</button>
           <button data-action="print-report" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-bold bg-brand hover:bg-brand-bright text-white shadow-glow">${icon('print', 'w-4 h-4')}${t('print')}</button>
           <button data-action="close-modal" class="px-3 py-2 rounded-xl text-sm font-semibold text-mute hover:text-ink ring-1 ring-line">${t('close')}</button>
         </div>
@@ -1583,6 +1588,40 @@ function openWeeklyReport() {
         <p class="text-[11px] text-faint text-center pt-2 border-t border-line">${t('rep_footer')}</p>
       </div>
     </div>`, { wide: true });
+}
+
+async function downloadReportPDF(btn) {
+  const el = document.getElementById('print-area');
+  if (!el || !window.html2canvas || !window.jspdf) return;
+  const label = btn ? btn.innerHTML : '';
+  if (btn) { btn.disabled = true; btn.innerHTML = t('generatingPdf'); }
+  try {
+    const canvas = await html2canvas(el, {
+      scale: 2,
+      backgroundColor: '#ffffff',
+      ignoreElements: (node) => node.classList && node.classList.contains('print-hide'),
+    });
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const pageW = pdf.internal.pageSize.getWidth();
+    const pageH = pdf.internal.pageSize.getHeight();
+    const imgW = pageW;
+    const imgH = (canvas.height * imgW) / canvas.width;
+    const imgData = canvas.toDataURL('image/png');
+    let heightLeft = imgH;
+    let position = 0;
+    pdf.addImage(imgData, 'PNG', 0, position, imgW, imgH);
+    heightLeft -= pageH;
+    while (heightLeft > 0) {
+      position = heightLeft - imgH;
+      pdf.addPage();
+      pdf.addImage(imgData, 'PNG', 0, position, imgW, imgH);
+      heightLeft -= pageH;
+    }
+    pdf.save(`Mowasil-Report-${todayISOStr()}.pdf`);
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = label; }
+  }
 }
 
 /* ---------- 11. Shell + render --------------------------------------- */
@@ -1958,6 +1997,7 @@ document.addEventListener('click', (e) => {
   }
   else if (a === 'close-modal') closeModal();
   else if (a === 'print-report') window.print();
+  else if (a === 'download-pdf') downloadReportPDF(el);
   else if (a === 'toggle-fin') {
     STATE.showFinancials = !STATE.showFinancials;
     try { localStorage.setItem('mowasil_show_financials', STATE.showFinancials ? '1' : '0'); } catch (e) {}
