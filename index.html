@@ -107,6 +107,8 @@ const STATE = {
   shipmentQuery: '',
   showFinancials: true,
   orgChosen: false,
+  role: null,
+  driverIndex: null,
 };
 try {
   const savedFin = localStorage.getItem('mowasil_show_financials');
@@ -130,6 +132,18 @@ const DICT = {
     orgCommercialDesc: 'إدارة ومتابعة شحنات الشركة، العملاء، والتحصيل المالي.',
     orgCharityDesc: 'إدارة ومتابعة السلال الغذائية، المستفيدين، والتبرعات.',
     switchOrg: 'تبديل القسم',
+    role_manager: 'مدير الشركة', role_coordinator: 'منسق', role_driver: 'سائق',
+    quickLogin: 'دخول سريع (تجريبي)',
+    eta_datetime: 'الموعد المتوقع', eta_col: 'الموعد المتوقع', eta_per_carrier: 'حسب شركة الشحن',
+    new_eta: 'الموعد الجديد المتوقع (اختياري)', hours: 'ساعة',
+    fulfilType: 'طريقة التنفيذ', ff_kind_driver: 'سائق داخلي', ff_kind_carrier: 'شركة شحن خارجية',
+    carrier_word: 'شركة الشحن', via_carrier: 'عبر',
+    waOptionalExternal: 'تفعيل رسالة واتساب للعميل (اختياري للشحن الخارجي)',
+    ext_hint: 'الموعد المتوقع ورسالة العميل اختياريان — التنسيق عادة يتم عبر شركة الشحن.',
+    newShipmentTitle: 'شحنة جديدة', editShipment: 'تعديل الشحنة', addShipment: 'إضافة شحنة',
+    phone: 'جوال العميل', address: 'العنوان',
+    waCustomer: 'واتساب العميل', startTransit: 'بدء التوصيل', markDelivered: 'تم التسليم',
+    noTrips: 'لا توجد شحنات مسندة إليك حالياً', rescheduled_n: 'أُعيدت جدولتها',
     langLabel: 'EN',
     logout: 'خروج',
     nav_dashboard: 'لوحة التحكم', nav_fleet: 'الأسطول والصيانة', nav_invoices: 'الفواتير والتحصيل', nav_settings: 'الإعدادات',
@@ -192,12 +206,12 @@ const DICT = {
     mode: {
       commercial: {
         party: 'العميل', parties: 'العملاء', unit: 'شحنة', units: 'الشحنات',
-        nav_shipments: 'الشحنات', orgWord: 'الشركة',
+        nav_shipments: 'الشحنات', orgWord: 'الشركة', nav_mytrips: 'شحناتي', unitPossessive: 'شحنتك',
         shTitle: 'إدارة وتتبّع الشحنات', recentTitle: 'أحدث الشحنات',
       },
       charity: {
         party: 'المستفيد', parties: 'المستفيدون', unit: 'سلّة', units: 'السلال الغذائية',
-        nav_shipments: 'السلال الغذائية', orgWord: 'الجمعية',
+        nav_shipments: 'السلال الغذائية', orgWord: 'الجمعية', nav_mytrips: 'سلالي', unitPossessive: 'سلتك',
         shTitle: 'إدارة وتتبّع السلال الغذائية', recentTitle: 'أحدث السلال',
       },
     },
@@ -215,6 +229,18 @@ const DICT = {
     orgCommercialDesc: 'Manage and track company shipments, clients, and collections.',
     orgCharityDesc: 'Manage and track aid baskets, beneficiaries, and donations.',
     switchOrg: 'Switch section',
+    role_manager: 'Manager', role_coordinator: 'Coordinator', role_driver: 'Driver',
+    quickLogin: 'Quick sign-in (demo)',
+    eta_datetime: 'Expected time', eta_col: 'Expected', eta_per_carrier: 'Per carrier',
+    new_eta: 'New expected time (optional)', hours: 'hrs',
+    fulfilType: 'Fulfillment', ff_kind_driver: 'In-house driver', ff_kind_carrier: 'External carrier',
+    carrier_word: 'Carrier', via_carrier: 'via',
+    waOptionalExternal: 'Enable customer WhatsApp message (optional for external shipments)',
+    ext_hint: 'Expected time and customer message are optional — coordination is usually via the carrier.',
+    newShipmentTitle: 'New shipment', editShipment: 'Edit shipment', addShipment: 'Add shipment',
+    phone: 'Customer phone', address: 'Address',
+    waCustomer: 'WhatsApp customer', startTransit: 'Start delivery', markDelivered: 'Mark delivered',
+    noTrips: 'No shipments currently assigned to you', rescheduled_n: 'Rescheduled',
     langLabel: 'ع',
     logout: 'Sign out',
     nav_dashboard: 'Dashboard', nav_fleet: 'Fleet & maintenance', nav_invoices: 'Invoices & collection', nav_settings: 'Settings',
@@ -269,12 +295,12 @@ const DICT = {
     mode: {
       commercial: {
         party: 'Client', parties: 'Clients', unit: 'shipment', units: 'Shipments',
-        nav_shipments: 'Shipments', orgWord: 'the company',
+        nav_shipments: 'Shipments', orgWord: 'the company', nav_mytrips: 'My trips', unitPossessive: 'your shipment',
         shTitle: 'Shipment tracking & management', recentTitle: 'Recent shipments',
       },
       charity: {
         party: 'Beneficiary', parties: 'Beneficiaries', unit: 'basket', units: 'Aid baskets',
-        nav_shipments: 'Aid baskets', orgWord: 'the association',
+        nav_shipments: 'Aid baskets', orgWord: 'the association', nav_mytrips: 'My trips', unitPossessive: 'your aid basket',
         shTitle: 'Aid-basket tracking & management', recentTitle: 'Recent baskets',
       },
     },
@@ -341,25 +367,30 @@ const PARTIES = {
 const party = (i) => PARTIES[STATE.mode][i % 6][STATE.lang];
 
 // Shipments — status: preparing | in_transit | delivered | delayed | cancelled
+// fulfil: 'driver' (in-house) | 'carrier' (external, e.g. Aramex)
+const ADDR_AR = ['حي الملقا، شارع الأمير سلطان', 'حي السلامة، طريق فلسطين', 'حي الشاطئ، طريق الكورنيش', 'حي العزيزية، شارع إبراهيم الجفالي', 'حي قباء، طريق قباء', 'حي المنسك، شارع الستين', 'حي الشرفية، طريق الحرمين', 'حي السلام، شارع الأمير عبدالمجيد', 'حي النزهة، شارع الأمير سعود', 'حي النرجس، طريق أنس بن مالك'];
+const ADDR_EN = ['Al-Malqa, Prince Sultan St', 'Al-Salamah, Palestine Rd', 'Al-Shati, Corniche Rd', 'Al-Aziziyah, Ibrahim Al-Jaffali St', 'Quba, Quba Rd', 'Al-Mansak, 60th St', 'Al-Sharafiyah, Haramain Rd', 'Al-Salam, Prince Abdulmajeed St', 'Al-Nuzha, Prince Saud St', 'Al-Narjis, Anas bin Malik Rd'];
+const PHONES = ['0551234567','0553001122','0554455667','0559876543','0552223344','0500112233','0561234599','0567889900','0568001122','0533445566','0559001234','0554321098','0501122334','0563345566','0577889900','0509988776','0562233445','0555667788'];
+let CARRIERS = [{ id: 'aramex', ar: 'أرامكس', en: 'Aramex' }];
 let SHIPMENTS = [
-  { id: 'MW-24831', p: 0, c: 0, created: '2026-09-01', driver: 0, status: 'in_transit', reason: null, note: '' },
-  { id: 'MW-24832', p: 1, c: 1, created: '2026-09-01', driver: 1, status: 'delayed', reason: 'vehicle', note: 'تعطّل ناقل الحركة قرب مخرج 12' },
-  { id: 'MW-24833', p: 2, c: 2, created: '2026-09-02', driver: 2, status: 'delivered', reason: null, note: '' },
-  { id: 'MW-24834', p: 3, c: 0, created: '2026-09-02', driver: 3, status: 'preparing', reason: null, note: '' },
-  { id: 'MW-24835', p: 4, c: 3, created: '2026-09-02', driver: 4, status: 'delayed', reason: 'no_answer', note: '' },
-  { id: 'MW-24836', p: 5, c: 4, created: '2026-09-03', driver: 5, status: 'in_transit', reason: null, note: '' },
-  { id: 'MW-24837', p: 0, c: 5, created: '2026-09-03', driver: 0, status: 'delivered', reason: null, note: '' },
-  { id: 'MW-24838', p: 1, c: 6, created: '2026-09-03', driver: 1, status: 'delayed', reason: 'traffic', note: '' },
-  { id: 'MW-24839', p: 2, c: 7, created: '2026-09-04', driver: 2, status: 'delayed', reason: null, note: '' },
-  { id: 'MW-24840', p: 3, c: 1, created: '2026-09-04', driver: 3, status: 'preparing', reason: null, note: '' },
-  { id: 'MW-24841', p: 4, c: 8, created: '2026-09-04', driver: 4, status: 'delayed', reason: 'address', note: 'الحي صحيح، رقم المبنى غير مطابق' },
-  { id: 'MW-24842', p: 5, c: 2, created: '2026-09-05', driver: 5, status: 'in_transit', reason: null, note: '' },
-  { id: 'MW-24843', p: 0, c: 9, created: '2026-09-05', driver: 0, status: 'delivered', reason: null, note: '' },
-  { id: 'MW-24844', p: 1, c: 3, created: '2026-09-05', driver: 1, status: 'delayed', reason: 'no_answer', note: '' },
-  { id: 'MW-24845', p: 2, c: 0, created: '2026-09-05', driver: 2, status: 'cancelled', reason: null, note: '' },
-  { id: 'MW-24846', p: 3, c: 4, created: '2026-09-06', driver: 3, status: 'preparing', reason: null, note: '' },
-  { id: 'MW-24847', p: 4, c: 5, created: '2026-09-06', driver: 4, status: 'delayed', reason: 'traffic', note: '' },
-  { id: 'MW-24848', p: 5, c: 6, created: '2026-09-06', driver: 5, status: 'in_transit', reason: null, note: '' },
+  { id: 'MW-24831', p: 0, c: 0, created: '2026-09-01', driver: 0, fulfil: 'driver', carrier: null, status: 'in_transit', reason: null, note: '', etaAt: '2026-09-06T15:00:00', phone: PHONES[0], address: { ar: ADDR_AR[0], en: ADDR_EN[0] }, schedule: [], waEnabled: true },
+  { id: 'MW-24832', p: 1, c: 1, created: '2026-09-01', driver: 1, fulfil: 'driver', carrier: null, status: 'delayed', reason: 'vehicle', note: 'تعطّل ناقل الحركة قرب مخرج 12', etaAt: '2026-09-05T10:00:00', phone: PHONES[1], address: { ar: ADDR_AR[1], en: ADDR_EN[1] }, schedule: [], waEnabled: true },
+  { id: 'MW-24833', p: 2, c: 2, created: '2026-09-02', driver: 2, fulfil: 'driver', carrier: null, status: 'delivered', reason: null, note: '', etaAt: '2026-09-02T16:00:00', phone: PHONES[2], address: { ar: ADDR_AR[2], en: ADDR_EN[2] }, schedule: [], waEnabled: true },
+  { id: 'MW-24834', p: 3, c: 0, created: '2026-09-02', driver: null, fulfil: 'carrier', carrier: 'أرامكس', status: 'preparing', reason: null, note: '', etaAt: null, phone: PHONES[3], address: { ar: ADDR_AR[3], en: ADDR_EN[3] }, schedule: [], waEnabled: false },
+  { id: 'MW-24835', p: 4, c: 3, created: '2026-09-02', driver: 4, fulfil: 'driver', carrier: null, status: 'delayed', reason: 'no_answer', note: '', etaAt: '2026-09-05T12:00:00', phone: PHONES[4], address: { ar: ADDR_AR[4], en: ADDR_EN[4] }, schedule: [], waEnabled: true },
+  { id: 'MW-24836', p: 5, c: 4, created: '2026-09-03', driver: 5, fulfil: 'driver', carrier: null, status: 'in_transit', reason: null, note: '', etaAt: '2026-09-06T17:30:00', phone: PHONES[5], address: { ar: ADDR_AR[5], en: ADDR_EN[5] }, schedule: [], waEnabled: true },
+  { id: 'MW-24837', p: 0, c: 5, created: '2026-09-03', driver: 0, fulfil: 'driver', carrier: null, status: 'delivered', reason: null, note: '', etaAt: '2026-09-03T14:00:00', phone: PHONES[6], address: { ar: ADDR_AR[6], en: ADDR_EN[6] }, schedule: [], waEnabled: true },
+  { id: 'MW-24838', p: 1, c: 6, created: '2026-09-03', driver: 1, fulfil: 'driver', carrier: null, status: 'delayed', reason: 'traffic', note: '', etaAt: '2026-09-05T09:00:00', phone: PHONES[7], address: { ar: ADDR_AR[7], en: ADDR_EN[7] }, schedule: [{ from: '2026-09-04T18:00:00', to: '2026-09-05T09:00:00', at: '2026-09-04T17:30:00' }], waEnabled: true },
+  { id: 'MW-24839', p: 2, c: 7, created: '2026-09-04', driver: null, fulfil: 'carrier', carrier: 'أرامكس', status: 'delayed', reason: null, note: '', etaAt: null, phone: PHONES[8], address: { ar: ADDR_AR[8], en: ADDR_EN[8] }, schedule: [], waEnabled: false },
+  { id: 'MW-24840', p: 3, c: 1, created: '2026-09-04', driver: 3, fulfil: 'driver', carrier: null, status: 'preparing', reason: null, note: '', etaAt: '2026-09-07T10:00:00', phone: PHONES[9], address: { ar: ADDR_AR[9], en: ADDR_EN[9] }, schedule: [], waEnabled: true },
+  { id: 'MW-24841', p: 4, c: 8, created: '2026-09-04', driver: 4, fulfil: 'driver', carrier: null, status: 'delayed', reason: 'address', note: 'الحي صحيح، رقم المبنى غير مطابق', etaAt: '2026-09-04T15:00:00', phone: PHONES[10], address: { ar: ADDR_AR[0], en: ADDR_EN[0] }, schedule: [], waEnabled: true },
+  { id: 'MW-24842', p: 5, c: 2, created: '2026-09-05', driver: 5, fulfil: 'driver', carrier: null, status: 'in_transit', reason: null, note: '', etaAt: '2026-09-06T13:00:00', phone: PHONES[11], address: { ar: ADDR_AR[1], en: ADDR_EN[1] }, schedule: [], waEnabled: true },
+  { id: 'MW-24843', p: 0, c: 9, created: '2026-09-05', driver: 0, fulfil: 'driver', carrier: null, status: 'delivered', reason: null, note: '', etaAt: '2026-09-05T18:00:00', phone: PHONES[12], address: { ar: ADDR_AR[2], en: ADDR_EN[2] }, schedule: [], waEnabled: true },
+  { id: 'MW-24844', p: 1, c: 3, created: '2026-09-05', driver: 1, fulfil: 'driver', carrier: null, status: 'delayed', reason: 'no_answer', note: '', etaAt: '2026-09-05T11:00:00', phone: PHONES[13], address: { ar: ADDR_AR[3], en: ADDR_EN[3] }, schedule: [], waEnabled: true },
+  { id: 'MW-24845', p: 2, c: 0, created: '2026-09-05', driver: 2, fulfil: 'driver', carrier: null, status: 'cancelled', reason: null, note: '', etaAt: null, phone: PHONES[14], address: { ar: ADDR_AR[4], en: ADDR_EN[4] }, schedule: [], waEnabled: true },
+  { id: 'MW-24846', p: 3, c: 4, created: '2026-09-06', driver: null, fulfil: 'carrier', carrier: 'أرامكس', status: 'preparing', reason: null, note: '', etaAt: null, phone: PHONES[15], address: { ar: ADDR_AR[5], en: ADDR_EN[5] }, schedule: [], waEnabled: false },
+  { id: 'MW-24847', p: 4, c: 5, created: '2026-09-06', driver: 4, fulfil: 'driver', carrier: null, status: 'delayed', reason: 'traffic', note: '', etaAt: '2026-09-06T08:00:00', phone: PHONES[16], address: { ar: ADDR_AR[6], en: ADDR_EN[6] }, schedule: [], waEnabled: true },
+  { id: 'MW-24848', p: 5, c: 6, created: '2026-09-06', driver: 5, fulfil: 'driver', carrier: null, status: 'in_transit', reason: null, note: '', etaAt: '2026-09-06T20:00:00', phone: PHONES[17], address: { ar: ADDR_AR[7], en: ADDR_EN[7] }, schedule: [], waEnabled: true },
 ];
 
 // Fleet — vstatus: on_route | idle | maintenance ; nextDate ISO ; svc key
@@ -389,6 +420,7 @@ let INVOICES = [
 ];
 
 const TODAY = new Date('2026-09-06T00:00:00');
+const NOW = new Date('2026-09-06T12:00:00'); // fixed "current moment" reference for ETA countdowns
 
 /* ---------- 4. Helpers --------------------------------------------------- */
 const $ = (sel, el = document) => el.querySelector(sel);
@@ -400,6 +432,51 @@ const fmtDate = (iso) => {
     { day: '2-digit', month: 'short', year: 'numeric' });
 };
 const daysBetween = (iso) => Math.round((new Date(iso + 'T00:00:00') - TODAY) / 86400000);
+const addr = (s) => (s.address ? s.address[STATE.lang] : '—');
+const isCarrier = (s) => s.fulfil === 'carrier';
+const todayISOStr = () => `${TODAY.getFullYear()}-${String(TODAY.getMonth() + 1).padStart(2, '0')}-${String(TODAY.getDate()).padStart(2, '0')}`;
+function fmtDateTime(iso) {
+  const d = new Date(iso);
+  return d.toLocaleString(STATE.lang === 'ar' ? 'ar-SA-u-ca-gregory-nu-latn' : 'en-GB',
+    { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+}
+function etaCell(s) {
+  if (!s.etaAt) return isCarrier(s) ? t('eta_per_carrier') : '—';
+  const diffH = Math.round((new Date(s.etaAt) - NOW) / 3600000);
+  const when = fmtDateTime(s.etaAt);
+  if (s.status === 'delivered' || s.status === 'cancelled') return when;
+  return diffH < 0
+    ? `${when} · ${t('overdueBy')} ${Math.abs(diffH)} ${t('hours')}`
+    : `${when} · ${t('within')} ${diffH} ${t('hours')}`;
+}
+function custMsg(s) {
+  const eta = s.etaAt ? fmtDateTime(s.etaAt) : t('eta_per_carrier');
+  const unit = t('unitPossessive');
+  const viaCarrier = isCarrier(s) && s.carrier ? (STATE.lang === 'ar' ? ` عبر ${s.carrier}` : ` via ${s.carrier}`) : '';
+  if (s.status === 'delivered') {
+    return STATE.lang === 'ar'
+      ? `عميلنا العزيز، تم تسليم ${unit} رقم ${s.id} بنجاح. شكراً لثقتك بـ${t('orgWord')}.`
+      : `Dear customer, ${unit} ${s.id} has been delivered successfully. Thank you for trusting us.`;
+  }
+  if (s.status === 'delayed') {
+    return STATE.lang === 'ar'
+      ? `عميلنا العزيز، نعتذر عن تأخر ${unit} رقم ${s.id}. الموعد الجديد المتوقع: ${eta}. نشكر تفهّمك.`
+      : `Dear customer, we apologize for the delay of ${unit} ${s.id}. New expected time: ${eta}. Thank you for your patience.`;
+  }
+  if (s.status === 'in_transit') {
+    return STATE.lang === 'ar'
+      ? `عميلنا العزيز، ${unit} رقم ${s.id} جاري توصيلها الآن${viaCarrier}. الموعد المتوقع للوصول: ${eta}.`
+      : `Dear customer, ${unit} ${s.id} is on its way${viaCarrier}. Expected arrival: ${eta}.`;
+  }
+  return STATE.lang === 'ar'
+    ? `عميلنا العزيز، ${unit} رقم ${s.id} قيد التحضير${viaCarrier}. الموعد المتوقع: ${eta}.`
+    : `Dear customer, ${unit} ${s.id} is being prepared${viaCarrier}. Expected: ${eta}.`;
+}
+function waPhone(phone) {
+  const digits = String(phone || '').replace(/\D/g, '');
+  return digits.startsWith('966') ? digits : '966' + digits.replace(/^0+/, '');
+}
+function custWaLink(s) { return `https://wa.me/${waPhone(s.phone)}?text=${encodeURIComponent(custMsg(s))}`; }
 
 function serviceLevel(v) {
   if (v.vstatus === 'maintenance') return 'urgent';
@@ -457,19 +534,23 @@ function constantTimeEqual(a, b) {
   for (let i = 0; i < a.length; i++) r |= a.charCodeAt(i) ^ b.charCodeAt(i);
   return r === 0;
 }
-// Seeded admin credential record (salt fixed for the demo; random per-user in production)
-const ADMIN = {
-  username: 'admin',
-  salt: 'a3f1c09e77b24d5589e6021bb4c7d810',
-  iters: PBKDF2_ITERS,
-  hash: null, // computed once on load from the demo password
-};
+// Seeded credential records — one per role (salts fixed for the demo; random per-user in production)
 const DEMO_PASSWORD = 'Mowasil@2026';
-(async () => { ADMIN.hash = await pbkdf2Hash(DEMO_PASSWORD, ADMIN.salt); })();
+const ACCOUNTS = [
+  { role: 'manager', username: 'admin', salt: 'a3f1c09e77b24d5589e6021bb4c7d810', password: DEMO_PASSWORD, hash: null, driverIndex: null },
+  { role: 'coordinator', username: 'coordinator', salt: 'b7e2d4a1f9c3e680a5b2c7d4e9f1a380', password: 'Coord@2026', hash: null, driverIndex: null },
+  { role: 'driver', username: 'driver', salt: 'c9f5b3e7a2d84619c0e5f2a7b3d9c460', password: 'Driver@2026', hash: null, driverIndex: 0 },
+];
+(async () => { for (const acc of ACCOUNTS) acc.hash = await pbkdf2Hash(acc.password, acc.salt); })();
 
 async function verifyLogin(username, password) {
-  const candidate = await pbkdf2Hash(password, ADMIN.salt);
-  return username.trim() === ADMIN.username && ADMIN.hash && constantTimeEqual(candidate, ADMIN.hash);
+  const uname = username.trim();
+  for (const acc of ACCOUNTS) {
+    if (uname !== acc.username || !acc.hash) continue;
+    const candidate = await pbkdf2Hash(password, acc.salt);
+    if (constantTimeEqual(candidate, acc.hash)) return acc;
+  }
+  return null;
 }
 
 /* ---------- 6. Icons (inline, currentColor) ---------------------------- */
@@ -494,6 +575,8 @@ const IC = {
   pulse: '<path d="M3 12h4l2-6 4 14 3-8h5"/>',
   spark: '<path d="M12 2v6M12 16v6M2 12h6M16 12h6M5 5l4 4M15 15l4 4M19 5l-4 4M9 15l-4 4"/>',
   settings: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>',
+  message: '<path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5c-1.35 0-2.62-.32-3.73-.9L3 21l1.9-5.7A8.46 8.46 0 0 1 3.5 11.5 8.5 8.5 0 0 1 12 3a8.5 8.5 0 0 1 9 8.5z"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
 };
 const icon = (name, cls = 'w-5 h-5') =>
   `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" class="${cls}">${IC[name] || ''}</svg>`;
@@ -753,10 +836,17 @@ function viewShipments() {
            <span>${s.reason ? esc(reasonLabel(s.reason)) : t('delayUnset')}</span>
          </button>`
       : `<span class="text-faint text-xs">—</span>`;
-    const action = late
-      ? `<button data-action="edit-delay" data-id="${s.id}"
-           class="text-xs font-semibold text-brand-bright hover:underline">${s.reason ? t('edit') : t('logDelay')}</button>`
-      : `<span class="text-faint text-xs">—</span>`;
+    const fulfilCell = isCarrier(s)
+      ? `<span class="inline-flex items-center gap-1 text-xs font-semibold text-info">${icon('truck', 'w-3.5 h-3.5')}${t('via_carrier')} ${esc(s.carrier || '—')}</span>`
+      : `<span class="text-sm text-mute">${esc(drv(s.driver))}</span>`;
+    const canWa = s.phone && (!isCarrier(s) || s.waEnabled);
+    const etaHtml = `${esc(etaCell(s))}${(s.schedule && s.schedule.length) ? `<span class="block text-[10px] text-warn">${t('rescheduled_n')}${s.schedule.length > 1 ? ' ×' + s.schedule.length : ''}</span>` : ''}`;
+    const actions = `<div class="flex items-center gap-1.5">
+      <button data-action="edit-shipment" data-id="${s.id}" title="${t('edit')}"
+        class="inline-flex items-center justify-center w-7 h-7 rounded-lg ring-1 ring-line text-faint hover:text-ink hover:ring-brand/50">${icon('edit', 'w-3.5 h-3.5')}</button>
+      ${canWa ? `<a href="${custWaLink(s)}" target="_blank" rel="noopener" title="${t('waCustomer')}"
+        class="inline-flex items-center justify-center w-7 h-7 rounded-lg ring-1 ring-ok/30 text-ok hover:bg-ok/10">${icon('message', 'w-3.5 h-3.5')}</a>` : ''}
+    </div>`;
     return `<tr class="row-in border-b border-line ${late ? 'bg-danger/[.05]' : 'hover:bg-white/[.02]'}"
              style="animation-delay:${Math.min(i * 25, 400)}ms">
       <td class="ps-4 pe-2 py-3 ${late ? 'border-s-2 border-danger' : 'border-s-2 border-transparent'}">
@@ -764,11 +854,11 @@ function viewShipments() {
       </td>
       <td class="px-2 py-3 text-sm text-ink">${esc(party(s.p))}</td>
       <td class="px-2 py-3 text-sm text-mute">${esc(cityLabel(s.c))}</td>
-      <td class="px-2 py-3 text-sm text-mute tabular-nums whitespace-nowrap">${fmtDate(s.created)}</td>
-      <td class="px-2 py-3 text-sm text-mute">${esc(drv(s.driver))}</td>
+      <td class="px-2 py-3 text-xs text-mute tabular-nums whitespace-nowrap">${etaHtml}</td>
+      <td class="px-2 py-3 whitespace-nowrap">${fulfilCell}</td>
       <td class="px-2 py-3">${statusPill(s.status)}</td>
       <td class="px-2 py-3">${reasonCell}</td>
-      <td class="px-2 pe-4 py-3">${action}</td>
+      <td class="px-2 pe-4 py-3">${actions}</td>
     </tr>`;
   }).join('');
 
@@ -777,6 +867,9 @@ function viewShipments() {
       <div class="p-5 flex flex-wrap items-center gap-3 justify-between border-b border-line">
         <h2 class="font-display font-bold text-lg">${t('shTitle')}</h2>
         <div class="flex items-center gap-2 flex-wrap">
+          <button data-action="add-shipment"
+            class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-surface2 ring-1 ring-line text-xs font-bold text-ink hover:ring-brand/50">
+            ${icon('plus', 'w-4 h-4')}${t('addShipment')}</button>
           ${STATE.showFinancials ? `<button data-action="add-invoice"
             class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-brand hover:bg-brand-bright text-white text-xs font-bold shadow-glow">
             ${icon('receipt', 'w-4 h-4')}${t('addInvoice')}</button>` : ''}
@@ -789,14 +882,14 @@ function viewShipments() {
       </div>
       <div class="px-5 py-3 flex flex-wrap gap-2 border-b border-line">${chips}</div>
       <div class="overflow-x-auto">
-        <table class="w-full min-w-[860px] text-start">
+        <table class="w-full min-w-[920px] text-start">
           <thead>
             <tr class="text-[11px] uppercase tracking-[.12em] text-faint bg-white/[.02]">
               <th class="ps-4 pe-2 py-3 text-start font-semibold">${t('col_no')}</th>
               <th class="px-2 py-3 text-start font-semibold">${t('party')}</th>
               <th class="px-2 py-3 text-start font-semibold">${t('col_city')}</th>
-              <th class="px-2 py-3 text-start font-semibold">${t('col_created')}</th>
-              <th class="px-2 py-3 text-start font-semibold">${t('col_driver')}</th>
+              <th class="px-2 py-3 text-start font-semibold">${t('eta_col')}</th>
+              <th class="px-2 py-3 text-start font-semibold">${t('fulfilType')}</th>
               <th class="px-2 py-3 text-start font-semibold">${t('col_status')}</th>
               <th class="px-2 py-3 text-start font-semibold">${t('col_delay')}</th>
               <th class="px-2 pe-4 py-3 text-start font-semibold">${t('col_action')}</th>
@@ -806,6 +899,113 @@ function viewShipments() {
         </table>
       </div>
     </div>`;
+}
+
+/* ---------- 9b. Add / Edit shipment ------------------------------------ */
+function openShipmentDialog(id) {
+  const editing = id ? SHIPMENTS.find((x) => x.id === id) : null;
+  const isCarrierMode = editing ? isCarrier(editing) : false;
+  const partyOpts = PARTIES[STATE.mode].map((p, i) =>
+    `<option value="${i}" ${editing && editing.p === i ? 'selected' : ''}>${esc(p[STATE.lang])}</option>`).join('');
+  const cities = STATE.lang === 'ar' ? CITIES_AR : CITIES_EN;
+  const cityOpts = cities.map((c, i) =>
+    `<option value="${i}" ${editing && editing.c === i ? 'selected' : ''}>${esc(c)}</option>`).join('');
+  const driverOpts = DRIVERS.map((d, i) =>
+    `<option value="${i}" ${editing && editing.driver === i ? 'selected' : ''}>${esc(d[STATE.lang])}</option>`).join('');
+  const carrierOpts = CARRIERS.map((c) => `<option value="${esc(c[STATE.lang])}"></option>`).join('');
+  openModal(`
+    <div class="p-5 border-b border-line flex items-center justify-between">
+      <h3 class="font-display font-bold text-lg">${editing ? t('editShipment') : t('newShipmentTitle')}</h3>
+      <button data-action="close-modal" class="text-faint hover:text-ink">${icon('x')}</button>
+    </div>
+    <form id="shipment-form" class="p-5 flex flex-col gap-4">
+      <div class="grid sm:grid-cols-2 gap-3">
+        <label class="block"><span class="text-xs font-semibold text-mute">${t('party')}</span>
+          <select name="party" required class="mt-1.5 w-full bg-bg border border-line rounded-xl px-3 py-2.5 text-sm text-ink outline-none focus:border-brand">${partyOpts}</select></label>
+        <label class="block"><span class="text-xs font-semibold text-mute">${t('col_city')}</span>
+          <select name="city" required class="mt-1.5 w-full bg-bg border border-line rounded-xl px-3 py-2.5 text-sm text-ink outline-none focus:border-brand">${cityOpts}</select></label>
+      </div>
+      <div class="grid sm:grid-cols-2 gap-3">
+        <label class="block"><span class="text-xs font-semibold text-mute">${t('phone')}</span>
+          <input name="phone" type="tel" placeholder="05XXXXXXXX" required value="${editing ? esc(editing.phone || '') : ''}"
+            class="mt-1.5 w-full bg-bg border border-line rounded-xl px-3 py-2.5 text-sm text-ink outline-none focus:border-brand" /></label>
+        <label class="block"><span class="text-xs font-semibold text-mute">${t('address')}</span>
+          <input name="address" required value="${editing ? esc(addr(editing)) : ''}"
+            class="mt-1.5 w-full bg-bg border border-line rounded-xl px-3 py-2.5 text-sm text-ink outline-none focus:border-brand" /></label>
+      </div>
+      <div>
+        <div class="text-xs font-semibold text-mute mb-2">${t('fulfilType')}</div>
+        <div class="grid grid-cols-2 gap-2">
+          <label class="flex items-center gap-2 rounded-xl px-3 py-2.5 ring-1 ring-line cursor-pointer has-[:checked]:ring-brand has-[:checked]:bg-brand/10">
+            <input type="radio" name="fulfil" value="driver" class="accent-brand" ${!isCarrierMode ? 'checked' : ''}>
+            <span class="text-sm text-ink">${t('ff_kind_driver')}</span></label>
+          <label class="flex items-center gap-2 rounded-xl px-3 py-2.5 ring-1 ring-line cursor-pointer has-[:checked]:ring-brand has-[:checked]:bg-brand/10">
+            <input type="radio" name="fulfil" value="carrier" class="accent-brand" ${isCarrierMode ? 'checked' : ''}>
+            <span class="text-sm text-ink">${t('ff_kind_carrier')}</span></label>
+        </div>
+      </div>
+      <div id="driver-field" class="${isCarrierMode ? 'hidden' : ''}">
+        <label class="block"><span class="text-xs font-semibold text-mute">${t('driver')}</span>
+          <select name="driver" class="mt-1.5 w-full bg-bg border border-line rounded-xl px-3 py-2.5 text-sm text-ink outline-none focus:border-brand">${driverOpts}</select></label>
+      </div>
+      <div id="carrier-field" class="${isCarrierMode ? '' : 'hidden'} flex flex-col gap-2">
+        <label class="block"><span class="text-xs font-semibold text-mute">${t('carrier_word')}</span>
+          <input name="carrier" list="carrier-list" placeholder="أرامكس" value="${editing ? esc(editing.carrier || '') : ''}"
+            class="mt-1.5 w-full bg-bg border border-line rounded-xl px-3 py-2.5 text-sm text-ink outline-none focus:border-brand" />
+          <datalist id="carrier-list">${carrierOpts}</datalist>
+        </label>
+        <label class="flex items-center gap-2 text-sm text-mute">
+          <input type="checkbox" name="waEnabled" class="accent-brand" ${editing && editing.waEnabled ? 'checked' : ''}>
+          <span>${t('waOptionalExternal')}</span>
+        </label>
+        <p class="text-[11px] text-faint">${t('ext_hint')}</p>
+      </div>
+      <label class="block"><span class="text-xs font-semibold text-mute">${t('eta_datetime')}</span>
+        <input name="eta" type="datetime-local" value="${editing && editing.etaAt ? editing.etaAt.slice(0, 16) : ''}"
+          class="mt-1.5 w-full bg-bg border border-line rounded-xl px-3 py-2.5 text-sm text-ink outline-none focus:border-brand" /></label>
+      <div class="flex justify-end gap-2 pt-1">
+        <button type="button" data-action="close-modal" class="px-4 py-2 rounded-xl text-sm font-semibold text-mute hover:text-ink">${t('cancel')}</button>
+        <button type="submit" class="px-4 py-2 rounded-xl text-sm font-bold bg-brand hover:bg-brand-bright text-white shadow-glow">${t('save')}</button>
+      </div>
+    </form>`);
+  const form = $('#shipment-form');
+  form.querySelectorAll('input[name="fulfil"]').forEach((r) => r.addEventListener('change', () => {
+    const carrierMode = form.querySelector('input[name="fulfil"]:checked').value === 'carrier';
+    $('#driver-field').classList.toggle('hidden', carrierMode);
+    $('#carrier-field').classList.toggle('hidden', !carrierMode);
+  }));
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const fd = new FormData(form);
+    const fulfil = fd.get('fulfil');
+    const partyIdx = Number(fd.get('party'));
+    const cityIdx = Number(fd.get('city'));
+    const etaVal = fd.get('eta');
+    const etaAt = etaVal ? etaVal + ':00' : null;
+    const phone = fd.get('phone');
+    const addressText = fd.get('address');
+    const rec = editing || { id: null, created: todayISOStr(), status: 'preparing', reason: null, note: '', schedule: [] };
+    rec.p = partyIdx; rec.c = cityIdx; rec.phone = phone; rec.address = { ar: addressText, en: addressText }; rec.etaAt = etaAt;
+    if (fulfil === 'carrier') {
+      rec.fulfil = 'carrier';
+      rec.carrier = fd.get('carrier').trim() || (CARRIERS[0] ? CARRIERS[0][STATE.lang] : 'أرامكس');
+      if (!CARRIERS.some((c) => c.ar === rec.carrier || c.en === rec.carrier)) CARRIERS.push({ id: 'x_' + Math.random().toString(36).slice(2, 7), ar: rec.carrier, en: rec.carrier });
+      rec.driver = null;
+      rec.waEnabled = fd.get('waEnabled') === 'on';
+    } else {
+      rec.fulfil = 'driver';
+      rec.driver = Number(fd.get('driver'));
+      rec.carrier = null;
+      rec.waEnabled = true;
+    }
+    if (!editing) {
+      const nums = SHIPMENTS.map((s) => parseInt(s.id.replace(/\D/g, ''), 10)).filter((n) => !isNaN(n));
+      rec.id = `MW-${(nums.length ? Math.max(...nums) : 24830) + 1}`;
+      SHIPMENTS.push(rec);
+    }
+    closeModal();
+    renderView();
+  });
 }
 
 function viewFleet() {
@@ -1067,6 +1267,11 @@ function openDelayDialog(id) {
         <span class="text-xs font-semibold text-mute">${t('notes')}</span>
         <textarea name="note" rows="2" class="mt-1.5 w-full bg-bg border border-line rounded-xl px-3 py-2 text-sm text-ink outline-none focus:border-brand">${esc(s.note || '')}</textarea>
       </label>
+      <label class="block border-t border-line pt-3">
+        <span class="text-xs font-semibold text-mute">${t('new_eta')}</span>
+        <input name="newEta" type="datetime-local" value="${s.etaAt ? s.etaAt.slice(0, 16) : ''}"
+          class="mt-1.5 w-full bg-bg border border-line rounded-xl px-3 py-2.5 text-sm text-ink outline-none focus:border-brand" />
+      </label>
       <div class="flex justify-end gap-2 pt-1">
         <button type="button" data-action="close-modal" class="px-4 py-2 rounded-xl text-sm font-semibold text-mute hover:text-ink">${t('cancel')}</button>
         <button type="submit" class="px-4 py-2 rounded-xl text-sm font-bold bg-brand hover:bg-brand-bright text-white shadow-glow">${t('save')}</button>
@@ -1077,9 +1282,48 @@ function openDelayDialog(id) {
     const fd = new FormData(e.target);
     const r = fd.get('reason');
     if (r) { s.reason = r; s.note = fd.get('note') || ''; }
+    const newEtaVal = fd.get('newEta');
+    const newEta = newEtaVal ? newEtaVal + ':00' : null;
+    if (newEta && newEta !== s.etaAt) {
+      s.schedule = s.schedule || [];
+      s.schedule.push({ from: s.etaAt, to: newEta, at: NOW.toISOString() });
+      s.etaAt = newEta;
+    }
     closeModal();
     render();
   });
+}
+
+/* ---------- 9c. Driver — My trips ------------------------------------- */
+function viewMyTrips() {
+  const mine = SHIPMENTS.filter((s) => s.fulfil === 'driver' && s.driver === STATE.driverIndex);
+  const cards = mine.map((s, i) => {
+    const late = s.status === 'delayed';
+    const next = s.status === 'preparing' ? { to: 'in_transit', label: t('startTransit') }
+      : s.status === 'in_transit' ? { to: 'delivered', label: t('markDelivered') } : null;
+    const canWa = s.phone && (!isCarrier(s) || s.waEnabled);
+    return `<div class="rounded-2xl bg-surface border ${late ? 'border-danger/40' : 'border-line'} p-4 shadow-card flex flex-col gap-3 row-in" style="animation-delay:${i * 40}ms">
+      <div class="flex items-start justify-between gap-2">
+        <div>
+          <div class="font-mono text-sm font-semibold text-ink">${esc(s.id)}</div>
+          <div class="text-sm text-mute">${esc(party(s.p))} · ${esc(cityLabel(s.c))}</div>
+        </div>
+        ${statusPill(s.status)}
+      </div>
+      <div class="text-xs text-mute">${esc(addr(s))}</div>
+      <div class="text-xs"><span class="text-faint">${t('eta_datetime')}: </span><span class="font-semibold ${late ? 'text-danger' : 'text-ink'}">${esc(etaCell(s))}</span></div>
+      <div class="flex flex-wrap gap-2 pt-1">
+        ${next ? `<button data-action="advance-status" data-id="${s.id}" data-to="${next.to}" class="px-3 py-2 rounded-xl text-xs font-bold bg-brand hover:bg-brand-bright text-white shadow-glow">${next.label}</button>` : ''}
+        <button data-action="edit-delay" data-id="${s.id}" class="px-3 py-2 rounded-xl text-xs font-semibold ring-1 ring-line text-mute hover:text-ink">${t('logDelay')}</button>
+        ${canWa ? `<a href="${custWaLink(s)}" target="_blank" rel="noopener" class="px-3 py-2 rounded-xl text-xs font-semibold ring-1 ring-ok/40 text-ok hover:bg-ok/10 inline-flex items-center gap-1.5">${icon('message', 'w-3.5 h-3.5')}${t('waCustomer')}</a>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+  return `<div class="flex flex-col gap-4">
+    <h2 class="font-display font-bold text-lg">${t('nav_mytrips')}</h2>
+    <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">${cards}</div>
+    ${!mine.length ? `<p class="text-sm text-faint py-8 text-center">${t('noTrips')}</p>` : ''}
+  </div>`;
 }
 
 function openWeeklyReport() {
@@ -1208,18 +1452,19 @@ function renderApp() {
         </div>
 
         <nav class="flex-1 p-3 flex flex-col gap-1.5">
+          ${STATE.role === 'driver' ? navBtn('mytrips', 'truck', t('nav_mytrips')) : `
           ${navBtn('dashboard', 'grid', t('nav_dashboard'))}
           ${navBtn('shipments', 'box', t('nav_shipments'))}
           ${navBtn('fleet', 'truck', t('nav_fleet'))}
           ${navBtn('invoices', 'receipt', t('nav_invoices'))}
-          ${navBtn('settings', 'settings', t('nav_settings'))}
+          ${STATE.role === 'manager' ? navBtn('settings', 'settings', t('nav_settings')) : ''}`}
         </nav>
 
         <div class="p-3 border-t border-line">
-          <button data-action="report"
+          ${STATE.role !== 'driver' ? `<button data-action="report"
             class="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-sm font-bold
             bg-gradient-to-l from-brand to-brand-bright text-white shadow-glow hover:brightness-110">
-            ${icon('file', 'w-4 h-4')}${t('weeklyReport')}</button>
+            ${icon('file', 'w-4 h-4')}${t('weeklyReport')}</button>` : ''}
           <div class="mt-3 flex items-center gap-1.5 text-[11px] text-faint px-1">
             ${icon('shield', 'w-3.5 h-3.5 text-ok')}<span>${t('secured')}</span>
           </div>
@@ -1231,7 +1476,7 @@ function renderApp() {
         <header class="sticky top-0 z-20 bg-bg/85 backdrop-blur border-b border-line">
           <div class="h-16 px-5 flex items-center justify-between gap-4">
             <div>
-              <h1 class="font-display font-bold text-base leading-none">${t('nav_' + (STATE.view === 'shipments' ? 'shipments' : STATE.view === 'fleet' ? 'fleet' : STATE.view === 'invoices' ? 'invoices' : STATE.view === 'settings' ? 'settings' : 'dashboard'))}</h1>
+              <h1 class="font-display font-bold text-base leading-none">${t('nav_' + (STATE.view === 'shipments' ? 'shipments' : STATE.view === 'fleet' ? 'fleet' : STATE.view === 'invoices' ? 'invoices' : STATE.view === 'settings' ? 'settings' : STATE.view === 'mytrips' ? 'mytrips' : 'dashboard'))}</h1>
               <p class="text-[11px] text-faint mt-1">${t('tagline')}</p>
             </div>
             <div class="flex items-center gap-2">
@@ -1244,9 +1489,9 @@ function renderApp() {
                 class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-surface2 ring-1 ring-line text-xs font-bold text-ink hover:ring-brand/50">
                 ${icon('globe', 'w-4 h-4 text-faint')}${t('langLabel')}</button>
               <!-- Report -->
-              <button data-action="report"
+              ${STATE.role !== 'driver' ? `<button data-action="report"
                 class="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-brand hover:bg-brand-bright text-white text-xs font-bold shadow-glow">
-                ${icon('file', 'w-4 h-4')}${t('generateReport')}</button>
+                ${icon('file', 'w-4 h-4')}${t('generateReport')}</button>` : ''}
               <!-- Logout -->
               <button data-action="logout" title="${t('logout')}"
                 class="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-surface2 ring-1 ring-line text-faint hover:text-danger hover:ring-danger/40">
@@ -1269,6 +1514,7 @@ function renderView() {
   const el = $('#view');
   if (!el) return;
   el.innerHTML =
+    STATE.view === 'mytrips' ? viewMyTrips() :
     STATE.view === 'shipments' ? viewShipments() :
     STATE.view === 'fleet' ? viewFleet() :
     STATE.view === 'invoices' ? viewInvoices() :
@@ -1372,12 +1618,27 @@ function renderLogin() {
               ${t('signIn')}</button>
           </form>
 
-          <div class="mt-5 pt-4 border-t border-line flex items-start gap-2 text-[11px] text-faint leading-relaxed">
+          <div class="mt-5 pt-4 border-t border-line">
+            <div class="text-[11px] font-semibold text-mute mb-2">${t('quickLogin')}</div>
+            <div class="grid grid-cols-3 gap-2">
+              <button type="button" data-action="quick-login" data-role="manager"
+                class="px-2 py-2 rounded-xl text-[11px] font-semibold ring-1 ring-line text-mute hover:text-ink hover:ring-brand/50">${t('role_manager')}</button>
+              <button type="button" data-action="quick-login" data-role="coordinator"
+                class="px-2 py-2 rounded-xl text-[11px] font-semibold ring-1 ring-line text-mute hover:text-ink hover:ring-brand/50">${t('role_coordinator')}</button>
+              <button type="button" data-action="quick-login" data-role="driver"
+                class="px-2 py-2 rounded-xl text-[11px] font-semibold ring-1 ring-line text-mute hover:text-ink hover:ring-brand/50">${t('role_driver')}</button>
+            </div>
+          </div>
+
+          <div class="mt-4 pt-4 border-t border-line flex items-start gap-2 text-[11px] text-faint leading-relaxed">
             ${icon('shield', 'w-4 h-4 text-ok shrink-0 mt-px')}
             <span>${t('hashNote')}</span>
           </div>
-          <div class="mt-2 text-[11px] text-mute">
-            <span class="font-semibold">${t('demoNote')}:</span> <code class="font-mono text-ink">admin</code> / <code class="font-mono text-ink">${DEMO_PASSWORD}</code>
+          <div class="mt-2 text-[11px] text-mute leading-relaxed">
+            <span class="font-semibold">${t('demoNote')}:</span>
+            <code class="font-mono text-ink">admin</code> / <code class="font-mono text-ink">${DEMO_PASSWORD}</code> ·
+            <code class="font-mono text-ink">coordinator</code> / <code class="font-mono text-ink">Coord@2026</code> ·
+            <code class="font-mono text-ink">driver</code> / <code class="font-mono text-ink">Driver@2026</code>
           </div>
         </div>
       </div>
@@ -1392,9 +1653,12 @@ function renderLogin() {
     btn.disabled = true;
     btn.textContent = '…';
     const fd = new FormData(e.target);
-    const ok = await verifyLogin(fd.get('username'), fd.get('password'));
-    if (ok) {
+    const acc = await verifyLogin(fd.get('username'), fd.get('password'));
+    if (acc) {
       STATE.authed = true;
+      STATE.role = acc.role;
+      STATE.driverIndex = acc.driverIndex;
+      STATE.view = acc.role === 'driver' ? 'mytrips' : 'dashboard';
       render();
     } else {
       err.classList.remove('hidden');
@@ -1409,15 +1673,38 @@ document.addEventListener('click', (e) => {
   const el = e.target.closest('[data-action]');
   if (!el) return;
   const a = el.dataset.action;
-  if (a === 'nav') { STATE.view = el.dataset.view; renderApp(); }
+  if (a === 'nav') {
+    let view = el.dataset.view;
+    if (STATE.role === 'driver') view = 'mytrips';
+    else if (view === 'settings' && STATE.role !== 'manager') view = 'dashboard';
+    else if (view === 'mytrips' && STATE.role !== 'driver') view = 'dashboard';
+    STATE.view = view;
+    renderApp();
+  }
   else if (a === 'choose-org') { STATE.mode = el.dataset.mode; STATE.orgChosen = true; render(); }
   else if (a === 'switch-org') { STATE.orgChosen = false; render(); }
   else if (a === 'lang') { STATE.lang = STATE.lang === 'ar' ? 'en' : 'ar'; render(); }
   else if (a === 'report') openWeeklyReport();
-  else if (a === 'logout') { STATE.authed = false; STATE.orgChosen = false; STATE.view = 'dashboard'; render(); }
+  else if (a === 'logout') { STATE.authed = false; STATE.orgChosen = false; STATE.role = null; STATE.driverIndex = null; STATE.view = 'dashboard'; render(); }
   else if (a === 'filter') { STATE.shipmentFilter = el.dataset.key; renderView(); }
   else if (a === 'edit-delay') openDelayDialog(el.dataset.id);
   else if (a === 'add-invoice') openInvoiceDialog();
+  else if (a === 'add-shipment') openShipmentDialog(null);
+  else if (a === 'edit-shipment') openShipmentDialog(el.dataset.id);
+  else if (a === 'advance-status') {
+    const sp = SHIPMENTS.find((x) => x.id === el.dataset.id);
+    if (sp) { sp.status = el.dataset.to; if (sp.status !== 'delayed') sp.reason = null; }
+    renderView();
+  }
+  else if (a === 'quick-login') {
+    const acc = ACCOUNTS.find((x) => x.role === el.dataset.role);
+    if (acc) {
+      const uEl = document.querySelector('#login-form [name="username"]');
+      const pEl = document.querySelector('#login-form [name="password"]');
+      if (uEl) uEl.value = acc.username;
+      if (pEl) pEl.value = acc.password;
+    }
+  }
   else if (a === 'close-modal') closeModal();
   else if (a === 'print-report') window.print();
   else if (a === 'toggle-fin') {
