@@ -1511,7 +1511,7 @@ function renderApp() {
           ${navBtn('shipments', 'box', t('nav_shipments'))}
           ${navBtn('fleet', 'truck', t('nav_fleet'))}
           ${navBtn('invoices', 'receipt', t('nav_invoices'))}
-          ${STATE.role === 'manager' ? navBtn('settings', 'settings', t('nav_settings')) : ''}`}
+          ${STATE.role !== 'driver' ? navBtn('settings', 'settings', t('nav_settings')) : ''}`}
         </nav>
 
         <div class="p-3 border-t border-line">
@@ -1730,7 +1730,7 @@ document.addEventListener('click', (e) => {
   if (a === 'nav') {
     let view = el.dataset.view;
     if (STATE.role === 'driver') view = 'mytrips';
-    else if (view === 'settings' && STATE.role !== 'manager') view = 'dashboard';
+    else if (view === 'settings' && STATE.role === 'driver') view = 'dashboard';
     else if (view === 'mytrips' && STATE.role !== 'driver') view = 'dashboard';
     STATE.view = view;
     renderApp();
