@@ -106,6 +106,7 @@ const STATE = {
   shipmentFilter: 'all',
   shipmentQuery: '',
   showFinancials: true,
+  orgChosen: false,
 };
 try {
   const savedFin = localStorage.getItem('mowasil_show_financials');
@@ -125,6 +126,10 @@ const DICT = {
     hashNote: 'كلمات مرور حسابات المسؤول تُخزَّن مُشفّرة — PBKDF2-SHA256 · 210,000 تكرار · Salt عشوائي',
     secured: 'اتصال مؤمَّن',
     modeCommercial: 'تجاري لوجستي', modeCharity: 'جمعية خيرية',
+    orgSelectTitle: 'اختر نوع الجهة', orgSelectDesc: 'حدّد نوع جهتك لتخصيص المسميات والبيانات المعروضة في المنصة',
+    orgCommercialDesc: 'إدارة ومتابعة شحنات الشركة، العملاء، والتحصيل المالي.',
+    orgCharityDesc: 'إدارة ومتابعة السلال الغذائية، المستفيدين، والتبرعات.',
+    switchOrg: 'تبديل القسم',
     langLabel: 'EN',
     logout: 'خروج',
     nav_dashboard: 'لوحة التحكم', nav_fleet: 'الأسطول والصيانة', nav_invoices: 'الفواتير والتحصيل', nav_settings: 'الإعدادات',
@@ -206,6 +211,10 @@ const DICT = {
     hashNote: 'Admin passwords are stored hashed — PBKDF2-SHA256 · 210,000 iterations · random salt',
     secured: 'Secure session',
     modeCommercial: 'Commercial logistics', modeCharity: 'Charity / aid',
+    orgSelectTitle: 'Select organization type', orgSelectDesc: 'Choose your organization type to tailor the labels and data shown across the platform.',
+    orgCommercialDesc: 'Manage and track company shipments, clients, and collections.',
+    orgCharityDesc: 'Manage and track aid baskets, beneficiaries, and donations.',
+    switchOrg: 'Switch section',
     langLabel: 'ع',
     logout: 'Sign out',
     nav_dashboard: 'Dashboard', nav_fleet: 'Fleet & maintenance', nav_invoices: 'Invoices & collection', nav_settings: 'Settings',
@@ -767,10 +776,15 @@ function viewShipments() {
     <div class="rounded-2xl bg-surface border border-line shadow-card overflow-hidden">
       <div class="p-5 flex flex-wrap items-center gap-3 justify-between border-b border-line">
         <h2 class="font-display font-bold text-lg">${t('shTitle')}</h2>
-        <div class="relative">
-          <span class="absolute inset-y-0 start-3 flex items-center text-faint">${icon('search', 'w-4 h-4')}</span>
-          <input data-action="search" value="${esc(STATE.shipmentQuery)}" placeholder="${t('search')}"
-            class="w-56 bg-bg border border-line rounded-xl ps-9 pe-3 py-2 text-sm text-ink placeholder:text-faint focus:border-brand outline-none" />
+        <div class="flex items-center gap-2 flex-wrap">
+          ${STATE.showFinancials ? `<button data-action="add-invoice"
+            class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-brand hover:bg-brand-bright text-white text-xs font-bold shadow-glow">
+            ${icon('receipt', 'w-4 h-4')}${t('addInvoice')}</button>` : ''}
+          <div class="relative">
+            <span class="absolute inset-y-0 start-3 flex items-center text-faint">${icon('search', 'w-4 h-4')}</span>
+            <input data-action="search" value="${esc(STATE.shipmentQuery)}" placeholder="${t('search')}"
+              class="w-56 bg-bg border border-line rounded-xl ps-9 pe-3 py-2 text-sm text-ink placeholder:text-faint focus:border-brand outline-none" />
+          </div>
         </div>
       </div>
       <div class="px-5 py-3 flex flex-wrap gap-2 border-b border-line">${chips}</div>
@@ -1221,13 +1235,10 @@ function renderApp() {
               <p class="text-[11px] text-faint mt-1">${t('tagline')}</p>
             </div>
             <div class="flex items-center gap-2">
-              <!-- Mode toggle -->
-              <div class="flex rounded-xl bg-surface2 ring-1 ring-line p-1 text-xs font-semibold">
-                <button data-action="mode" data-mode="commercial"
-                  class="px-3 py-1.5 rounded-lg transition ${STATE.mode === 'commercial' ? 'bg-brand text-white' : 'text-mute hover:text-ink'}">${t('modeCommercial')}</button>
-                <button data-action="mode" data-mode="charity"
-                  class="px-3 py-1.5 rounded-lg transition ${STATE.mode === 'charity' ? 'bg-brand text-white' : 'text-mute hover:text-ink'}">${t('modeCharity')}</button>
-              </div>
+              <!-- Switch section -->
+              <button data-action="switch-org" title="${t('switchOrg')}"
+                class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-surface2 ring-1 ring-line text-xs font-bold text-ink hover:ring-brand/50">
+                ${icon('grid', 'w-4 h-4 text-faint')}${t('switchOrg')}</button>
               <!-- Lang toggle -->
               <button data-action="lang" title="language"
                 class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-surface2 ring-1 ring-line text-xs font-bold text-ink hover:ring-brand/50">
@@ -1268,8 +1279,54 @@ function renderView() {
 function render() {
   document.documentElement.lang = STATE.lang;
   document.documentElement.dir = DICT[STATE.lang]._dir;
-  if (STATE.authed) renderApp();
-  else renderLogin();
+  if (!STATE.authed) renderLogin();
+  else if (!STATE.orgChosen) renderOrgSelect();
+  else renderApp();
+}
+
+/* ---------- 11b. Organization-type selection ------------------------- */
+function renderOrgSelect() {
+  stopFields();
+  const root = $('#root');
+  root.className = 'min-h-screen text-ink grid-bg';
+  root.innerHTML = `
+    <div class="min-h-screen flex items-center justify-center p-5 relative overflow-hidden">
+      <canvas id="org-canvas" class="absolute inset-0 w-full h-full opacity-60"></canvas>
+      <div class="absolute inset-0 bg-gradient-to-b from-transparent via-bg/40 to-bg"></div>
+      <div class="relative w-full max-w-2xl flex flex-col items-center gap-8">
+        <div class="flex items-center gap-3">
+          <img src="${LOGO_URI}" alt="MOWASIL" class="w-14 h-14 rounded-2xl object-cover shadow-glow ring-1 ring-white/10" />
+          <div>
+            <div class="font-display font-black text-xl leading-none">مُوصل <span class="text-brand-bright">| MOWASIL</span></div>
+            <div class="text-[10px] tracking-[.24em] text-faint mt-1.5">${t('brandSub')}</div>
+          </div>
+        </div>
+        <div class="text-center">
+          <h1 class="font-display font-bold text-xl">${t('orgSelectTitle')}</h1>
+          <p class="text-sm text-mute mt-1.5">${t('orgSelectDesc')}</p>
+        </div>
+        <div class="grid sm:grid-cols-2 gap-4 w-full">
+          <button data-action="choose-org" data-mode="commercial"
+            class="group text-start rounded-2xl bg-surface/95 border border-line hover:border-brand/50 shadow-card p-6 flex flex-col gap-3 transition backdrop-blur">
+            <span class="w-11 h-11 rounded-xl bg-brand/10 text-brand-bright flex items-center justify-center group-hover:bg-brand group-hover:text-white transition">${icon('truck', 'w-5 h-5')}</span>
+            <div>
+              <div class="font-display font-bold text-base">${t('modeCommercial')}</div>
+              <p class="text-xs text-mute mt-1 leading-relaxed">${t('orgCommercialDesc')}</p>
+            </div>
+          </button>
+          <button data-action="choose-org" data-mode="charity"
+            class="group text-start rounded-2xl bg-surface/95 border border-line hover:border-brand/50 shadow-card p-6 flex flex-col gap-3 transition backdrop-blur">
+            <span class="w-11 h-11 rounded-xl bg-brand/10 text-brand-bright flex items-center justify-center group-hover:bg-brand group-hover:text-white transition">${icon('box', 'w-5 h-5')}</span>
+            <div>
+              <div class="font-display font-bold text-base">${t('modeCharity')}</div>
+              <p class="text-xs text-mute mt-1 leading-relaxed">${t('orgCharityDesc')}</p>
+            </div>
+          </button>
+        </div>
+        <button data-action="lang" class="text-xs font-bold text-faint hover:text-ink ring-1 ring-line rounded-lg px-3 py-1.5">${t('langLabel')}</button>
+      </div>
+    </div>`;
+  nodeField($('#org-canvas'), 9000);
 }
 
 /* ---------- 12. Login screen ---------------------------------------- */
@@ -1353,10 +1410,11 @@ document.addEventListener('click', (e) => {
   if (!el) return;
   const a = el.dataset.action;
   if (a === 'nav') { STATE.view = el.dataset.view; renderApp(); }
-  else if (a === 'mode') { STATE.mode = el.dataset.mode; renderApp(); }
+  else if (a === 'choose-org') { STATE.mode = el.dataset.mode; STATE.orgChosen = true; render(); }
+  else if (a === 'switch-org') { STATE.orgChosen = false; render(); }
   else if (a === 'lang') { STATE.lang = STATE.lang === 'ar' ? 'en' : 'ar'; render(); }
   else if (a === 'report') openWeeklyReport();
-  else if (a === 'logout') { STATE.authed = false; STATE.view = 'dashboard'; render(); }
+  else if (a === 'logout') { STATE.authed = false; STATE.orgChosen = false; STATE.view = 'dashboard'; render(); }
   else if (a === 'filter') { STATE.shipmentFilter = el.dataset.key; renderView(); }
   else if (a === 'edit-delay') openDelayDialog(el.dataset.id);
   else if (a === 'add-invoice') openInvoiceDialog();
