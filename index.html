@@ -172,6 +172,7 @@ const DICT = {
     waBackendNote: 'الإرسال التلقائي الفعلي حسب الدورية المحددة يتم عبر خادم مُوصل + واجهة WhatsApp Business Cloud API (مرحلة الخادم). هذه الشاشة تحفظ الإعداد وتتيح إرسال تجريبي فوري.',
     waSummaryTitle: 'ملخص', waTotal: 'الإجمالي', waDelivered: 'تم التوصيل', waDelayed: 'المتأخرة', waActive: 'قيد التنفيذ',
     waIssued: 'الصادر', waCollected: 'المحصَّل', downloadPdf: 'تحميل PDF', generatingPdf: 'جاري التجهيز…',
+    waTopReasons: 'أكثر أسباب التأخير تكراراً',
     langLabel: 'EN',
     logout: 'خروج',
     nav_dashboard: 'لوحة التحكم', nav_fleet: 'الأسطول والصيانة', nav_invoices: 'الفواتير والتحصيل', nav_settings: 'الإعدادات',
@@ -290,6 +291,7 @@ const DICT = {
     waBackendNote: 'Actual automatic sending on the chosen frequency runs via the Mowasil server + WhatsApp Business Cloud API (server phase). This screen saves the setting and lets you send an instant test.',
     waSummaryTitle: 'Summary', waTotal: 'Total', waDelivered: 'Delivered', waDelayed: 'Delayed', waActive: 'Active',
     waIssued: 'Issued', waCollected: 'Collected', downloadPdf: 'Download PDF', generatingPdf: 'Generating…',
+    waTopReasons: 'Most frequent delay reasons',
     langLabel: 'ع',
     logout: 'Sign out',
     nav_dashboard: 'Dashboard', nav_fleet: 'Fleet & maintenance', nav_invoices: 'Invoices & collection', nav_settings: 'Settings',
@@ -552,6 +554,10 @@ function waReportMsg() {
   ];
   if (STATE.showFinancials) {
     lines.push(`${t('waIssued')}: ${money(m.issued)}`, `${t('waCollected')}: ${money(m.collected)}`);
+  }
+  if (m.reasonsSorted.length) {
+    lines.push('', `${t('waTopReasons')}:`);
+    m.reasonsSorted.slice(0, 3).forEach((r) => lines.push(`- ${r.label}: ${r.n}`));
   }
   return lines.join('\n');
 }
