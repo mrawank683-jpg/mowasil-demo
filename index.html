@@ -145,6 +145,9 @@ const DICT = {
     waCustomer: 'واتساب العميل', startTransit: 'بدء التوصيل', markDelivered: 'تم التسليم',
     noTrips: 'لا توجد شحنات مسندة إليك حالياً', rescheduled_n: 'أُعيدت جدولتها',
     waAutoHint: 'ستُفتح رسالة واتساب جاهزة للعميل بالموعد الجديد بعد الحفظ.',
+    shipType: 'نوع الشحنة', shipType_parcel: 'طرد عادي', shipType_docs: 'مستندات',
+    shipType_cold: 'بضائع مبرّدة', shipType_bulky: 'قطعة كبيرة/ثقيلة',
+    invoiceNoField: 'رقم الفاتورة (اختياري)', invoiceNoNone: 'بدون فاتورة مرتبطة',
     langLabel: 'EN',
     logout: 'خروج',
     nav_dashboard: 'لوحة التحكم', nav_fleet: 'الأسطول والصيانة', nav_invoices: 'الفواتير والتحصيل', nav_settings: 'الإعدادات',
@@ -176,7 +179,7 @@ const DICT = {
     col_driver: 'السائق', col_status: 'الحالة', col_delay: 'سبب التأخير', col_action: 'إجراء',
     st_preparing: 'قيد التحضير', st_in_transit: 'جاري التوصيل', st_delivered: 'تم التوصيل',
     st_delayed: 'متأخرة', st_cancelled: 'ملغاة',
-    delayUnset: 'غير محدَّد', logDelay: 'تسجيل السبب', updateDelay: 'تحديث سبب التأخير',
+    delayUnset: 'غير محدَّد', logDelay: 'تسجيل تأخير', updateDelay: 'تحديث سبب التأخير',
     pickReason: 'اختر سبب التأخير', notes: 'ملاحظة (اختياري)',
     // Fleet
     flTitle: 'إدارة السيارات وصيانة الأسطول',
@@ -243,6 +246,9 @@ const DICT = {
     waCustomer: 'WhatsApp customer', startTransit: 'Start delivery', markDelivered: 'Mark delivered',
     noTrips: 'No shipments currently assigned to you', rescheduled_n: 'Rescheduled',
     waAutoHint: 'A ready WhatsApp message with the new appointment will open after saving.',
+    shipType: 'Shipment type', shipType_parcel: 'Standard parcel', shipType_docs: 'Documents',
+    shipType_cold: 'Refrigerated goods', shipType_bulky: 'Bulky / heavy item',
+    invoiceNoField: 'Invoice # (optional)', invoiceNoNone: 'No linked invoice',
     langLabel: 'ع',
     logout: 'Sign out',
     nav_dashboard: 'Dashboard', nav_fleet: 'Fleet & maintenance', nav_invoices: 'Invoices & collection', nav_settings: 'Settings',
@@ -269,7 +275,7 @@ const DICT = {
     col_driver: 'Driver', col_status: 'Status', col_delay: 'Delay reason', col_action: 'Action',
     st_preparing: 'Preparing', st_in_transit: 'In transit', st_delivered: 'Delivered',
     st_delayed: 'Delayed', st_cancelled: 'Cancelled',
-    delayUnset: 'Not set', logDelay: 'Log reason', updateDelay: 'Update delay reason',
+    delayUnset: 'Not set', logDelay: 'Log delay', updateDelay: 'Update delay reason',
     pickReason: 'Select a delay reason', notes: 'Note (optional)',
     flTitle: 'Fleet & maintenance management',
     plate: 'Plate', model: 'Model', driver: 'Driver', odo: 'Odometer',
@@ -367,6 +373,7 @@ const PARTIES = {
   ],
 };
 const party = (i) => PARTIES[STATE.mode][i % 6][STATE.lang];
+const partyOf = (s) => (s && s.partyName ? s.partyName : party(s.p));
 
 // Shipments — status: preparing | in_transit | delivered | delayed | cancelled
 // fulfil: 'driver' (in-house) | 'carrier' (external, e.g. Aramex)
@@ -754,7 +761,7 @@ function viewDashboard() {
     <div class="flex items-center justify-between gap-3 py-2.5 border-b border-line last:border-0">
       <div class="min-w-0">
         <div class="font-mono text-sm text-ink">${esc(s.id)}</div>
-        <div class="text-xs text-mute truncate">${esc(party(s.p))} · ${esc(cityLabel(s.c))}</div>
+        <div class="text-xs text-mute truncate">${esc(partyOf(s))} · ${esc(cityLabel(s.c))}</div>
       </div>
       ${statusPill(s.status)}
     </div>`).join('');
@@ -812,7 +819,7 @@ function filteredShipments() {
   const q = STATE.shipmentQuery.trim().toLowerCase();
   if (q) rows = rows.filter((s) =>
     s.id.toLowerCase().includes(q) ||
-    party(s.p).toLowerCase().includes(q) ||
+    partyOf(s).toLowerCase().includes(q) ||
     cityLabel(s.c).toLowerCase().includes(q));
   return rows;
 }
@@ -854,7 +861,7 @@ function viewShipments() {
       <td class="ps-4 pe-2 py-3 ${late ? 'border-s-2 border-danger' : 'border-s-2 border-transparent'}">
         <span class="font-mono text-sm font-semibold text-ink">${esc(s.id)}</span>
       </td>
-      <td class="px-2 py-3 text-sm text-ink">${esc(party(s.p))}</td>
+      <td class="px-2 py-3 text-sm text-ink">${esc(partyOf(s))}</td>
       <td class="px-2 py-3 text-sm text-mute">${esc(cityLabel(s.c))}</td>
       <td class="px-2 py-3 text-xs text-mute tabular-nums whitespace-nowrap">${etaHtml}</td>
       <td class="px-2 py-3 whitespace-nowrap">${fulfilCell}</td>
@@ -907,14 +914,16 @@ function viewShipments() {
 function openShipmentDialog(id) {
   const editing = id ? SHIPMENTS.find((x) => x.id === id) : null;
   const isCarrierMode = editing ? isCarrier(editing) : false;
-  const partyOpts = PARTIES[STATE.mode].map((p, i) =>
-    `<option value="${i}" ${editing && editing.p === i ? 'selected' : ''}>${esc(p[STATE.lang])}</option>`).join('');
   const cities = STATE.lang === 'ar' ? CITIES_AR : CITIES_EN;
   const cityOpts = cities.map((c, i) =>
     `<option value="${i}" ${editing && editing.c === i ? 'selected' : ''}>${esc(c)}</option>`).join('');
   const driverOpts = DRIVERS.map((d, i) =>
     `<option value="${i}" ${editing && editing.driver === i ? 'selected' : ''}>${esc(d[STATE.lang])}</option>`).join('');
   const carrierOpts = CARRIERS.map((c) => `<option value="${esc(c[STATE.lang])}"></option>`).join('');
+  const shipTypeOpts = ['parcel', 'docs', 'cold', 'bulky'].map((k) =>
+    `<option value="${k}" ${(editing ? editing.shipType === k : k === 'parcel') ? 'selected' : ''}>${t('shipType_' + k)}</option>`).join('');
+  const invoiceOpts = INVOICES.map((iv) =>
+    `<option value="${esc(iv.id)}" ${editing && editing.invoiceId === iv.id ? 'selected' : ''}>${esc(iv.id)} — ${esc(party(iv.p))} — ${money(iv.amount)}</option>`).join('');
   openModal(`
     <div class="p-5 border-b border-line flex items-center justify-between">
       <h3 class="font-display font-bold text-lg">${editing ? t('editShipment') : t('newShipmentTitle')}</h3>
@@ -923,7 +932,8 @@ function openShipmentDialog(id) {
     <form id="shipment-form" class="p-5 flex flex-col gap-4">
       <div class="grid sm:grid-cols-2 gap-3">
         <label class="block"><span class="text-xs font-semibold text-mute">${t('party')}</span>
-          <select name="party" required class="mt-1.5 w-full bg-bg border border-line rounded-xl px-3 py-2.5 text-sm text-ink outline-none focus:border-brand">${partyOpts}</select></label>
+          <input name="partyName" type="text" required placeholder="${t('party')}" value="${editing ? esc(partyOf(editing)) : ''}"
+            class="mt-1.5 w-full bg-bg border border-line rounded-xl px-3 py-2.5 text-sm text-ink outline-none focus:border-brand" /></label>
         <label class="block"><span class="text-xs font-semibold text-mute">${t('col_city')}</span>
           <select name="city" required class="mt-1.5 w-full bg-bg border border-line rounded-xl px-3 py-2.5 text-sm text-ink outline-none focus:border-brand">${cityOpts}</select></label>
       </div>
@@ -934,6 +944,14 @@ function openShipmentDialog(id) {
         <label class="block"><span class="text-xs font-semibold text-mute">${t('address')}</span>
           <input name="address" required value="${editing ? esc(addr(editing)) : ''}"
             class="mt-1.5 w-full bg-bg border border-line rounded-xl px-3 py-2.5 text-sm text-ink outline-none focus:border-brand" /></label>
+      </div>
+      <div class="grid sm:grid-cols-2 gap-3">
+        <label class="block"><span class="text-xs font-semibold text-mute">${t('shipType')}</span>
+          <select name="shipType" class="mt-1.5 w-full bg-bg border border-line rounded-xl px-3 py-2.5 text-sm text-ink outline-none focus:border-brand">${shipTypeOpts}</select></label>
+        <label class="block"><span class="text-xs font-semibold text-mute">${t('invoiceNoField')}</span>
+          <select name="invoiceId" class="mt-1.5 w-full bg-bg border border-line rounded-xl px-3 py-2.5 text-sm text-ink outline-none focus:border-brand">
+            <option value="">${t('invoiceNoNone')}</option>${invoiceOpts}
+          </select></label>
       </div>
       <div>
         <div class="text-xs font-semibold text-mute mb-2">${t('fulfilType')}</div>
@@ -980,14 +998,15 @@ function openShipmentDialog(id) {
     e.preventDefault();
     const fd = new FormData(form);
     const fulfil = fd.get('fulfil');
-    const partyIdx = Number(fd.get('party'));
+    const partyName = fd.get('partyName').trim();
     const cityIdx = Number(fd.get('city'));
     const etaVal = fd.get('eta');
     const etaAt = etaVal ? etaVal + ':00' : null;
     const phone = fd.get('phone');
     const addressText = fd.get('address');
     const rec = editing || { id: null, created: todayISOStr(), status: 'preparing', reason: null, note: '', schedule: [] };
-    rec.p = partyIdx; rec.c = cityIdx; rec.phone = phone; rec.address = { ar: addressText, en: addressText }; rec.etaAt = etaAt;
+    rec.partyName = partyName; rec.p = rec.p ?? 0; rec.c = cityIdx; rec.phone = phone; rec.address = { ar: addressText, en: addressText }; rec.etaAt = etaAt;
+    rec.shipType = fd.get('shipType'); rec.invoiceId = fd.get('invoiceId') || null;
     if (fulfil === 'carrier') {
       rec.fulfil = 'carrier';
       rec.carrier = fd.get('carrier').trim() || (CARRIERS[0] ? CARRIERS[0][STATE.lang] : 'أرامكس');
@@ -1132,7 +1151,7 @@ function openInvoiceDialog() {
   const partyOpts = PARTIES[STATE.mode].map((p, i) =>
     `<option value="${i}">${esc(p[STATE.lang])}</option>`).join('');
   const shipOpts = SHIPMENTS.map((s) =>
-    `<option value="${esc(s.id)}">${esc(s.id)} — ${esc(party(s.p))}</option>`).join('');
+    `<option value="${esc(s.id)}">${esc(s.id)} — ${esc(partyOf(s))}</option>`).join('');
   const todayISO = `${TODAY.getFullYear()}-${String(TODAY.getMonth() + 1).padStart(2, '0')}-${String(TODAY.getDate()).padStart(2, '0')}`;
   openModal(`
     <div class="p-5 border-b border-line flex items-center justify-between">
@@ -1260,7 +1279,7 @@ function openDelayDialog(id, autoWa) {
     <form id="delay-form" class="p-5 flex flex-col gap-4">
       <div class="flex items-center gap-2 text-sm text-mute">
         <span class="font-mono font-semibold text-ink">${esc(s.id)}</span> ·
-        <span>${esc(party(s.p))}</span> · <span>${esc(cityLabel(s.c))}</span>
+        <span>${esc(partyOf(s))}</span> · <span>${esc(cityLabel(s.c))}</span>
       </div>
       <div>
         <div class="text-xs font-semibold text-mute mb-2">${t('pickReason')}</div>
@@ -1311,7 +1330,7 @@ function viewMyTrips() {
       <div class="flex items-start justify-between gap-2">
         <div>
           <div class="font-mono text-sm font-semibold text-ink">${esc(s.id)}</div>
-          <div class="text-sm text-mute">${esc(party(s.p))} · ${esc(cityLabel(s.c))}</div>
+          <div class="text-sm text-mute">${esc(partyOf(s))} · ${esc(cityLabel(s.c))}</div>
         </div>
         ${statusPill(s.status)}
       </div>
