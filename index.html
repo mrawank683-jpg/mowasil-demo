@@ -236,12 +236,12 @@ const DICT = {
       commercial: {
         party: 'العميل', parties: 'العملاء', unit: 'شحنة', units: 'الشحنات',
         nav_shipments: 'الشحنات', orgWord: 'الشركة', nav_mytrips: 'شحناتي', unitPossessive: 'شحنتك',
-        shTitle: 'إدارة وتتبّع الشحنات', recentTitle: 'أحدث الشحنات',
+        shTitle: 'إدارة وتتبّع الشحنات', recentTitle: 'كل الشحنات',
       },
       charity: {
         party: 'المستفيد', parties: 'المستفيدون', unit: 'سلّة', units: 'السلال الغذائية',
         nav_shipments: 'السلال الغذائية', orgWord: 'الجمعية', nav_mytrips: 'سلالي', unitPossessive: 'سلتك',
-        shTitle: 'إدارة وتتبّع السلال الغذائية', recentTitle: 'أحدث السلال',
+        shTitle: 'إدارة وتتبّع السلال الغذائية', recentTitle: 'كل السلال',
       },
     },
   },
@@ -347,12 +347,12 @@ const DICT = {
       commercial: {
         party: 'Client', parties: 'Clients', unit: 'shipment', units: 'Shipments',
         nav_shipments: 'Shipments', orgWord: 'the company', nav_mytrips: 'My trips', unitPossessive: 'your shipment',
-        shTitle: 'Shipment tracking & management', recentTitle: 'Recent shipments',
+        shTitle: 'Shipment tracking & management', recentTitle: 'All shipments',
       },
       charity: {
         party: 'Beneficiary', parties: 'Beneficiaries', unit: 'basket', units: 'Aid baskets',
         nav_shipments: 'Aid baskets', orgWord: 'the association', nav_mytrips: 'My trips', unitPossessive: 'your aid basket',
-        shTitle: 'Aid-basket tracking & management', recentTitle: 'Recent baskets',
+        shTitle: 'Aid-basket tracking & management', recentTitle: 'All aid baskets',
       },
     },
   },
@@ -833,7 +833,7 @@ function viewDashboard() {
       }).join('')
     : `<p class="text-sm text-faint py-4 text-center">${t('serviceOk')}</p>`;
 
-  const recent = SHIPMENTS.slice(-5).reverse().map((s) => `
+  const recent = [...SHIPMENTS].reverse().map((s) => `
     <div class="flex items-center justify-between gap-3 py-2.5 border-b border-line last:border-0">
       <div class="min-w-0">
         <div class="font-mono text-sm text-ink">${esc(s.id)}</div>
