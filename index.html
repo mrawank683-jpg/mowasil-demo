@@ -145,7 +145,7 @@ const DICT = {
     waCustomer: 'واتساب العميل', startTransit: 'بدء التوصيل', markDelivered: 'تم التسليم',
     noTrips: 'لا توجد شحنات مسندة إليك حالياً', rescheduled_n: 'أُعيدت جدولتها',
     waAutoHint: 'ستُفتح رسالة واتساب جاهزة للعميل بالموعد الجديد بعد الحفظ.',
-    shipType: 'نوع الشحنة', shipType_parcel: 'طرد عادي', shipType_docs: 'مستندات',
+    shipType: 'نوع الشحنة', shipType_none: 'غير محدد', shipType_parcel: 'طرد عادي', shipType_docs: 'مستندات',
     shipType_cold: 'بضائع مبرّدة', shipType_bulky: 'قطعة كبيرة/ثقيلة',
     invoiceNoField: 'رقم الفاتورة (اختياري)', invoiceNoNone: 'بدون فاتورة مرتبطة',
     langLabel: 'EN',
@@ -246,7 +246,7 @@ const DICT = {
     waCustomer: 'WhatsApp customer', startTransit: 'Start delivery', markDelivered: 'Mark delivered',
     noTrips: 'No shipments currently assigned to you', rescheduled_n: 'Rescheduled',
     waAutoHint: 'A ready WhatsApp message with the new appointment will open after saving.',
-    shipType: 'Shipment type', shipType_parcel: 'Standard parcel', shipType_docs: 'Documents',
+    shipType: 'Shipment type', shipType_none: 'Unspecified', shipType_parcel: 'Standard parcel', shipType_docs: 'Documents',
     shipType_cold: 'Refrigerated goods', shipType_bulky: 'Bulky / heavy item',
     invoiceNoField: 'Invoice # (optional)', invoiceNoNone: 'No linked invoice',
     langLabel: 'ع',
@@ -356,7 +356,7 @@ const drv = (i) => DRIVERS[i][STATE.lang];
 // Commercial clients / charity beneficiaries
 const PARTIES = {
   commercial: [
-    { ar: 'شركة الواحة للتجارة', en: 'Al-Waha Trading Co.' },
+    { ar: 'شركة نفار للمراكن والأثاث والشجر الصناعي', en: 'Nifar Co. — Shades, Furniture & Artificial Trees' },
     { ar: 'مؤسسة رواد الإمداد', en: 'Ruwad Supply Est.' },
     { ar: 'متاجر نُقطة', en: 'Nuqta Stores' },
     { ar: 'مصنع الخليج للبلاستيك', en: 'Gulf Plastics Factory' },
@@ -920,8 +920,8 @@ function openShipmentDialog(id) {
   const driverOpts = DRIVERS.map((d, i) =>
     `<option value="${i}" ${editing && editing.driver === i ? 'selected' : ''}>${esc(d[STATE.lang])}</option>`).join('');
   const carrierOpts = CARRIERS.map((c) => `<option value="${esc(c[STATE.lang])}"></option>`).join('');
-  const shipTypeOpts = ['parcel', 'docs', 'cold', 'bulky'].map((k) =>
-    `<option value="${k}" ${(editing ? editing.shipType === k : k === 'parcel') ? 'selected' : ''}>${t('shipType_' + k)}</option>`).join('');
+  const shipTypeOpts = ['', 'parcel', 'docs', 'cold', 'bulky'].map((k) =>
+    `<option value="${k}" ${(editing ? (editing.shipType || '') === k : k === '') ? 'selected' : ''}>${k ? t('shipType_' + k) : t('shipType_none')}</option>`).join('');
   const invoiceOpts = INVOICES.map((iv) =>
     `<option value="${esc(iv.id)}" ${editing && editing.invoiceId === iv.id ? 'selected' : ''}>${esc(iv.id)} — ${esc(party(iv.p))} — ${money(iv.amount)}</option>`).join('');
   openModal(`
@@ -949,9 +949,10 @@ function openShipmentDialog(id) {
         <label class="block"><span class="text-xs font-semibold text-mute">${t('shipType')}</span>
           <select name="shipType" class="mt-1.5 w-full bg-bg border border-line rounded-xl px-3 py-2.5 text-sm text-ink outline-none focus:border-brand">${shipTypeOpts}</select></label>
         <label class="block"><span class="text-xs font-semibold text-mute">${t('invoiceNoField')}</span>
-          <select name="invoiceId" class="mt-1.5 w-full bg-bg border border-line rounded-xl px-3 py-2.5 text-sm text-ink outline-none focus:border-brand">
-            <option value="">${t('invoiceNoNone')}</option>${invoiceOpts}
-          </select></label>
+          <input name="invoiceId" list="invoice-list" placeholder="INV-XXXX" value="${editing && editing.invoiceId ? esc(editing.invoiceId) : ''}"
+            class="mt-1.5 w-full bg-bg border border-line rounded-xl px-3 py-2.5 text-sm text-ink outline-none focus:border-brand" />
+          <datalist id="invoice-list">${invoiceOpts}</datalist>
+        </label>
       </div>
       <div>
         <div class="text-xs font-semibold text-mute mb-2">${t('fulfilType')}</div>
@@ -1006,7 +1007,7 @@ function openShipmentDialog(id) {
     const addressText = fd.get('address');
     const rec = editing || { id: null, created: todayISOStr(), status: 'preparing', reason: null, note: '', schedule: [] };
     rec.partyName = partyName; rec.p = rec.p ?? 0; rec.c = cityIdx; rec.phone = phone; rec.address = { ar: addressText, en: addressText }; rec.etaAt = etaAt;
-    rec.shipType = fd.get('shipType'); rec.invoiceId = fd.get('invoiceId') || null;
+    rec.shipType = fd.get('shipType') || null; rec.invoiceId = fd.get('invoiceId').trim() || null;
     if (fulfil === 'carrier') {
       rec.fulfil = 'carrier';
       rec.carrier = fd.get('carrier').trim() || (CARRIERS[0] ? CARRIERS[0][STATE.lang] : 'أرامكس');
