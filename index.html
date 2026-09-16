@@ -211,6 +211,7 @@ const DICT = {
     plate: 'رقم اللوحة', model: 'الموديل', driver: 'السائق', odo: 'العدّاد',
     vs_on_route: 'في مهمة', vs_idle: 'متوقفة', vs_maintenance: 'في الصيانة',
     nextService: 'الصيانة القادمة', serviceDue: 'صيانة مستحقة', serviceUrgent: 'صيانة عاجلة',
+    editMaintenanceTitle: 'تحديث الصيانة القادمة', serviceType: 'نوع الصيانة', nextServiceDate: 'الموعد القادم',
     serviceOk: 'الحالة جيدة', within: 'خلال', days: 'يوم', overdueBy: 'متأخرة',
     maintCost: 'تكلفة الصيانة (سنوي)',
     svc_oil: 'تغيير الزيت', svc_brakes: 'الفرامل', svc_inspection: 'الفحص الدوري', svc_tires: 'الإطارات',
@@ -324,6 +325,7 @@ const DICT = {
     plate: 'Plate', model: 'Model', driver: 'Driver', odo: 'Odometer',
     vs_on_route: 'On route', vs_idle: 'Idle', vs_maintenance: 'In service',
     nextService: 'Next service', serviceDue: 'Service due', serviceUrgent: 'Urgent service',
+    editMaintenanceTitle: 'Update next service', serviceType: 'Service type', nextServiceDate: 'Next date',
     serviceOk: 'Healthy', within: 'in', days: 'days', overdueBy: 'overdue',
     maintCost: 'Maintenance cost (yr)',
     svc_oil: 'Oil change', svc_brakes: 'Brakes', svc_inspection: 'Inspection', svc_tires: 'Tires',
@@ -1138,15 +1140,17 @@ function viewFleet() {
         <div><div class="text-[11px] uppercase tracking-wider text-faint">${t('maintCost')}</div>
           <div class="text-ink tabular-nums">${STATE.showFinancials ? money(v.cost) : '—'}</div></div>
       </div>
-      <div class="rounded-xl px-3 py-2.5 flex items-center justify-between
+      <div class="rounded-xl px-3 py-2.5 flex items-center justify-between gap-2
         ${lvl === 'urgent' ? 'bg-danger/[.08] ring-1 ring-danger/20' : lvl === 'due' ? 'bg-warn/[.07] ring-1 ring-warn/20' : 'bg-white/[.03]'}">
-        <div class="text-xs">
+        <div class="text-xs min-w-0">
           <span class="text-faint">${t('nextService')}: </span>
           <span class="text-ink font-semibold">${t(v.svc)}</span>
+          <div class="text-xs font-bold ${lvl === 'urgent' ? 'text-danger' : lvl === 'due' ? 'text-warn' : 'text-mute'} tabular-nums whitespace-nowrap mt-0.5">
+            ${fmtDate(v.nextDate)} · ${d < 0 ? `${t('overdueBy')} ${Math.abs(d)} ${t('days')}` : `${t('within')} ${d} ${t('days')}`}
+          </div>
         </div>
-        <div class="text-xs font-bold ${lvl === 'urgent' ? 'text-danger' : lvl === 'due' ? 'text-warn' : 'text-mute'} tabular-nums whitespace-nowrap">
-          ${fmtDate(v.nextDate)} · ${d < 0 ? `${t('overdueBy')} ${Math.abs(d)} ${t('days')}` : `${t('within')} ${d} ${t('days')}`}
-        </div>
+        <button data-action="edit-maintenance" data-plate="${esc(v.plate)}" title="${t('edit')}"
+          class="shrink-0 inline-flex items-center justify-center w-7 h-7 rounded-lg ring-1 ring-line text-faint hover:text-ink hover:ring-brand/50 bg-surface">${icon('edit', 'w-3.5 h-3.5')}</button>
       </div>
     </div>`;
   }).join('');
@@ -1468,6 +1472,45 @@ function openDelayDialog(id, autoWa) {
     closeModal();
     render();
     if (canAutoWa) window.open(custWaLink(s), '_blank', 'noopener');
+  });
+}
+
+/* ---------- 9b2. Fleet — update next service --------------------------- */
+function openMaintenanceDialog(plate) {
+  const v = FLEET.find((x) => x.plate === plate);
+  if (!v) return;
+  const svcOpts = ['svc_oil', 'svc_brakes', 'svc_inspection', 'svc_tires'].map((k) =>
+    `<option value="${k}" ${v.svc === k ? 'selected' : ''}>${t(k)}</option>`).join('');
+  openModal(`
+    <div class="p-5 border-b border-line flex items-center justify-between">
+      <h3 class="font-display font-bold text-lg">${t('editMaintenanceTitle')}</h3>
+      <button data-action="close-modal" class="text-faint hover:text-ink">${icon('x')}</button>
+    </div>
+    <form id="maintenance-form" class="p-5 flex flex-col gap-4">
+      <div class="flex items-center gap-2 text-sm text-mute">
+        <span class="font-mono font-semibold text-ink">${esc(v.plate)}</span> · <span>${esc(v.model)}</span>
+      </div>
+      <label class="block">
+        <span class="text-xs font-semibold text-mute">${t('serviceType')}</span>
+        <select name="svc" class="mt-1.5 w-full bg-bg border border-line rounded-xl px-3 py-2.5 text-sm text-ink outline-none focus:border-brand">${svcOpts}</select>
+      </label>
+      <label class="block">
+        <span class="text-xs font-semibold text-mute">${t('nextServiceDate')}</span>
+        <input name="nextDate" type="date" required value="${v.nextDate || ''}"
+          class="mt-1.5 w-full bg-bg border border-line rounded-xl px-3 py-2.5 text-sm text-ink outline-none focus:border-brand" />
+      </label>
+      <div class="flex justify-end gap-2 pt-1">
+        <button type="button" data-action="close-modal" class="px-4 py-2 rounded-xl text-sm font-semibold text-mute hover:text-ink">${t('cancel')}</button>
+        <button type="submit" class="px-4 py-2 rounded-xl text-sm font-bold bg-brand hover:bg-brand-bright text-white shadow-glow">${t('save')}</button>
+      </div>
+    </form>`);
+  $('#maintenance-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    v.svc = fd.get('svc');
+    v.nextDate = fd.get('nextDate');
+    closeModal();
+    renderView();
   });
 }
 
@@ -1968,6 +2011,7 @@ document.addEventListener('click', (e) => {
   else if (a === 'edit-delay') openDelayDialog(el.dataset.id, el.dataset.autoWa === '1');
   else if (a === 'add-invoice') openInvoiceDialog();
   else if (a === 'add-shipment') openShipmentDialog(null);
+  else if (a === 'edit-maintenance') openMaintenanceDialog(el.dataset.plate);
   else if (a === 'add-ship-type') {
     const input = document.getElementById('new-ship-type-input');
     const name = input.value.trim();
