@@ -6,7 +6,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800;900&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" />
 
 <script>
   tailwind.config = {
@@ -18,18 +18,22 @@
           surface2: '#1E2430',
           surface3: '#252C3A',
           line:     'rgba(255,255,255,0.09)',
-          ink:      '#EAECF2',
-          mute:     '#8A93A5',
-          faint:    '#5B6373',
+          ink:      '#F3F5FA',
+          mute:     '#B4BCCB',
+          faint:    '#8E97A9',
           brand:    { DEFAULT: '#E50914', bright: '#FF2A2A', deep: '#8E0610', wash: 'rgba(229,9,20,0.12)' },
           ok:       '#31C56B',
           warn:     '#F5A524',
           danger:   '#FF4D4D',
           info:     '#4C86F0',
         },
+        fontSize: {
+          xs: ['0.8125rem', { lineHeight: '1.35rem' }],
+          sm: ['0.9375rem', { lineHeight: '1.6rem' }],
+        },
         fontFamily: {
           display: ['Cairo', 'system-ui', 'sans-serif'],
-          sans:    ['"IBM Plex Sans Arabic"', 'system-ui', 'sans-serif'],
+          sans:    ['Cairo', '"IBM Plex Sans Arabic"', 'system-ui', 'sans-serif'],
           mono:    ['"IBM Plex Mono"', 'ui-monospace', 'monospace'],
         },
         boxShadow: {
@@ -44,7 +48,9 @@
 <style>
   :root { color-scheme: dark; }
   html, body { background: #0D0F12; }
-  body { font-family: 'IBM Plex Sans Arabic', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  body { font-family: 'Cairo', 'IBM Plex Sans Arabic', system-ui, sans-serif; font-size: 15px; font-weight: 500; line-height: 1.65; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+  html[lang="ar"] [class*="tracking-"]:not(.keep-tracking) { letter-spacing: 0 !important; }
+  input, select, textarea, button { font-family: inherit; }
 
   ::selection { background: rgba(229,9,20,0.35); }
   ::-webkit-scrollbar { width: 10px; height: 10px; }
@@ -731,7 +737,7 @@ function statusPill(status) {
   const [k, cls] = map[status];
   const dot = status === 'delayed' ? '<span class="w-1.5 h-1.5 rounded-full bg-danger pulse-red"></span>' :
     `<span class="w-1.5 h-1.5 rounded-full bg-current opacity-80"></span>`;
-  return `<span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ${cls}">${dot}${t(k)}</span>`;
+  return `<span class="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ${cls}">${dot}${t(k)}</span>`;
 }
 function payPill(s) {
   const map = {
@@ -740,7 +746,7 @@ function payPill(s) {
     cancelled: ['pay_cancelled', 'text-faint bg-white/5 ring-white/10'],
   };
   const [k, cls] = map[s];
-  return `<span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ${cls}">${t(k)}</span>`;
+  return `<span class="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ${cls}">${t(k)}</span>`;
 }
 function finHiddenNote() {
   return `<div class="rounded-2xl bg-surface border border-line p-5 shadow-card flex flex-wrap items-center justify-between gap-3">
@@ -765,7 +771,7 @@ function kpiCard({ label, value, icon: ic, delta, trend, accent = 'ink', spark }
   const arrow = trend === 'up' ? '▲' : trend === 'down' ? '▼' : '•';
   return `<div class="rounded-2xl bg-surface border border-line p-4 flex flex-col gap-3 shadow-card">
     <div class="flex items-start justify-between">
-      <span class="text-[11px] uppercase tracking-[.14em] text-mute font-semibold">${esc(label)}</span>
+      <span class="text-[12.5px] uppercase tracking-[.14em] text-mute font-semibold">${esc(label)}</span>
       <span class="text-faint">${icon(ic, 'w-[18px] h-[18px]')}</span>
     </div>
     <div class="font-display font-extrabold text-3xl leading-none tabular-nums ${accCls}">${value}</div>
@@ -799,7 +805,7 @@ function viewDashboard() {
   const rateBar = `
     <div class="rounded-2xl bg-surface border border-line p-4 shadow-card flex flex-col gap-3">
       <div class="flex items-center justify-between">
-        <span class="text-[11px] uppercase tracking-[.14em] text-mute font-semibold">${t('collectionRate')}</span>
+        <span class="text-[12.5px] uppercase tracking-[.14em] text-mute font-semibold">${t('collectionRate')}</span>
         <span class="font-display font-extrabold text-2xl tabular-nums text-ok">${m.collectionRate}%</span>
       </div>
       <div class="h-2.5 rounded-full bg-white/5 overflow-hidden">
@@ -932,7 +938,7 @@ function viewShipments() {
       ? `<span class="inline-flex items-center gap-1 text-xs font-semibold text-info">${icon('truck', 'w-3.5 h-3.5')}${t('via_carrier')} ${esc(s.carrier || '—')}</span>`
       : `<span class="text-sm text-mute">${esc(drv(s.driver))}</span>`;
     const canWa = s.phone && (!isCarrier(s) || s.waEnabled);
-    const etaHtml = `${esc(etaCell(s))}${(s.schedule && s.schedule.length) ? `<span class="block text-[10px] text-warn">${t('rescheduled_n')}${s.schedule.length > 1 ? ' ×' + s.schedule.length : ''}</span>` : ''}`;
+    const etaHtml = `${esc(etaCell(s))}${(s.schedule && s.schedule.length) ? `<span class="block text-[12px] text-warn">${t('rescheduled_n')}${s.schedule.length > 1 ? ' ×' + s.schedule.length : ''}</span>` : ''}`;
     const actions = `<div class="flex items-center gap-1.5">
       ${readOnly ? '' : `<button data-action="edit-shipment" data-id="${s.id}" title="${t('edit')}"
         class="inline-flex items-center justify-center w-7 h-7 rounded-lg ring-1 ring-line text-faint hover:text-ink hover:ring-brand/50">${icon('edit', 'w-3.5 h-3.5')}</button>`}
@@ -942,7 +948,7 @@ function viewShipments() {
     return `<tr class="row-in border-b border-line ${late ? 'bg-danger/[.05]' : 'hover:bg-white/[.02]'}"
              style="animation-delay:${Math.min(i * 25, 400)}ms">
       <td class="ps-4 pe-2 py-3 ${late ? 'border-s-2 border-danger' : 'border-s-2 border-transparent'}">
-        <span class="font-mono text-sm font-semibold text-ink">${esc(s.id)}</span>
+        <span class="font-mono text-sm font-semibold text-ink whitespace-nowrap">${esc(s.id)}</span>
       </td>
       <td class="px-2 py-3 text-sm text-ink">${esc(partyOf(s))}</td>
       <td class="px-2 py-3 text-sm text-mute">${esc(cityLabel(s.c))}</td>
@@ -974,9 +980,9 @@ function viewShipments() {
       </div>
       <div class="px-5 py-3 flex flex-wrap gap-2 border-b border-line">${chips}</div>
       <div class="overflow-x-auto">
-        <table class="w-full min-w-[920px] text-start">
+        <table class="w-full min-w-[1100px] text-start">
           <thead>
-            <tr class="text-[11px] uppercase tracking-[.12em] text-faint bg-white/[.02]">
+            <tr class="text-[12.5px] uppercase tracking-[.12em] text-faint bg-white/[.02]">
               <th class="ps-4 pe-2 py-3 text-start font-semibold">${t('col_no')}</th>
               <th class="px-2 py-3 text-start font-semibold">${t('party')}</th>
               <th class="px-2 py-3 text-start font-semibold">${t('col_city')}</th>
@@ -1059,7 +1065,7 @@ function openShipmentDialog(id) {
           <input type="checkbox" name="waEnabled" class="accent-brand" ${editing && editing.waEnabled ? 'checked' : ''}>
           <span>${t('waOptionalExternal')}</span>
         </label>
-        <p class="text-[11px] text-faint">${t('ext_hint')}</p>
+        <p class="text-[12.5px] text-faint">${t('ext_hint')}</p>
       </div>
       <label class="block"><span class="text-xs font-semibold text-mute">${t('eta_datetime')}</span>
         <input name="eta" type="datetime-local" value="${editing && editing.etaAt ? editing.etaAt.slice(0, 16) : ''}"
@@ -1132,12 +1138,12 @@ function viewFleet() {
         ${badge}
       </div>
       <div class="grid grid-cols-2 gap-x-4 gap-y-2.5 text-sm">
-        <div><div class="text-[11px] uppercase tracking-wider text-faint">${t('driver')}</div><div class="text-ink">${esc(drv(v.driver))}</div></div>
-        <div><div class="text-[11px] uppercase tracking-wider text-faint">${t('col_status')}</div>
+        <div><div class="text-[12.5px] uppercase tracking-wider text-faint">${t('driver')}</div><div class="text-ink">${esc(drv(v.driver))}</div></div>
+        <div><div class="text-[12.5px] uppercase tracking-wider text-faint">${t('col_status')}</div>
           <div class="${vs} font-semibold">${t('vs_' + v.vstatus)}</div></div>
-        <div><div class="text-[11px] uppercase tracking-wider text-faint">${t('odo')}</div>
+        <div><div class="text-[12.5px] uppercase tracking-wider text-faint">${t('odo')}</div>
           <div class="text-ink tabular-nums">${v.odo.toLocaleString('en-US')} كم</div></div>
-        <div><div class="text-[11px] uppercase tracking-wider text-faint">${t('maintCost')}</div>
+        <div><div class="text-[12.5px] uppercase tracking-wider text-faint">${t('maintCost')}</div>
           <div class="text-ink tabular-nums">${STATE.showFinancials ? money(v.cost) : '—'}</div></div>
       </div>
       <div class="rounded-xl px-3 py-2.5 flex items-center justify-between gap-2
@@ -1173,7 +1179,7 @@ function viewInvoices() {
     const overdue = iv.pstatus === 'pending' && daysBetween(iv.due) < 0;
     return `<tr class="row-in border-b border-line ${overdue ? 'bg-danger/[.05]' : 'hover:bg-white/[.02]'}" style="animation-delay:${i * 25}ms">
       <td class="ps-4 pe-2 py-3 ${overdue ? 'border-s-2 border-danger' : 'border-s-2 border-transparent'}">
-        <span class="font-mono text-sm font-semibold text-ink">${esc(iv.id)}</span></td>
+        <span class="font-mono text-sm font-semibold text-ink whitespace-nowrap">${esc(iv.id)}</span></td>
       <td class="px-2 py-3"><span class="font-mono text-xs text-mute">${esc(iv.ship)}</span></td>
       <td class="px-2 py-3 text-sm text-ink">${esc(party(iv.p))}</td>
       <td class="px-2 py-3 text-sm font-semibold text-ink tabular-nums whitespace-nowrap">${money(iv.amount)}</td>
@@ -1181,7 +1187,7 @@ function viewInvoices() {
       <td class="px-2 py-3 text-sm tabular-nums whitespace-nowrap ${overdue ? 'text-danger font-semibold' : 'text-mute'}">${fmtDate(iv.due)}</td>
       <td class="px-2 pe-4 py-3">
         <div class="flex items-center gap-2">${payPill(iv.pstatus)}
-        ${overdue ? `<span class="text-[10px] font-bold text-danger uppercase tracking-wide">${t('overdue')}</span>` : ''}</div>
+        ${overdue ? `<span class="text-[12px] font-bold text-danger uppercase tracking-wide">${t('overdue')}</span>` : ''}</div>
       </td>
     </tr>`;
   }).join('');
@@ -1191,13 +1197,13 @@ function viewInvoices() {
     <div class="flex flex-col gap-5">
       <div class="grid gap-3 sm:grid-cols-3">
         <div class="rounded-2xl bg-surface border border-line p-4 shadow-card">
-          <div class="text-[11px] uppercase tracking-[.14em] text-mute font-semibold">${t('finIssued')}</div>
+          <div class="text-[12.5px] uppercase tracking-[.14em] text-mute font-semibold">${t('finIssued')}</div>
           <div class="font-display font-extrabold text-2xl mt-1 tabular-nums">${money(m.issued)}</div></div>
         <div class="rounded-2xl bg-surface border border-line p-4 shadow-card">
-          <div class="text-[11px] uppercase tracking-[.14em] text-mute font-semibold">${t('finCollected')}</div>
+          <div class="text-[12.5px] uppercase tracking-[.14em] text-mute font-semibold">${t('finCollected')}</div>
           <div class="font-display font-extrabold text-2xl mt-1 tabular-nums text-ok">${money(m.collected)}</div></div>
         <div class="rounded-2xl bg-surface border border-line p-4 shadow-card">
-          <div class="text-[11px] uppercase tracking-[.14em] text-mute font-semibold">${t('finPending')}</div>
+          <div class="text-[12.5px] uppercase tracking-[.14em] text-mute font-semibold">${t('finPending')}</div>
           <div class="font-display font-extrabold text-2xl mt-1 tabular-nums text-warn">${money(m.pending)}</div></div>
       </div>
       <div class="rounded-2xl bg-surface border border-line shadow-card overflow-hidden">
@@ -1208,8 +1214,8 @@ function viewInvoices() {
             ${icon('receipt', 'w-4 h-4')}${t('addInvoice')}</button>
         </div>
         <div class="overflow-x-auto">
-          <table class="w-full min-w-[820px]">
-            <thead><tr class="text-[11px] uppercase tracking-[.12em] text-faint bg-white/[.02]">
+          <table class="w-full min-w-[960px]">
+            <thead><tr class="text-[12.5px] uppercase tracking-[.12em] text-faint bg-white/[.02]">
               <th class="ps-4 pe-2 py-3 text-start font-semibold">${t('inv_no')}</th>
               <th class="px-2 py-3 text-start font-semibold">${t('inv_ship')}</th>
               <th class="px-2 py-3 text-start font-semibold">${t('party')}</th>
@@ -1395,7 +1401,7 @@ function viewSettings() {
           <button data-action="save-wa-report" class="px-4 py-2.5 rounded-xl text-sm font-bold bg-brand hover:bg-brand-bright text-white shadow-glow">${t('save')}</button>
           ${WA_REPORT_CONFIG.number ? `<a href="${waReportLink()}" target="_blank" rel="noopener" class="px-4 py-2.5 rounded-xl text-sm font-semibold ring-1 ring-ok/40 text-ok hover:bg-ok/10 inline-flex items-center gap-1.5">${icon('message', 'w-4 h-4')}${t('waSendNow')}</a>` : ''}
         </div>
-        <p class="text-[11px] text-faint leading-relaxed">${t('waBackendNote')}</p>
+        <p class="text-[12.5px] text-faint leading-relaxed">${t('waBackendNote')}</p>
       </div>
     </div>`;
 }
@@ -1451,7 +1457,7 @@ function openDelayDialog(id, autoWa) {
         <input name="newEta" type="datetime-local" value="${s.etaAt ? s.etaAt.slice(0, 16) : ''}"
           class="mt-1.5 w-full bg-bg border border-line rounded-xl px-3 py-2.5 text-sm text-ink outline-none focus:border-brand" />
       </label>
-      ${canAutoWa ? `<p class="text-[11px] text-ok flex items-center gap-1.5">${icon('message', 'w-3.5 h-3.5')}${t('waAutoHint')}</p>` : ''}
+      ${canAutoWa ? `<p class="text-[12.5px] text-ok flex items-center gap-1.5">${icon('message', 'w-3.5 h-3.5')}${t('waAutoHint')}</p>` : ''}
       <div class="flex justify-end gap-2 pt-1">
         <button type="button" data-action="close-modal" class="px-4 py-2 rounded-xl text-sm font-semibold text-mute hover:text-ink">${t('cancel')}</button>
         <button type="submit" class="px-4 py-2 rounded-xl text-sm font-bold bg-brand hover:bg-brand-bright text-white shadow-glow">${t('save')}</button>
@@ -1525,7 +1531,7 @@ function viewMyTrips() {
     return `<div class="rounded-2xl bg-surface border ${late ? 'border-danger/40' : 'border-line'} p-4 shadow-card flex flex-col gap-3 row-in" style="animation-delay:${i * 40}ms">
       <div class="flex items-start justify-between gap-2">
         <div>
-          <div class="font-mono text-sm font-semibold text-ink">${esc(s.id)}</div>
+          <div class="font-mono text-sm font-semibold text-ink whitespace-nowrap">${esc(s.id)}</div>
           <div class="text-sm text-mute">${esc(partyOf(s))} · ${esc(cityLabel(s.c))}</div>
         </div>
         ${statusPill(s.status)}
@@ -1553,7 +1559,7 @@ function openWeeklyReport() {
 
   const box = (label, val, cls = 'text-ink') =>
     `<div class="rounded-xl bg-white/[.03] ring-1 ring-line px-3 py-3 print-keep-bg">
-      <div class="text-[11px] uppercase tracking-wider text-faint">${label}</div>
+      <div class="text-[12.5px] uppercase tracking-wider text-faint">${label}</div>
       <div class="font-display font-extrabold text-xl mt-1 tabular-nums ${cls}">${val}</div></div>`;
 
   const reasonList = m.reasonsSorted.length
@@ -1584,13 +1590,13 @@ function openWeeklyReport() {
             <img src="${LOGO_URI}" alt="MOWASIL" class="w-9 h-9 rounded-lg object-cover shadow-glow ring-1 ring-white/10" />
             <div>
               <div class="font-display font-black text-lg leading-none">مُوصل <span class="text-brand-bright">| MOWASIL</span></div>
-              <div class="text-[10px] tracking-[.2em] text-faint">${t('brandSub')}</div>
+              <div class="text-[12px] tracking-[.2em] text-faint keep-tracking">${t('brandSub')}</div>
             </div>
           </div>
           <h3 class="font-display font-bold text-xl mt-3">${t('rep_title')}</h3>
           <p class="text-xs text-mute mt-1">${t('rep_period')}: ${period} · ${t('rep_generated')}: ${now}</p>
           <p class="text-xs text-faint mt-0.5">${STATE.mode === 'commercial' ? t('modeCommercial') : t('modeCharity')}</p>
-          ${!STATE.showFinancials ? `<p class="text-[11px] text-warn italic mt-1">${t('finHiddenReportNote')}</p>` : ''}
+          ${!STATE.showFinancials ? `<p class="text-[12.5px] text-warn italic mt-1">${t('finHiddenReportNote')}</p>` : ''}
         </div>
         <div class="flex gap-2 print-hide">
           <button data-action="download-pdf" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-bold bg-surface2 ring-1 ring-line text-ink hover:ring-brand/50">${icon('file', 'w-4 h-4')}${t('downloadPdf')}</button>
@@ -1639,7 +1645,7 @@ function openWeeklyReport() {
           </ul>
         </section>` : ''}
 
-        <p class="text-[11px] text-faint text-center pt-2 border-t border-line">${t('rep_footer')}</p>
+        <p class="text-[12.5px] text-faint text-center pt-2 border-t border-line">${t('rep_footer')}</p>
       </div>
     </div>`, { wide: true });
 }
@@ -1701,7 +1707,7 @@ function renderApp() {
             <img src="${LOGO_URI}" alt="MOWASIL" class="w-11 h-11 rounded-xl object-cover shadow-glow ring-1 ring-white/10" />
             <div>
               <div class="font-display font-black text-[15px] leading-none">مُوصل <span class="text-brand-bright">| MOWASIL</span></div>
-              <div class="text-[9px] tracking-[.22em] text-faint mt-1">${t('brandSub')}</div>
+              <div class="text-[11.5px] tracking-[.22em] text-faint mt-1 keep-tracking">${t('brandSub')}</div>
             </div>
           </div>
         </div>
@@ -1724,7 +1730,7 @@ function renderApp() {
             class="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-sm font-bold
             bg-gradient-to-l from-brand to-brand-bright text-white shadow-glow hover:brightness-110">
             ${icon('file', 'w-4 h-4')}${t('weeklyReport')}</button>` : ''}
-          <div class="mt-3 flex items-center gap-1.5 text-[11px] text-faint px-1">
+          <div class="mt-3 flex items-center gap-1.5 text-[12.5px] text-faint px-1">
             ${icon('shield', 'w-3.5 h-3.5 text-ok')}<span>${t('secured')}</span>
           </div>
         </div>
@@ -1736,7 +1742,7 @@ function renderApp() {
           <div class="h-16 px-5 flex items-center justify-between gap-4">
             <div>
               <h1 class="font-display font-bold text-base leading-none">${t('nav_' + (STATE.view === 'shipments' ? 'shipments' : STATE.view === 'fleet' ? 'fleet' : STATE.view === 'invoices' ? 'invoices' : STATE.view === 'settings' ? 'settings' : STATE.view === 'mytrips' ? 'mytrips' : 'dashboard'))}</h1>
-              <p class="text-[11px] text-faint mt-1">${t('tagline')}</p>
+              <p class="text-[12.5px] text-faint mt-1">${t('tagline')}</p>
             </div>
             <div class="flex items-center gap-2">
               <!-- Switch section -->
@@ -1804,7 +1810,7 @@ function renderOrgSelect() {
           <img src="${LOGO_URI}" alt="MOWASIL" class="w-20 h-20 rounded-2xl object-cover shadow-glow ring-1 ring-white/10" />
           <div>
             <div class="font-display font-black text-xl leading-none">مُوصل <span class="text-brand-bright">| MOWASIL</span></div>
-            <div class="text-[10px] tracking-[.24em] text-faint mt-1.5">${t('brandSub')}</div>
+            <div class="text-[12px] tracking-[.24em] text-faint mt-1.5 keep-tracking">${t('brandSub')}</div>
           </div>
         </div>
         <div class="text-center">
@@ -1849,7 +1855,7 @@ function renderRoleSelect() {
           <img src="${LOGO_URI}" alt="MOWASIL" class="w-20 h-20 rounded-2xl object-cover shadow-glow ring-1 ring-white/10" />
           <div>
             <div class="font-display font-black text-xl leading-none">مُوصل <span class="text-brand-bright">| MOWASIL</span></div>
-            <div class="text-[10px] tracking-[.24em] text-faint mt-1.5">${t('brandSub')}</div>
+            <div class="text-[12px] tracking-[.24em] text-faint mt-1.5 keep-tracking">${t('brandSub')}</div>
           </div>
         </div>
         <div class="text-center">
@@ -1907,7 +1913,7 @@ function renderLogin() {
           <img src="${LOGO_URI}" alt="MOWASIL" class="w-20 h-20 rounded-2xl object-cover shadow-glow ring-1 ring-white/10" />
           <div>
             <div class="font-display font-black text-xl leading-none">مُوصل <span class="text-brand-bright">| MOWASIL</span></div>
-            <div class="text-[10px] tracking-[.24em] text-faint mt-1.5">${t('brandSub')}</div>
+            <div class="text-[12px] tracking-[.24em] text-faint mt-1.5 keep-tracking">${t('brandSub')}</div>
           </div>
         </div>
 
@@ -1937,22 +1943,22 @@ function renderLogin() {
           </form>
 
           <div class="mt-5 pt-4 border-t border-line">
-            <div class="text-[11px] font-semibold text-mute mb-2">${t('quickLogin')}</div>
+            <div class="text-[12.5px] font-semibold text-mute mb-2">${t('quickLogin')}</div>
             <div class="grid grid-cols-3 gap-2">
               <button type="button" data-action="quick-login" data-role="manager"
-                class="px-2 py-2 rounded-xl text-[11px] font-semibold ring-1 ring-line text-mute hover:text-ink hover:ring-brand/50">${t('role_manager')}</button>
+                class="px-2 py-2 rounded-xl text-[12.5px] font-semibold ring-1 ring-line text-mute hover:text-ink hover:ring-brand/50">${t('role_manager')}</button>
               <button type="button" data-action="quick-login" data-role="coordinator"
-                class="px-2 py-2 rounded-xl text-[11px] font-semibold ring-1 ring-line text-mute hover:text-ink hover:ring-brand/50">${t('role_coordinator')}</button>
+                class="px-2 py-2 rounded-xl text-[12.5px] font-semibold ring-1 ring-line text-mute hover:text-ink hover:ring-brand/50">${t('role_coordinator')}</button>
               <button type="button" data-action="quick-login" data-role="driver"
-                class="px-2 py-2 rounded-xl text-[11px] font-semibold ring-1 ring-line text-mute hover:text-ink hover:ring-brand/50">${t('role_driver')}</button>
+                class="px-2 py-2 rounded-xl text-[12.5px] font-semibold ring-1 ring-line text-mute hover:text-ink hover:ring-brand/50">${t('role_driver')}</button>
             </div>
           </div>
 
-          <div class="mt-4 pt-4 border-t border-line flex items-start gap-2 text-[11px] text-faint leading-relaxed">
+          <div class="mt-4 pt-4 border-t border-line flex items-start gap-2 text-[12.5px] text-faint leading-relaxed">
             ${icon('shield', 'w-4 h-4 text-ok shrink-0 mt-px')}
             <span>${t('hashNote')}</span>
           </div>
-          <div class="mt-2 text-[11px] text-mute leading-relaxed">
+          <div class="mt-2 text-[12.5px] text-mute leading-relaxed">
             <span class="font-semibold">${t('demoNote')}:</span>
             <code class="font-mono text-ink">admin</code> / <code class="font-mono text-ink">${DEMO_PASSWORD}</code> ·
             <code class="font-mono text-ink">coordinator</code> / <code class="font-mono text-ink">Coord@2026</code> ·
